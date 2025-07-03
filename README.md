@@ -1,6 +1,6 @@
 # Protein-Ligand Binding Affinity Prediction
 
-A comprehensive quantum omputational chemistry project for predicting protein-ligand binding affinity using 3D spatial representations and deep learning techniques. This project replicates and extends hybrid methodologies from a recent a research paper [binding affinity](https://www.nature.com/articles/s41598-023-45269-y) in molecular modeling and drug discovery.
+A comprehensive quantum computational chemistry project for predicting protein-ligand binding affinity using 3D spatial representations and deep learning techniques. This project replicates and extends hybrid methodologies from a recent a research paper [binding affinity](https://www.nature.com/articles/s41598-023-45269-y) in molecular modeling and drug discovery.
 
 ## 🧬 Project Overview
 
