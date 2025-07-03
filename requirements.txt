@@ -1,0 +1,29 @@
+# Core scientific computing
+numpy
+pandas
+matplotlib
+
+# Deep learning framework
+torch
+torchvision
+torchaudio
+
+# Chemistry and molecular data processing
+rdkit
+
+# Utilities
+pathlib
+
+# Type hints (usually built-in but good to include)
+typing
+
+# Standard library modules (included for completeness, but not needed in requirements.txt)
+# These are built-in Python modules:
+# os
+# glob
+# math
+# time
+# itertools
+
+# Note: google.colab is only available in Google Colab environment
+# If running locally, you would need to comment out or remove any google.colab imports
