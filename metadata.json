@@ -1,0 +1,2798 @@
+[
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\1a30\\1a30_protein.mol2",
+    "protein_id": "1a30",
+    "num_atoms": 3777,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.1357315465023643,
+    "processing_time": 0.9022002220153809,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\1bcu\\1bcu_protein.mol2",
+    "protein_id": "1bcu",
+    "num_atoms": 5307,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.19294919465717517,
+    "processing_time": 1.2491495609283447,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\1bzc\\1bzc_protein.mol2",
+    "protein_id": "1bzc",
+    "num_atoms": 5279,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.1815189562345806,
+    "processing_time": 1.2030386924743652,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\1c5z\\1c5z_protein.mol2",
+    "protein_id": "1c5z",
+    "num_atoms": 5109,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.20018406918174342,
+    "processing_time": 1.208604335784912,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\1eby\\1eby_protein.mol2",
+    "protein_id": "1eby",
+    "num_atoms": 3419,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.12328178004214638,
+    "processing_time": 0.8041560649871826,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\1g2k\\1g2k_protein.mol2",
+    "protein_id": "1g2k",
+    "num_atoms": 3344,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.12089357878032483,
+    "processing_time": 0.7956068515777588,
+    "success": true
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\1k1i\\1k1i_protein.mol2"
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\1lpg\\1lpg_protein.mol2"
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\1mq6\\1mq6_protein.mol2"
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\1nc1\\1nc1_protein.mol2",
+    "protein_id": "1nc1",
+    "num_atoms": 7507,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.22205754330283717,
+    "processing_time": 1.5564451217651367,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\1nc3\\1nc3_protein.mol2",
+    "protein_id": "1nc3",
+    "num_atoms": 7491,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.2229670474403783,
+    "processing_time": 1.593189001083374,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\1nvq\\1nvq_protein.mol2",
+    "protein_id": "1nvq",
+    "num_atoms": 4925,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.16509186594109787,
+    "processing_time": 1.1298348903656006,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\1o0h\\1o0h_protein.mol2",
+    "protein_id": "1o0h",
+    "num_atoms": 5335,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.17587440892269737,
+    "processing_time": 1.133211612701416,
+    "success": true
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\1o3f\\1o3f_protein.mol2"
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\1o5b\\1o5b_protein.mol2",
+    "protein_id": "1o5b",
+    "num_atoms": 4899,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.19007532220137746,
+    "processing_time": 1.1709609031677246,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\1owh\\1owh_protein.mol2",
+    "protein_id": "1owh",
+    "num_atoms": 4331,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.1642749184056332,
+    "processing_time": 1.0518646240234375,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\1oyt\\1oyt_protein.mol2",
+    "protein_id": "1oyt",
+    "num_atoms": 5776,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.2058360451146176,
+    "processing_time": 1.3655705451965332,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\1p1n\\1p1n_protein.mol2",
+    "protein_id": "1p1n",
+    "num_atoms": 4430,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.1585996527420847,
+    "processing_time": 1.038153886795044,
+    "success": true
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\1p1q\\1p1q_protein.mol2"
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\1ps3\\1ps3_protein.mol2"
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\1pxn\\1pxn_protein.mol2",
+    "protein_id": "1pxn",
+    "num_atoms": 4947,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.16982409828587583,
+    "processing_time": 1.1229748725891113,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\1q8u\\1q8u_protein.mol2",
+    "protein_id": "1q8u",
+    "num_atoms": 6668,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.2305713452790913,
+    "processing_time": 1.5476515293121338,
+    "success": true
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\1qf1\\1qf1_protein.mol2"
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\1qkt\\1qkt_protein.mol2",
+    "protein_id": "1qkt",
+    "num_atoms": 5195,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.18287879542300575,
+    "processing_time": 1.2220077514648438,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\1r5y\\1r5y_protein.mol2",
+    "protein_id": "1r5y",
+    "num_atoms": 6833,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.21742529618112663,
+    "processing_time": 1.516939401626587,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\1s38\\1s38_protein.mol2",
+    "protein_id": "1s38",
+    "num_atoms": 6681,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.2158606679815995,
+    "processing_time": 1.4606831073760986,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\1sqa\\1sqa_protein.mol2",
+    "protein_id": "1sqa",
+    "num_atoms": 4001,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.15462353355006167,
+    "processing_time": 0.9611959457397461,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\1syi\\1syi_protein.mol2",
+    "protein_id": "1syi",
+    "num_atoms": 9280,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.2921576248972039,
+    "processing_time": 2.00596022605896,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\1u1b\\1u1b_protein.mol2",
+    "protein_id": "1u1b",
+    "num_atoms": 1989,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.08013675087376644,
+    "processing_time": 0.48559021949768066,
+    "success": true
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\1uto\\1uto_protein.mol2"
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\1vso\\1vso_protein.mol2",
+    "protein_id": "1vso",
+    "num_atoms": 4506,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.15486747340152138,
+    "processing_time": 1.0590922832489014,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\1w4o\\1w4o_protein.mol2",
+    "protein_id": "1w4o",
+    "num_atoms": 4313,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.14818010832134046,
+    "processing_time": 0.9649274349212646,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\1y6r\\1y6r_protein.mol2",
+    "protein_id": "1y6r",
+    "num_atoms": 7393,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.22119000083521792,
+    "processing_time": 1.5538544654846191,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\1yc1\\1yc1_protein.mol2",
+    "protein_id": "1yc1",
+    "num_atoms": 4231,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.15003826743678042,
+    "processing_time": 1.0212244987487793,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\1ydr\\1ydr_protein.mol2",
+    "protein_id": "1ydr",
+    "num_atoms": 5898,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.20543269107216283,
+    "processing_time": 1.3533422946929932,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\1ydt\\1ydt_protein.mol2",
+    "protein_id": "1ydt",
+    "num_atoms": 5906,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.20537446674547696,
+    "processing_time": 1.3603675365447998,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\1z6e\\1z6e_protein.mol2",
+    "protein_id": "1z6e",
+    "num_atoms": 4888,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.17411984895405017,
+    "processing_time": 1.1355502605438232,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\1z95\\1z95_protein.mol2",
+    "protein_id": "1z95",
+    "num_atoms": 4319,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.15313981708727384,
+    "processing_time": 1.0137121677398682,
+    "success": true
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\1z9g\\1z9g_protein.mol2"
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2al5\\2al5_protein.mol2",
+    "protein_id": "2al5",
+    "num_atoms": 10310,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.301788330078125,
+    "processing_time": 2.1275076866149902,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2br1\\2br1_protein.mol2",
+    "protein_id": "2br1",
+    "num_atoms": 5327,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.17898860730622945,
+    "processing_time": 1.198519229888916,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2brb\\2brb_protein.mol2",
+    "protein_id": "2brb",
+    "num_atoms": 5106,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.17513696770918996,
+    "processing_time": 1.1599175930023193,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2c3i\\2c3i_protein.mol2",
+    "protein_id": "2c3i",
+    "num_atoms": 4888,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.1743762367650082,
+    "processing_time": 1.1646792888641357,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2cbv\\2cbv_protein.mol2",
+    "protein_id": "2cbv",
+    "num_atoms": 16333,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.25324229190224096,
+    "processing_time": 1.9138996601104736,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2fvd\\2fvd_protein.mol2",
+    "protein_id": "2fvd",
+    "num_atoms": 5191,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.17422866821289062,
+    "processing_time": 1.1788747310638428,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2fxs\\2fxs_protein.mol2",
+    "protein_id": "2fxs",
+    "num_atoms": 4195,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.14581479524311267,
+    "processing_time": 0.9895598888397217,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2hb1\\2hb1_protein.mol2",
+    "protein_id": "2hb1",
+    "num_atoms": 5321,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.18062691939504524,
+    "processing_time": 1.2192611694335938,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2iwx\\2iwx_protein.mol2",
+    "protein_id": "2iwx",
+    "num_atoms": 4620,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.1564586037083676,
+    "processing_time": 1.0762529373168945,
+    "success": true
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\2j7h\\2j7h_protein.mol2"
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2p15\\2p15_protein.mol2",
+    "protein_id": "2p15",
+    "num_atoms": 9625,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.29224395751953125,
+    "processing_time": 2.05267333984375,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2p4y\\2p4y_protein.mol2",
+    "protein_id": "2p4y",
+    "num_atoms": 7963,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.23564308568050987,
+    "processing_time": 1.6281919479370117,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2pog\\2pog_protein.mol2",
+    "protein_id": "2pog",
+    "num_atoms": 7558,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.24523062455026726,
+    "processing_time": 1.6790835857391357,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2qbp\\2qbp_protein.mol2",
+    "protein_id": "2qbp",
+    "num_atoms": 5159,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.17818270231548108,
+    "processing_time": 1.174839735031128,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2qbq\\2qbq_protein.mol2",
+    "protein_id": "2qbq",
+    "num_atoms": 5619,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.19033211155941612,
+    "processing_time": 1.2857470512390137,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2qbr\\2qbr_protein.mol2",
+    "protein_id": "2qbr",
+    "num_atoms": 5450,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.18494475515265213,
+    "processing_time": 1.238943099975586,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2qe4\\2qe4_protein.mol2",
+    "protein_id": "2qe4",
+    "num_atoms": 6738,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.22434676320929275,
+    "processing_time": 1.492504596710205,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2qnq\\2qnq_protein.mol2",
+    "protein_id": "2qnq",
+    "num_atoms": 3338,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.1208445900364926,
+    "processing_time": 0.7940454483032227,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2r9w\\2r9w_protein.mol2",
+    "protein_id": "2r9w",
+    "num_atoms": 12986,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.28653676886307566,
+    "processing_time": 2.072624921798706,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2v00\\2v00_protein.mol2",
+    "protein_id": "2v00",
+    "num_atoms": 6436,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.212194141588713,
+    "processing_time": 1.4754705429077148,
+    "success": true
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\2v7a\\2v7a_protein.mol2"
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2vkm\\2vkm_protein.mol2",
+    "protein_id": "2vkm",
+    "num_atoms": 26436,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.22426565069901316,
+    "processing_time": 1.931746482849121,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2vvn\\2vvn_protein.mol2",
+    "protein_id": "2vvn",
+    "num_atoms": 24267,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.2341754311009457,
+    "processing_time": 1.9461164474487305,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2vw5\\2vw5_protein.mol2",
+    "protein_id": "2vw5",
+    "num_atoms": 3771,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.1324051304867393,
+    "processing_time": 0.8856518268585205,
+    "success": true
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\2w4x\\2w4x_protein.mol2"
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\2w66\\2w66_protein.mol2"
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2wbg\\2wbg_protein.mol2",
+    "protein_id": "2wbg",
+    "num_atoms": 33852,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.20836257934570312,
+    "processing_time": 2.011547088623047,
+    "success": true
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\2wca\\2wca_protein.mol2"
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2weg\\2weg_protein.mol2",
+    "protein_id": "2weg",
+    "num_atoms": 4932,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.17561982807360196,
+    "processing_time": 1.181941032409668,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2wer\\2wer_protein.mol2",
+    "protein_id": "2wer",
+    "num_atoms": 7690,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.21676695974249588,
+    "processing_time": 1.5089404582977295,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2wnc\\2wnc_protein.mol2",
+    "protein_id": "2wnc",
+    "num_atoms": 18446,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.3533578169973273,
+    "processing_time": 2.5758988857269287,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2wvt\\2wvt_protein.mol2",
+    "protein_id": "2wvt",
+    "num_atoms": 15490,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.24158377396432976,
+    "processing_time": 1.8197741508483887,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2x00\\2x00_protein.mol2",
+    "protein_id": "2x00",
+    "num_atoms": 17822,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.35945290013363485,
+    "processing_time": 2.5400633811950684,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2xb8\\2xb8_protein.mol2",
+    "protein_id": "2xb8",
+    "num_atoms": 27528,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.30851404290450246,
+    "processing_time": 2.4023752212524414,
+    "success": true
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\2xbv\\2xbv_protein.mol2"
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2xdl\\2xdl_protein.mol2",
+    "protein_id": "2xdl",
+    "num_atoms": 8634,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.26039946706671463,
+    "processing_time": 1.8645894527435303,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2xii\\2xii_protein.mol2",
+    "protein_id": "2xii",
+    "num_atoms": 16212,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.25277388723273025,
+    "processing_time": 1.9087409973144531,
+    "success": true
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\2xj7\\2xj7_protein.mol2"
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2xnb\\2xnb_protein.mol2",
+    "protein_id": "2xnb",
+    "num_atoms": 5599,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.18667743080540708,
+    "processing_time": 1.2618277072906494,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2xys\\2xys_protein.mol2",
+    "protein_id": "2xys",
+    "num_atoms": 19355,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.3547620271381579,
+    "processing_time": 2.6440958976745605,
+    "success": true
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\2y5h\\2y5h_protein.mol2"
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2yfe\\2yfe_protein.mol2",
+    "protein_id": "2yfe",
+    "num_atoms": 9120,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.24342587119654605,
+    "processing_time": 1.7074623107910156,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2yge\\2yge_protein.mol2",
+    "protein_id": "2yge",
+    "num_atoms": 3836,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.13485235916940788,
+    "processing_time": 0.9019186496734619,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2yki\\2yki_protein.mol2",
+    "protein_id": "2yki",
+    "num_atoms": 4064,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.14623140033922696,
+    "processing_time": 0.9722239971160889,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2ymd\\2ymd_protein.mol2",
+    "protein_id": "2ymd",
+    "num_atoms": 40981,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.37891789486533717,
+    "processing_time": 3.2395687103271484,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2zb1\\2zb1_protein.mol2",
+    "protein_id": "2zb1",
+    "num_atoms": 6317,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.2119247034976357,
+    "processing_time": 1.4010586738586426,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2zda\\2zda_protein.mol2",
+    "protein_id": "2zda",
+    "num_atoms": 5490,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.19519926372327304,
+    "processing_time": 1.2871427536010742,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\2zy1\\2zy1_protein.mol2",
+    "protein_id": "2zy1",
+    "num_atoms": 6159,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.21121276052374588,
+    "processing_time": 1.3883085250854492,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3acw\\3acw_protein.mol2",
+    "protein_id": "3acw",
+    "num_atoms": 5572,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.19245027240953946,
+    "processing_time": 1.2779531478881836,
+    "success": true
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\3ao4\\3ao4_protein.mol2"
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3arp\\3arp_protein.mol2",
+    "protein_id": "3arp",
+    "num_atoms": 11200,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.2859081469084087,
+    "processing_time": 2.07602596282959,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3arq\\3arq_protein.mol2",
+    "protein_id": "3arq",
+    "num_atoms": 11041,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.2837281478078742,
+    "processing_time": 2.0701608657836914,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3aru\\3aru_protein.mol2",
+    "protein_id": "3aru",
+    "num_atoms": 10366,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.26804833663137334,
+    "processing_time": 1.8919157981872559,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3arv\\3arv_protein.mol2",
+    "protein_id": "3arv",
+    "num_atoms": 11103,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.28510324578536184,
+    "processing_time": 2.0443475246429443,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3ary\\3ary_protein.mol2",
+    "protein_id": "3ary",
+    "num_atoms": 11416,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.2900733947753906,
+    "processing_time": 2.0721819400787354,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3b1m\\3b1m_protein.mol2",
+    "protein_id": "3b1m",
+    "num_atoms": 5250,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.17764442845394737,
+    "processing_time": 1.2079730033874512,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3b27\\3b27_protein.mol2",
+    "protein_id": "3b27",
+    "num_atoms": 4270,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.1493626644736842,
+    "processing_time": 0.9973123073577881,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3b5r\\3b5r_protein.mol2",
+    "protein_id": "3b5r",
+    "num_atoms": 4571,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.1598412363152755,
+    "processing_time": 1.0606160163879395,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3b65\\3b65_protein.mol2",
+    "protein_id": "3b65",
+    "num_atoms": 4643,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.16300703349866366,
+    "processing_time": 1.089505672454834,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3b68\\3b68_protein.mol2",
+    "protein_id": "3b68",
+    "num_atoms": 4505,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.15900320755807976,
+    "processing_time": 1.0485568046569824,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3bgz\\3bgz_protein.mol2",
+    "protein_id": "3bgz",
+    "num_atoms": 4665,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.16487201891447367,
+    "processing_time": 1.0901942253112793,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3bv9\\3bv9_protein.mol2",
+    "protein_id": "3bv9",
+    "num_atoms": 5431,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.19441705001027962,
+    "processing_time": 1.2918856143951416,
+    "success": true
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\3cj4\\3cj4_protein.mol2"
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3coy\\3coy_protein.mol2",
+    "protein_id": "3coy",
+    "num_atoms": 9484,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.22428552727950246,
+    "processing_time": 1.5739047527313232,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3coz\\3coz_protein.mol2",
+    "protein_id": "3coz",
+    "num_atoms": 9550,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.2252141049033717,
+    "processing_time": 1.5766348838806152,
+    "success": true
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\3d4z\\3d4z_protein.mol2"
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3d6q\\3d6q_protein.mol2",
+    "protein_id": "3d6q",
+    "num_atoms": 4821,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.16093605443050987,
+    "processing_time": 1.053039312362671,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3dd0\\3dd0_protein.mol2",
+    "protein_id": "3dd0",
+    "num_atoms": 4689,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.17023568404348274,
+    "processing_time": 1.1282973289489746,
+    "success": true
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\3dx2\\3dx2_protein.mol2"
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3dxg\\3dxg_protein.mol2",
+    "protein_id": "3dxg",
+    "num_atoms": 4785,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.16499047530324837,
+    "processing_time": 1.0335462093353271,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3e5a\\3e5a_protein.mol2",
+    "protein_id": "3e5a",
+    "num_atoms": 5035,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.17849088969983554,
+    "processing_time": 1.1603057384490967,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3e92\\3e92_protein.mol2",
+    "protein_id": "3e92",
+    "num_atoms": 6658,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.2183697349146793,
+    "processing_time": 1.4729506969451904,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3e93\\3e93_protein.mol2",
+    "protein_id": "3e93",
+    "num_atoms": 6917,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.2242443687037418,
+    "processing_time": 1.5252468585968018,
+    "success": true
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\3ehy\\3ehy_protein.mol2"
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3f3a\\3f3a_protein.mol2",
+    "protein_id": "3f3a",
+    "num_atoms": 8425,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.27157291613127055,
+    "processing_time": 1.8854293823242188,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3f3c\\3f3c_protein.mol2",
+    "protein_id": "3f3c",
+    "num_atoms": 8442,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.2735798484400699,
+    "processing_time": 1.8690218925476074,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3f3d\\3f3d_protein.mol2",
+    "protein_id": "3f3d",
+    "num_atoms": 8340,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.2712643271998355,
+    "processing_time": 1.8649301528930664,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3f3e\\3f3e_protein.mol2",
+    "protein_id": "3f3e",
+    "num_atoms": 8640,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.27634209080746297,
+    "processing_time": 1.908968448638916,
+    "success": true
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\3fcq\\3fcq_protein.mol2"
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3fur\\3fur_protein.mol2",
+    "protein_id": "3fur",
+    "num_atoms": 4726,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.16497983430561267,
+    "processing_time": 1.1010384559631348,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3fv1\\3fv1_protein.mol2",
+    "protein_id": "3fv1",
+    "num_atoms": 9588,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.2815089978669819,
+    "processing_time": 1.9506821632385254,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3fv2\\3fv2_protein.mol2",
+    "protein_id": "3fv2",
+    "num_atoms": 9615,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.28286020379317434,
+    "processing_time": 1.9629707336425781,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3g0w\\3g0w_protein.mol2",
+    "protein_id": "3g0w",
+    "num_atoms": 4609,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.159912109375,
+    "processing_time": 1.0590152740478516,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3g2z\\3g2z_protein.mol2",
+    "protein_id": "3g2z",
+    "num_atoms": 9560,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.18742169831928454,
+    "processing_time": 1.3604331016540527,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3g31\\3g31_protein.mol2",
+    "protein_id": "3g31",
+    "num_atoms": 8900,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.1755935267398232,
+    "processing_time": 1.2642621994018555,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3gbb\\3gbb_protein.mol2",
+    "protein_id": "3gbb",
+    "num_atoms": 9225,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.2380983453047903,
+    "processing_time": 1.5860788822174072,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3gc5\\3gc5_protein.mol2",
+    "protein_id": "3gc5",
+    "num_atoms": 6552,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.21118947079307154,
+    "processing_time": 1.4293718338012695,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3ge7\\3ge7_protein.mol2",
+    "protein_id": "3ge7",
+    "num_atoms": 6375,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.20616892764442846,
+    "processing_time": 1.3839125633239746,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3gnw\\3gnw_protein.mol2",
+    "protein_id": "3gnw",
+    "num_atoms": 19111,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.24107079756887337,
+    "processing_time": 1.826862096786499,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3gr2\\3gr2_protein.mol2",
+    "protein_id": "3gr2",
+    "num_atoms": 12723,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.28400220369037826,
+    "processing_time": 2.031378746032715,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3gv9\\3gv9_protein.mol2",
+    "protein_id": "3gv9",
+    "num_atoms": 12942,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.2898206208881579,
+    "processing_time": 2.093688726425171,
+    "success": true
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\3gy4\\3gy4_protein.mol2"
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3ivg\\3ivg_protein.mol2",
+    "protein_id": "3ivg",
+    "num_atoms": 9681,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.22799040141858554,
+    "processing_time": 1.5924890041351318,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3jvr\\3jvr_protein.mol2",
+    "protein_id": "3jvr",
+    "num_atoms": 4833,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.16148577238384046,
+    "processing_time": 1.081648349761963,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3jvs\\3jvs_protein.mol2",
+    "protein_id": "3jvs",
+    "num_atoms": 4918,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.1635121797260485,
+    "processing_time": 1.0858900547027588,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3jya\\3jya_protein.mol2",
+    "protein_id": "3jya",
+    "num_atoms": 4405,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.1607716209010074,
+    "processing_time": 1.01971435546875,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3k5v\\3k5v_protein.mol2",
+    "protein_id": "3k5v",
+    "num_atoms": 10421,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.2361958152369449,
+    "processing_time": 1.6386523246765137,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3kgp\\3kgp_protein.mol2",
+    "protein_id": "3kgp",
+    "num_atoms": 4429,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.17023347553453946,
+    "processing_time": 1.0550401210784912,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3kr8\\3kr8_protein.mol2",
+    "protein_id": "3kr8",
+    "num_atoms": 7626,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.19949963218287417,
+    "processing_time": 1.3363618850708008,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3kwa\\3kwa_protein.mol2",
+    "protein_id": "3kwa",
+    "num_atoms": 4572,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.1666729575709293,
+    "processing_time": 1.084580659866333,
+    "success": true
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\3lka\\3lka_protein.mol2"
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3mss\\3mss_protein.mol2",
+    "protein_id": "3mss",
+    "num_atoms": 19221,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.20421981811523438,
+    "processing_time": 1.5679967403411865,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3myg\\3myg_protein.mol2",
+    "protein_id": "3myg",
+    "num_atoms": 4307,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.1542408591822574,
+    "processing_time": 0.9932169914245605,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3n76\\3n76_protein.mol2",
+    "protein_id": "3n76",
+    "num_atoms": 31914,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.33719635009765625,
+    "processing_time": 2.705866575241089,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3n7a\\3n7a_protein.mol2",
+    "protein_id": "3n7a",
+    "num_atoms": 7383,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.19061339528937088,
+    "processing_time": 1.2935700416564941,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3n86\\3n86_protein.mol2",
+    "protein_id": "3n86",
+    "num_atoms": 7869,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.20609664916992188,
+    "processing_time": 1.414679765701294,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3nq9\\3nq9_protein.mol2",
+    "protein_id": "3nq9",
+    "num_atoms": 2911,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.11204287880345394,
+    "processing_time": 0.7044446468353271,
+    "success": true
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\3nw9\\3nw9_protein.mol2"
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\3nx7\\3nx7_protein.mol2"
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3o9i\\3o9i_protein.mol2",
+    "protein_id": "3o9i",
+    "num_atoms": 3677,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.12896106117650083,
+    "processing_time": 0.8629007339477539,
+    "success": true
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\3oe4\\3oe4_protein.mol2"
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\3oe5\\3oe5_protein.mol2"
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\3ozs\\3ozs_protein.mol2"
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\3ozt\\3ozt_protein.mol2"
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3p5o\\3p5o_protein.mol2",
+    "protein_id": "3p5o",
+    "num_atoms": 2910,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.10686412610505756,
+    "processing_time": 0.7012951374053955,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3prs\\3prs_protein.mol2",
+    "protein_id": "3prs",
+    "num_atoms": 5608,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.19254323055869654,
+    "processing_time": 1.275087833404541,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3pww\\3pww_protein.mol2",
+    "protein_id": "3pww",
+    "num_atoms": 6007,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.20262306614925987,
+    "processing_time": 1.359929084777832,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3pxf\\3pxf_protein.mol2",
+    "protein_id": "3pxf",
+    "num_atoms": 5483,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.17720794677734375,
+    "processing_time": 1.1692419052124023,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3pyy\\3pyy_protein.mol2",
+    "protein_id": "3pyy",
+    "num_atoms": 9098,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.22124963057668587,
+    "processing_time": 1.5276110172271729,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3qgy\\3qgy_protein.mol2",
+    "protein_id": "3qgy",
+    "num_atoms": 9301,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.1873889722322163,
+    "processing_time": 1.2991979122161865,
+    "success": true
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\3qqs\\3qqs_protein.mol2"
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\3r88\\3r88_protein.mol2"
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3rlr\\3rlr_protein.mol2",
+    "protein_id": "3rlr",
+    "num_atoms": 7772,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.23701216045178866,
+    "processing_time": 1.6094286441802979,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3rr4\\3rr4_protein.mol2",
+    "protein_id": "3rr4",
+    "num_atoms": 6566,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.2128603081954153,
+    "processing_time": 1.4369432926177979,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3rsx\\3rsx_protein.mol2",
+    "protein_id": "3rsx",
+    "num_atoms": 6235,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.21152596724660774,
+    "processing_time": 1.3558826446533203,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3ryj\\3ryj_protein.mol2",
+    "protein_id": "3ryj",
+    "num_atoms": 5029,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.17954956857781662,
+    "processing_time": 1.2034657001495361,
+    "success": true
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\3tsk\\3tsk_protein.mol2"
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\3twp\\3twp_protein.mol2"
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3u5j\\3u5j_protein.mol2",
+    "protein_id": "3u5j",
+    "num_atoms": 2763,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.10165666279039885,
+    "processing_time": 0.660226583480835,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3u8n\\3u8n_protein.mol2",
+    "protein_id": "3u8n",
+    "num_atoms": 7103,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.21976952803762337,
+    "processing_time": 1.51890230178833,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3u9q\\3u9q_protein.mol2",
+    "protein_id": "3u9q",
+    "num_atoms": 5524,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.1885984320389597,
+    "processing_time": 1.2819104194641113,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3udh\\3udh_protein.mol2",
+    "protein_id": "3udh",
+    "num_atoms": 7066,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.2348729183799342,
+    "processing_time": 1.536674976348877,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3ueu\\3ueu_protein.mol2",
+    "protein_id": "3ueu",
+    "num_atoms": 2685,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.10205379285310444,
+    "processing_time": 0.637148380279541,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3uev\\3uev_protein.mol2",
+    "protein_id": "3uev",
+    "num_atoms": 2762,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.1049601906224301,
+    "processing_time": 0.6596958637237549,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3uew\\3uew_protein.mol2",
+    "protein_id": "3uew",
+    "num_atoms": 2696,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.1033628363358347,
+    "processing_time": 0.6416349411010742,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3uex\\3uex_protein.mol2",
+    "protein_id": "3uex",
+    "num_atoms": 2683,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.1028906169690584,
+    "processing_time": 0.6363892555236816,
+    "success": true
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\3ui7\\3ui7_protein.mol2"
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3uo4\\3uo4_protein.mol2",
+    "protein_id": "3uo4",
+    "num_atoms": 4536,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.16083506533974096,
+    "processing_time": 1.0484428405761719,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3up2\\3up2_protein.mol2",
+    "protein_id": "3up2",
+    "num_atoms": 4683,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.1664932652523643,
+    "processing_time": 1.0727152824401855,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3uri\\3uri_protein.mol2",
+    "protein_id": "3uri",
+    "num_atoms": 5516,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.2011923539011102,
+    "processing_time": 1.2785530090332031,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3utu\\3utu_protein.mol2",
+    "protein_id": "3utu",
+    "num_atoms": 5048,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.18291573775442024,
+    "processing_time": 1.1830129623413086,
+    "success": true
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\3uuo\\3uuo_protein.mol2"
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3wtj\\3wtj_protein.mol2",
+    "protein_id": "3wtj",
+    "num_atoms": 17464,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.3696295085706209,
+    "processing_time": 2.6554620265960693,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3wz8\\3wz8_protein.mol2",
+    "protein_id": "3wz8",
+    "num_atoms": 6367,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.21223269010844983,
+    "processing_time": 1.4292683601379395,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3zdg\\3zdg_protein.mol2",
+    "protein_id": "3zdg",
+    "num_atoms": 6816,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.21108286004317434,
+    "processing_time": 1.4136760234832764,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3zso\\3zso_protein.mol2",
+    "protein_id": "3zso",
+    "num_atoms": 5168,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.18760299682617188,
+    "processing_time": 1.2336244583129883,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3zsx\\3zsx_protein.mol2",
+    "protein_id": "3zsx",
+    "num_atoms": 5019,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.18362507067228617,
+    "processing_time": 1.1768858432769775,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\3zt2\\3zt2_protein.mol2",
+    "protein_id": "3zt2",
+    "num_atoms": 5018,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.18205622622841283,
+    "processing_time": 1.1804118156433105,
+    "success": true
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\4abg\\4abg_protein.mol2"
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4agn\\4agn_protein.mol2",
+    "protein_id": "4agn",
+    "num_atoms": 7943,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.23903174149362663,
+    "processing_time": 1.607346534729004,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4agp\\4agp_protein.mol2",
+    "protein_id": "4agp",
+    "num_atoms": 7822,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.2370159751490543,
+    "processing_time": 1.577265977859497,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4agq\\4agq_protein.mol2",
+    "protein_id": "4agq",
+    "num_atoms": 7713,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.23454525596217105,
+    "processing_time": 1.565356731414795,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4cig\\4cig_protein.mol2",
+    "protein_id": "4cig",
+    "num_atoms": 5079,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.1854039242393092,
+    "processing_time": 1.1896131038665771,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4cr9\\4cr9_protein.mol2",
+    "protein_id": "4cr9",
+    "num_atoms": 4619,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.1690410814787212,
+    "processing_time": 1.1033453941345215,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4cra\\4cra_protein.mol2",
+    "protein_id": "4cra",
+    "num_atoms": 4370,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.1638388382761102,
+    "processing_time": 1.0403847694396973,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4crc\\4crc_protein.mol2",
+    "protein_id": "4crc",
+    "num_atoms": 4296,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.160308837890625,
+    "processing_time": 1.0301659107208252,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4ddh\\4ddh_protein.mol2",
+    "protein_id": "4ddh",
+    "num_atoms": 9777,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.2303928576017681,
+    "processing_time": 1.599283218383789,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4ddk\\4ddk_protein.mol2",
+    "protein_id": "4ddk",
+    "num_atoms": 10209,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.2387544732344778,
+    "processing_time": 1.6792478561401367,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4de1\\4de1_protein.mol2",
+    "protein_id": "4de1",
+    "num_atoms": 10102,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.1962844447085732,
+    "processing_time": 1.4358973503112793,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4de2\\4de2_protein.mol2",
+    "protein_id": "4de2",
+    "num_atoms": 9445,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.18708520186574837,
+    "processing_time": 1.3718743324279785,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4de3\\4de3_protein.mol2",
+    "protein_id": "4de3",
+    "num_atoms": 9247,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.18480240671258225,
+    "processing_time": 1.3270277976989746,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4djv\\4djv_protein.mol2",
+    "protein_id": "4djv",
+    "num_atoms": 14674,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.23811601337633634,
+    "processing_time": 1.754523754119873,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4dld\\4dld_protein.mol2",
+    "protein_id": "4dld",
+    "num_atoms": 9657,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.2876731471011513,
+    "processing_time": 1.9852235317230225,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4e5w\\4e5w_protein.mol2",
+    "protein_id": "4e5w",
+    "num_atoms": 10601,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.2025242855674342,
+    "processing_time": 1.4261810779571533,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4ea2\\4ea2_protein.mol2",
+    "protein_id": "4ea2",
+    "num_atoms": 4859,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.17359603078741775,
+    "processing_time": 1.1270058155059814,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4eo8\\4eo8_protein.mol2",
+    "protein_id": "4eo8",
+    "num_atoms": 20679,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.28802128842002467,
+    "processing_time": 2.245088815689087,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4eor\\4eor_protein.mol2",
+    "protein_id": "4eor",
+    "num_atoms": 17887,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.30003035695929275,
+    "processing_time": 2.2194151878356934,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4f09\\4f09_protein.mol2",
+    "protein_id": "4f09",
+    "num_atoms": 5058,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.1770007484837582,
+    "processing_time": 1.1607027053833008,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4f2w\\4f2w_protein.mol2",
+    "protein_id": "4f2w",
+    "num_atoms": 7786,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.23621388485557154,
+    "processing_time": 1.609663963317871,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4f3c\\4f3c_protein.mol2",
+    "protein_id": "4f3c",
+    "num_atoms": 7331,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.222248679713199,
+    "processing_time": 1.5261752605438232,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4f9w\\4f9w_protein.mol2",
+    "protein_id": "4f9w",
+    "num_atoms": 5977,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.18823322496916117,
+    "processing_time": 1.252927303314209,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4gfm\\4gfm_protein.mol2",
+    "protein_id": "4gfm",
+    "num_atoms": 5230,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.18668405633223684,
+    "processing_time": 1.222757339477539,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4gid\\4gid_protein.mol2",
+    "protein_id": "4gid",
+    "num_atoms": 27650,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.23933651572779605,
+    "processing_time": 2.03996205329895,
+    "success": true
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\4gkm\\4gkm_protein.mol2"
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\4gr0\\4gr0_protein.mol2"
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4hge\\4hge_protein.mol2",
+    "protein_id": "4hge",
+    "num_atoms": 10051,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.2392132407740543,
+    "processing_time": 1.645695686340332,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4ih5\\4ih5_protein.mol2",
+    "protein_id": "4ih5",
+    "num_atoms": 20659,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.3401938990542763,
+    "processing_time": 2.5453107357025146,
+    "success": true
+  },
+  {
+    "error": "Load failed",
+    "file": "c:\\spatial_representation\\demo_charges\\4ih7\\4ih7_protein.mol2"
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4ivb\\4ivb_protein.mol2",
+    "protein_id": "4ivb",
+    "num_atoms": 10292,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.19777558979235196,
+    "processing_time": 1.3640193939208984,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4ivc\\4ivc_protein.mol2",
+    "protein_id": "4ivc",
+    "num_atoms": 9834,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.19408577366879112,
+    "processing_time": 1.3276655673980713,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4j21\\4j21_protein.mol2",
+    "protein_id": "4j21",
+    "num_atoms": 3935,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.14485369230571546,
+    "processing_time": 0.915743350982666,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4j28\\4j28_protein.mol2",
+    "protein_id": "4j28",
+    "num_atoms": 16293,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.27433013916015625,
+    "processing_time": 2.0525317192077637,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4j3l\\4j3l_protein.mol2",
+    "protein_id": "4j3l",
+    "num_atoms": 3809,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.1399839300858347,
+    "processing_time": 0.8927171230316162,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4jfs\\4jfs_protein.mol2",
+    "protein_id": "4jfs",
+    "num_atoms": 16643,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.2763414884868421,
+    "processing_time": 2.0950121879577637,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4jia\\4jia_protein.mol2",
+    "protein_id": "4jia",
+    "num_atoms": 5418,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.1832016392758018,
+    "processing_time": 1.2148902416229248,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4jsz\\4jsz_protein.mol2",
+    "protein_id": "4jsz",
+    "num_atoms": 4477,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.1632278843929893,
+    "processing_time": 1.0704145431518555,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4jxs\\4jxs_protein.mol2",
+    "protein_id": "4jxs",
+    "num_atoms": 12387,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.27794004741467926,
+    "processing_time": 1.9708483219146729,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4k18\\4k18_protein.mol2",
+    "protein_id": "4k18",
+    "num_atoms": 4885,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.173314747057463,
+    "processing_time": 1.1269543170928955,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4k77\\4k77_protein.mol2",
+    "protein_id": "4k77",
+    "num_atoms": 9650,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.19508201197574013,
+    "processing_time": 1.3116505146026611,
+    "success": true
+  },
+  {
+    "file": "c:\\spatial_representation\\demo_charges\\4kz6\\4kz6_protein.mol2",
+    "protein_id": "4kz6",
+    "num_atoms": 13406,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.2907961795204564,
+    "processing_time": 2.153860569000244,
+    "success": true
+  }
+]
