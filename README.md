@@ -16,7 +16,7 @@ This project implements a complete pipeline for:
 ```text
 bindingaffinity/
 ├── batch_process_chimerax.py          # ChimeraX batch processing script
-├── Copy_of_[clyde_explore]_step4_spatial_representation_3d.ipynb  # Main analysis notebook
+├── step4_spatial_representation_3d.ipynb  # Main analysis notebook
 ├── requirements.txt                    # Python dependencies
 ├── README.md                          # This file
 └── demo_charges/                      # Processed molecular data
