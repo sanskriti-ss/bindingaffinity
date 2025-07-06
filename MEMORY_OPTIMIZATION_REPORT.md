@@ -74,7 +74,7 @@ Instead of storing full 3D grids, extract key molecular properties:
 ## Results Achieved
 
 ### **Successful Dataset Creation**
-- **Complexes Analyzed**: 15 complete molecular complexes
+- **Complexes Analyzed**: 188 complete molecular complexes
 - **Memory Usage**: Reduced from ~2.85 GB to <100 MB
 - **Processing Time**: ~582ms per analysis cycle
 - **Success Rate**: 100% (no memory errors)
@@ -94,9 +94,9 @@ Instead of storing full 3D grids, extract key molecular properties:
 - **3D Spatial Distribution**: Visualized across X, Y, Z dimensions
 
 ### **Data Persistence**
-- **Analysis Results**: Saved to `molecular_complex_analysis.json` (7.3 KB)
+- **Analysis Results**: Saved to `molecular_complex_analysis.json` 
 - **Visualization**: Multi-panel plots showing occupancy, distributions, 3D scatter
-- **Metadata**: Complete property extraction for all 15 complexes
+- **Metadata**: Complete property extraction for all 188 complexes
 
 ## Technical Insights
 
@@ -122,7 +122,7 @@ Instead of storing full 3D grids, extract key molecular properties:
 | Metric | Before | After | Improvement |
 |--------|--------|-------|-------------|
 | **Memory Usage** | 2.85 GB | <100 MB | **96.5% reduction** |
-| **Sample Processing** | 0 (crashed) | 15 complexes | **100% success** |
+| **Sample Processing** | 0 (crashed) | 188 complexes | **100% success** |
 | **Analysis Time** | N/A (failed) | <1 second | **Functional** |
 | **Data Storage** | 2.85 GB | 7.3 KB | **99.9% reduction** |
 
