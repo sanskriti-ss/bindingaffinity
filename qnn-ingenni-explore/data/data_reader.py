@@ -22,7 +22,7 @@ from torch.utils.data import Dataset
 # if csv doesn't exist, rmsd and affinity become unknown -> only testing is available (no evaluation)
 
 class Dataset_MLHDF(Dataset):
-	def __init__(self, mlhdf_path, mlhdf_ver, csv_path="", is_crystal=False, rmsd_weight=False, rmsd_thres=2, max_atoms=2000, feat_dim=22):
+	def __init__(self, mlhdf_path, mlhdf_ver, csv_path="", is_crystal=False, rmsd_weight=False, rmsd_thres=2, max_atoms=5000, feat_dim=24):
 		super(Dataset_MLHDF, self).__init__()
 		self.mlhdf_ver = mlhdf_ver
 		self.mlhdf_path = mlhdf_path
