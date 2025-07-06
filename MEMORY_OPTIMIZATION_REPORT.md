@@ -136,7 +136,7 @@ Instead of storing full 3D grids, extract key molecular properties:
   - Added comprehensive visualization functions
 
 ### New Files Created
-- **`molecular_complex_analysis.json`** - Analysis results (15 complexes)
+- **`molecular_complex_analysis.json`** - Analysis results (188 complexes)
 - **`MEMORY_OPTIMIZATION_REPORT.md`** - This documentation
 
 ## Future Recommendations
