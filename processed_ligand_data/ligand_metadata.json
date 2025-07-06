@@ -1,0 +1,4124 @@
+[
+  {
+    "file": "./demo_charges\\1a30\\1a30_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 49,
+    "num_heavy_atoms": 26,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.995393451891447e-05,
+    "processing_time": 0.008787870407104492,
+    "success": true,
+    "ligand_id": "1a30"
+  },
+  {
+    "file": "./demo_charges\\1bcu\\1bcu_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 28,
+    "num_heavy_atoms": 16,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.7305201480263158e-05,
+    "processing_time": 0.007630586624145508,
+    "success": true,
+    "ligand_id": "1bcu"
+  },
+  {
+    "file": "./demo_charges\\1bzc\\1bzc_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 43,
+    "num_heavy_atoms": 29,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.955238743832237e-05,
+    "processing_time": 0.009171009063720703,
+    "success": true,
+    "ligand_id": "1bzc"
+  },
+  {
+    "file": "./demo_charges\\1c5z\\1c5z_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 18,
+    "num_heavy_atoms": 9,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 1.5861109683388158e-05,
+    "processing_time": 0.008796453475952148,
+    "success": true,
+    "ligand_id": "1c5z"
+  },
+  {
+    "file": "./demo_charges\\1eby\\1eby_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 88,
+    "num_heavy_atoms": 48,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 7.950632195723684e-05,
+    "processing_time": 0.009116649627685547,
+    "success": true,
+    "ligand_id": "1eby"
+  },
+  {
+    "file": "./demo_charges\\1g2k\\1g2k_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 82,
+    "num_heavy_atoms": 45,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 7.54908511513158e-05,
+    "processing_time": 0.009624958038330078,
+    "success": true,
+    "ligand_id": "1g2k"
+  },
+  {
+    "file": "./demo_charges\\1k1i\\1k1i_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 64,
+    "num_heavy_atoms": 36,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.8224326685855265e-05,
+    "processing_time": 0.008905887603759766,
+    "success": true,
+    "ligand_id": "1k1i"
+  },
+  {
+    "file": "./demo_charges\\1lpg\\1lpg_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 78,
+    "num_heavy_atoms": 41,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 7.087305972450657e-05,
+    "processing_time": 0.009825468063354492,
+    "success": true,
+    "ligand_id": "1lpg"
+  },
+  {
+    "file": "./demo_charges\\1mq6\\1mq6_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 54,
+    "num_heavy_atoms": 36,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.2201120476973684e-05,
+    "processing_time": 0.009168148040771484,
+    "success": true,
+    "ligand_id": "1mq6"
+  },
+  {
+    "file": "./demo_charges\\1nc1\\1nc1_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 36,
+    "num_heavy_atoms": 20,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.3729954769736845e-05,
+    "processing_time": 0.007866382598876953,
+    "success": true,
+    "ligand_id": "1nc1"
+  },
+  {
+    "file": "./demo_charges\\1nc3\\1nc3_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 32,
+    "num_heavy_atoms": 19,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.1521445826480265e-05,
+    "processing_time": 0.007439374923706055,
+    "success": true,
+    "ligand_id": "1nc3"
+  },
+  {
+    "file": "./demo_charges\\1nvq\\1nvq_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 63,
+    "num_heavy_atoms": 36,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.9830515008223684e-05,
+    "processing_time": 0.008627891540527344,
+    "success": true,
+    "ligand_id": "1nvq"
+  },
+  {
+    "file": "./demo_charges\\1o0h\\1o0h_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 39,
+    "num_heavy_atoms": 27,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.834774619654605e-05,
+    "processing_time": 0.008148908615112305,
+    "success": true,
+    "ligand_id": "1o0h"
+  },
+  {
+    "file": "./demo_charges\\1o3f\\1o3f_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 43,
+    "num_heavy_atoms": 25,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.055625513980263e-05,
+    "processing_time": 0.008347749710083008,
+    "success": true,
+    "ligand_id": "1o3f"
+  },
+  {
+    "file": "./demo_charges\\1o5b\\1o5b_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 21,
+    "num_heavy_atoms": 13,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.0077354029605265e-05,
+    "processing_time": 0.007843255996704102,
+    "success": true,
+    "ligand_id": "1o5b"
+  },
+  {
+    "file": "./demo_charges\\1owh\\1owh_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 44,
+    "num_heavy_atoms": 24,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.0757028680098684e-05,
+    "processing_time": 0.009232759475708008,
+    "success": true,
+    "ligand_id": "1owh"
+  },
+  {
+    "file": "./demo_charges\\1oyt\\1oyt_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 55,
+    "num_heavy_atoms": 30,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.0594932154605265e-05,
+    "processing_time": 0.008187055587768555,
+    "success": true,
+    "ligand_id": "1oyt"
+  },
+  {
+    "file": "./demo_charges\\1p1n\\1p1n_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 29,
+    "num_heavy_atoms": 15,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.4695145456414474e-05,
+    "processing_time": 0.007563591003417969,
+    "success": true,
+    "ligand_id": "1p1n"
+  },
+  {
+    "file": "./demo_charges\\1p1q\\1p1q_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 22,
+    "num_heavy_atoms": 13,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 1.9675806949013158e-05,
+    "processing_time": 0.007701396942138672,
+    "success": true,
+    "ligand_id": "1p1q"
+  },
+  {
+    "file": "./demo_charges\\1ps3\\1ps3_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 28,
+    "num_heavy_atoms": 16,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.6100560238486842e-05,
+    "processing_time": 0.007630586624145508,
+    "success": true,
+    "ligand_id": "1ps3"
+  },
+  {
+    "file": "./demo_charges\\1pxn\\1pxn_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 37,
+    "num_heavy_atoms": 22,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.47338224712171e-05,
+    "processing_time": 0.008347034454345703,
+    "success": true,
+    "ligand_id": "1pxn"
+  },
+  {
+    "file": "./demo_charges\\1q8u\\1q8u_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 44,
+    "num_heavy_atoms": 22,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.975316097861842e-05,
+    "processing_time": 0.008105278015136719,
+    "success": true,
+    "ligand_id": "1q8u"
+  },
+  {
+    "file": "./demo_charges\\1qf1\\1qf1_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 53,
+    "num_heavy_atoms": 26,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.396940532483553e-05,
+    "processing_time": 0.008342981338500977,
+    "success": true,
+    "ligand_id": "1qf1"
+  },
+  {
+    "file": "./demo_charges\\1qkt\\1qkt_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 44,
+    "num_heavy_atoms": 20,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.7544652035361845e-05,
+    "processing_time": 0.008166074752807617,
+    "success": true,
+    "ligand_id": "1qkt"
+  },
+  {
+    "file": "./demo_charges\\1r5y\\1r5y_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 21,
+    "num_heavy_atoms": 13,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.0679674650493423e-05,
+    "processing_time": 0.007769107818603516,
+    "success": true,
+    "ligand_id": "1r5y"
+  },
+  {
+    "file": "./demo_charges\\1s38\\1s38_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 22,
+    "num_heavy_atoms": 13,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.0880448190789474e-05,
+    "processing_time": 0.00764155387878418,
+    "success": true,
+    "ligand_id": "1s38"
+  },
+  {
+    "file": "./demo_charges\\1sqa\\1sqa_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 54,
+    "num_heavy_atoms": 31,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.119725277549342e-05,
+    "processing_time": 0.00922536849975586,
+    "success": true,
+    "ligand_id": "1sqa"
+  },
+  {
+    "file": "./demo_charges\\1syi\\1syi_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 30,
+    "num_heavy_atoms": 17,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.7305201480263158e-05,
+    "processing_time": 0.008287906646728516,
+    "success": true,
+    "ligand_id": "1syi"
+  },
+  {
+    "file": "./demo_charges\\1u1b\\1u1b_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 74,
+    "num_heavy_atoms": 51,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 7.147538034539474e-05,
+    "processing_time": 0.009772062301635742,
+    "success": true,
+    "ligand_id": "1u1b"
+  },
+  {
+    "file": "./demo_charges\\1uto\\1uto_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 21,
+    "num_heavy_atoms": 9,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 1.7668071546052632e-05,
+    "processing_time": 0.007973194122314453,
+    "success": true,
+    "ligand_id": "1uto"
+  },
+  {
+    "file": "./demo_charges\\1vso\\1vso_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 38,
+    "num_heavy_atoms": 21,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.232453998766447e-05,
+    "processing_time": 0.007861614227294922,
+    "success": true,
+    "ligand_id": "1vso"
+  },
+  {
+    "file": "./demo_charges\\1w4o\\1w4o_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 32,
+    "num_heavy_atoms": 21,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.071835166529605e-05,
+    "processing_time": 0.007911443710327148,
+    "success": true,
+    "ligand_id": "1w4o"
+  },
+  {
+    "file": "./demo_charges\\1y6r\\1y6r_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 38,
+    "num_heavy_atoms": 20,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.573769017269737e-05,
+    "processing_time": 0.007637977600097656,
+    "success": true,
+    "ligand_id": "1y6r"
+  },
+  {
+    "file": "./demo_charges\\1yc1\\1yc1_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 42,
+    "num_heavy_atoms": 27,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.115857576069079e-05,
+    "processing_time": 0.0074231624603271484,
+    "success": true,
+    "ligand_id": "1yc1"
+  },
+  {
+    "file": "./demo_charges\\1ydr\\1ydr_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 38,
+    "num_heavy_atoms": 20,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.5536916632401316e-05,
+    "processing_time": 0.007824420928955078,
+    "success": true,
+    "ligand_id": "1ydr"
+  },
+  {
+    "file": "./demo_charges\\1ydt\\1ydt_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 48,
+    "num_heavy_atoms": 27,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.396940532483553e-05,
+    "processing_time": 0.008095264434814453,
+    "success": true,
+    "ligand_id": "1ydt"
+  },
+  {
+    "file": "./demo_charges\\1z6e\\1z6e_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 60,
+    "num_heavy_atoms": 38,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.8224326685855265e-05,
+    "processing_time": 0.00873875617980957,
+    "success": true,
+    "ligand_id": "1z6e"
+  },
+  {
+    "file": "./demo_charges\\1z95\\1z95_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 43,
+    "num_heavy_atoms": 29,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.035548159950658e-05,
+    "processing_time": 0.00760197639465332,
+    "success": true,
+    "ligand_id": "1z95"
+  },
+  {
+    "file": "./demo_charges\\1z9g\\1z9g_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 31,
+    "num_heavy_atoms": 17,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.690365439967105e-05,
+    "processing_time": 0.007849454879760742,
+    "success": true,
+    "ligand_id": "1z9g"
+  },
+  {
+    "file": "./demo_charges\\2al5\\2al5_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 23,
+    "num_heavy_atoms": 15,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.1683542351973684e-05,
+    "processing_time": 0.007574558258056641,
+    "success": true,
+    "ligand_id": "2al5"
+  },
+  {
+    "file": "./demo_charges\\2br1\\2br1_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 50,
+    "num_heavy_atoms": 29,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.6981008429276316e-05,
+    "processing_time": 0.008896350860595703,
+    "success": true,
+    "ligand_id": "2br1"
+  },
+  {
+    "file": "./demo_charges\\2brb\\2brb_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 42,
+    "num_heavy_atoms": 25,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.015470805921053e-05,
+    "processing_time": 0.009081363677978516,
+    "success": true,
+    "ligand_id": "2brb"
+  },
+  {
+    "file": "./demo_charges\\2c3i\\2c3i_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 41,
+    "num_heavy_atoms": 23,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.7544652035361845e-05,
+    "processing_time": 0.008687734603881836,
+    "success": true,
+    "ligand_id": "2c3i"
+  },
+  {
+    "file": "./demo_charges\\2cbv\\2cbv_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 26,
+    "num_heavy_atoms": 12,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.3289730674342107e-05,
+    "processing_time": 0.007905721664428711,
+    "success": true,
+    "ligand_id": "2cbv"
+  },
+  {
+    "file": "./demo_charges\\2fvd\\2fvd_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 51,
+    "num_heavy_atoms": 30,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.778410259046053e-05,
+    "processing_time": 0.009952783584594727,
+    "success": true,
+    "ligand_id": "2fvd"
+  },
+  {
+    "file": "./demo_charges\\2fxs\\2fxs_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 46,
+    "num_heavy_atoms": 28,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.2563990542763155e-05,
+    "processing_time": 0.008185148239135742,
+    "success": true,
+    "ligand_id": "2fxs"
+  },
+  {
+    "file": "./demo_charges\\2hb1\\2hb1_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 17,
+    "num_heavy_atoms": 14,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 1.6864977384868423e-05,
+    "processing_time": 0.008527278900146484,
+    "success": true,
+    "ligand_id": "2hb1"
+  },
+  {
+    "file": "./demo_charges\\2iwx\\2iwx_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 45,
+    "num_heavy_atoms": 24,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.0957802220394735e-05,
+    "processing_time": 0.008797168731689453,
+    "success": true,
+    "ligand_id": "2iwx"
+  },
+  {
+    "file": "./demo_charges\\2j7h\\2j7h_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 24,
+    "num_heavy_atoms": 10,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.1081221731085526e-05,
+    "processing_time": 0.007748842239379883,
+    "success": true,
+    "ligand_id": "2j7h"
+  },
+  {
+    "file": "./demo_charges\\2p15\\2p15_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 61,
+    "num_heavy_atoms": 32,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.38073087993421e-05,
+    "processing_time": 0.008759737014770508,
+    "success": true,
+    "ligand_id": "2p15"
+  },
+  {
+    "file": "./demo_charges\\2p4y\\2p4y_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 61,
+    "num_heavy_atoms": 40,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.7822779605263155e-05,
+    "processing_time": 0.009446382522583008,
+    "success": true,
+    "ligand_id": "2p4y"
+  },
+  {
+    "file": "./demo_charges\\2pog\\2pog_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 39,
+    "num_heavy_atoms": 21,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.593846371299342e-05,
+    "processing_time": 0.008391618728637695,
+    "success": true,
+    "ligand_id": "2pog"
+  },
+  {
+    "file": "./demo_charges\\2qbp\\2qbp_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 60,
+    "num_heavy_atoms": 37,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.6216591282894735e-05,
+    "processing_time": 0.009574651718139648,
+    "success": true,
+    "ligand_id": "2qbp"
+  },
+  {
+    "file": "./demo_charges\\2qbq\\2qbq_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 57,
+    "num_heavy_atoms": 31,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.0594932154605265e-05,
+    "processing_time": 0.008479833602905273,
+    "success": true,
+    "ligand_id": "2qbq"
+  },
+  {
+    "file": "./demo_charges\\2qbr\\2qbr_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 42,
+    "num_heavy_atoms": 28,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.035548159950658e-05,
+    "processing_time": 0.008058547973632812,
+    "success": true,
+    "ligand_id": "2qbr"
+  },
+  {
+    "file": "./demo_charges\\2qe4\\2qe4_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 46,
+    "num_heavy_atoms": 24,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.1961669921875e-05,
+    "processing_time": 0.008776664733886719,
+    "success": true,
+    "ligand_id": "2qe4"
+  },
+  {
+    "file": "./demo_charges\\2qnq\\2qnq_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 71,
+    "num_heavy_atoms": 41,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 6.685758891858553e-05,
+    "processing_time": 0.00839376449584961,
+    "success": true,
+    "ligand_id": "2qnq"
+  },
+  {
+    "file": "./demo_charges\\2r9w\\2r9w_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 42,
+    "num_heavy_atoms": 29,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.035548159950658e-05,
+    "processing_time": 0.007607698440551758,
+    "success": true,
+    "ligand_id": "2r9w"
+  },
+  {
+    "file": "./demo_charges\\2v00\\2v00_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 29,
+    "num_heavy_atoms": 16,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.6301333778782893e-05,
+    "processing_time": 0.007463693618774414,
+    "success": true,
+    "ligand_id": "2v00"
+  },
+  {
+    "file": "./demo_charges\\2v7a\\2v7a_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 66,
+    "num_heavy_atoms": 35,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 6.103515625e-05,
+    "processing_time": 0.00893092155456543,
+    "success": true,
+    "ligand_id": "2v7a"
+  },
+  {
+    "file": "./demo_charges\\2vkm\\2vkm_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 90,
+    "num_heavy_atoms": 47,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 7.950632195723684e-05,
+    "processing_time": 0.009670257568359375,
+    "success": true,
+    "ligand_id": "2vkm"
+  },
+  {
+    "file": "./demo_charges\\2vvn\\2vvn_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 32,
+    "num_heavy_atoms": 16,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.8108295641447368e-05,
+    "processing_time": 0.0076258182525634766,
+    "success": true,
+    "ligand_id": "2vvn"
+  },
+  {
+    "file": "./demo_charges\\2vw5\\2vw5_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 78,
+    "num_heavy_atoms": 36,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 6.4849853515625e-05,
+    "processing_time": 0.008469820022583008,
+    "success": true,
+    "ligand_id": "2vw5"
+  },
+  {
+    "file": "./demo_charges\\2w4x\\2w4x_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 33,
+    "num_heavy_atoms": 18,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.9513710423519735e-05,
+    "processing_time": 0.007959842681884766,
+    "success": true,
+    "ligand_id": "2w4x"
+  },
+  {
+    "file": "./demo_charges\\2w66\\2w66_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 35,
+    "num_heavy_atoms": 16,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.0517578125e-05,
+    "processing_time": 0.006909370422363281,
+    "success": true,
+    "ligand_id": "2w66"
+  },
+  {
+    "file": "./demo_charges\\2wbg\\2wbg_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 51,
+    "num_heavy_atoms": 22,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.216244346217105e-05,
+    "processing_time": 0.007872581481933594,
+    "success": true,
+    "ligand_id": "2wbg"
+  },
+  {
+    "file": "./demo_charges\\2wca\\2wca_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 50,
+    "num_heavy_atoms": 27,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.4571725945723684e-05,
+    "processing_time": 0.008111238479614258,
+    "success": true,
+    "ligand_id": "2wca"
+  },
+  {
+    "file": "./demo_charges\\2weg\\2weg_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 17,
+    "num_heavy_atoms": 11,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 1.6463430304276316e-05,
+    "processing_time": 0.0073697566986083984,
+    "success": true,
+    "ligand_id": "2weg"
+  },
+  {
+    "file": "./demo_charges\\2wer\\2wer_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 42,
+    "num_heavy_atoms": 25,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.9351613898026316e-05,
+    "processing_time": 0.007401227951049805,
+    "success": true,
+    "ligand_id": "2wer"
+  },
+  {
+    "file": "./demo_charges\\2wnc\\2wnc_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 42,
+    "num_heavy_atoms": 21,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.814697265625e-05,
+    "processing_time": 0.007756710052490234,
+    "success": true,
+    "ligand_id": "2wnc"
+  },
+  {
+    "file": "./demo_charges\\2wvt\\2wvt_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 29,
+    "num_heavy_atoms": 13,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.5096692537006577e-05,
+    "processing_time": 0.007642984390258789,
+    "success": true,
+    "ligand_id": "2wvt"
+  },
+  {
+    "file": "./demo_charges\\2x00\\2x00_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 85,
+    "num_heavy_atoms": 37,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 7.20777009662829e-05,
+    "processing_time": 0.008771419525146484,
+    "success": true,
+    "ligand_id": "2x00"
+  },
+  {
+    "file": "./demo_charges\\2xb8\\2xb8_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 39,
+    "num_heavy_atoms": 22,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.5336143092105265e-05,
+    "processing_time": 0.008125782012939453,
+    "success": true,
+    "ligand_id": "2xb8"
+  },
+  {
+    "file": "./demo_charges\\2xbv\\2xbv_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 57,
+    "num_heavy_atoms": 36,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.420885587993421e-05,
+    "processing_time": 0.007967233657836914,
+    "success": true,
+    "ligand_id": "2xbv"
+  },
+  {
+    "file": "./demo_charges\\2xdl\\2xdl_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 33,
+    "num_heavy_atoms": 16,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.8108295641447368e-05,
+    "processing_time": 0.007596731185913086,
+    "success": true,
+    "ligand_id": "2xdl"
+  },
+  {
+    "file": "./demo_charges\\2xii\\2xii_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 51,
+    "num_heavy_atoms": 28,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.718178196957237e-05,
+    "processing_time": 0.00820302963256836,
+    "success": true,
+    "ligand_id": "2xii"
+  },
+  {
+    "file": "./demo_charges\\2xj7\\2xj7_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 35,
+    "num_heavy_atoms": 16,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.071835166529605e-05,
+    "processing_time": 0.007304191589355469,
+    "success": true,
+    "ligand_id": "2xj7"
+  },
+  {
+    "file": "./demo_charges\\2xnb\\2xnb_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 50,
+    "num_heavy_atoms": 27,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.718178196957237e-05,
+    "processing_time": 0.0076978206634521484,
+    "success": true,
+    "ligand_id": "2xnb"
+  },
+  {
+    "file": "./demo_charges\\2xys\\2xys_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 48,
+    "num_heavy_atoms": 25,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.4772499486019735e-05,
+    "processing_time": 0.00821065902709961,
+    "success": true,
+    "ligand_id": "2xys"
+  },
+  {
+    "file": "./demo_charges\\2y5h\\2y5h_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 60,
+    "num_heavy_atoms": 31,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.420885587993421e-05,
+    "processing_time": 0.009018898010253906,
+    "success": true,
+    "ligand_id": "2y5h"
+  },
+  {
+    "file": "./demo_charges\\2yfe\\2yfe_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 48,
+    "num_heavy_atoms": 25,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.15601228412829e-05,
+    "processing_time": 0.008291482925415039,
+    "success": true,
+    "ligand_id": "2yfe"
+  },
+  {
+    "file": "./demo_charges\\2yge\\2yge_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 80,
+    "num_heavy_atoms": 40,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 6.986919202302631e-05,
+    "processing_time": 0.008833646774291992,
+    "success": true,
+    "ligand_id": "2yge"
+  },
+  {
+    "file": "./demo_charges\\2yki\\2yki_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 52,
+    "num_heavy_atoms": 34,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.2401894017269735e-05,
+    "processing_time": 0.008762121200561523,
+    "success": true,
+    "ligand_id": "2yki"
+  },
+  {
+    "file": "./demo_charges\\2ymd\\2ymd_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 26,
+    "num_heavy_atoms": 13,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.268741005345395e-05,
+    "processing_time": 0.007643461227416992,
+    "success": true,
+    "ligand_id": "2ymd"
+  },
+  {
+    "file": "./demo_charges\\2zb1\\2zb1_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 47,
+    "num_heavy_atoms": 26,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.3166311163651316e-05,
+    "processing_time": 0.008016824722290039,
+    "success": true,
+    "ligand_id": "2zb1"
+  },
+  {
+    "file": "./demo_charges\\2zda\\2zda_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 58,
+    "num_heavy_atoms": 29,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.159879985608553e-05,
+    "processing_time": 0.015191316604614258,
+    "success": true,
+    "ligand_id": "2zda"
+  },
+  {
+    "file": "./demo_charges\\2zy1\\2zy1_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 42,
+    "num_heavy_atoms": 24,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.794619911595395e-05,
+    "processing_time": 0.00816035270690918,
+    "success": true,
+    "ligand_id": "2zy1"
+  },
+  {
+    "file": "./demo_charges\\3acw\\3acw_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 43,
+    "num_heavy_atoms": 21,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.9150840357730265e-05,
+    "processing_time": 0.008124351501464844,
+    "success": true,
+    "ligand_id": "3acw"
+  },
+  {
+    "file": "./demo_charges\\3ao4\\3ao4_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 27,
+    "num_heavy_atoms": 16,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.6100560238486842e-05,
+    "processing_time": 0.0072247982025146484,
+    "success": true,
+    "ligand_id": "3ao4"
+  },
+  {
+    "file": "./demo_charges\\3arp\\3arp_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 74,
+    "num_heavy_atoms": 34,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 6.344443873355263e-05,
+    "processing_time": 0.00831294059753418,
+    "success": true,
+    "ligand_id": "3arp"
+  },
+  {
+    "file": "./demo_charges\\3arq\\3arq_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 62,
+    "num_heavy_atoms": 36,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.742123252467105e-05,
+    "processing_time": 0.008125782012939453,
+    "success": true,
+    "ligand_id": "3arq"
+  },
+  {
+    "file": "./demo_charges\\3aru\\3aru_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 38,
+    "num_heavy_atoms": 20,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.272608706825658e-05,
+    "processing_time": 0.007561922073364258,
+    "success": true,
+    "ligand_id": "3aru"
+  },
+  {
+    "file": "./demo_charges\\3arv\\3arv_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 39,
+    "num_heavy_atoms": 25,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.9150840357730265e-05,
+    "processing_time": 0.0074231624603271484,
+    "success": true,
+    "ligand_id": "3arv"
+  },
+  {
+    "file": "./demo_charges\\3ary\\3ary_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 27,
+    "num_heavy_atoms": 17,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.6702880859375e-05,
+    "processing_time": 0.007012605667114258,
+    "success": true,
+    "ligand_id": "3ary"
+  },
+  {
+    "file": "./demo_charges\\3b1m\\3b1m_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 65,
+    "num_heavy_atoms": 38,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 6.0031288548519735e-05,
+    "processing_time": 0.008318424224853516,
+    "success": true,
+    "ligand_id": "3b1m"
+  },
+  {
+    "file": "./demo_charges\\3b27\\3b27_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 25,
+    "num_heavy_atoms": 16,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.4092824835526316e-05,
+    "processing_time": 0.007824420928955078,
+    "success": true,
+    "ligand_id": "3b27"
+  },
+  {
+    "file": "./demo_charges\\3b5r\\3b5r_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 41,
+    "num_heavy_atoms": 28,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.85485197368421e-05,
+    "processing_time": 0.008409976959228516,
+    "success": true,
+    "ligand_id": "3b5r"
+  },
+  {
+    "file": "./demo_charges\\3b65\\3b65_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 39,
+    "num_heavy_atoms": 25,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.654078433388158e-05,
+    "processing_time": 0.007515668869018555,
+    "success": true,
+    "ligand_id": "3b65"
+  },
+  {
+    "file": "./demo_charges\\3b68\\3b68_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 49,
+    "num_heavy_atoms": 31,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.497327302631579e-05,
+    "processing_time": 0.008017301559448242,
+    "success": true,
+    "ligand_id": "3b68"
+  },
+  {
+    "file": "./demo_charges\\3bgz\\3bgz_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 38,
+    "num_heavy_atoms": 24,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.6942331414473684e-05,
+    "processing_time": 0.007944345474243164,
+    "success": true,
+    "ligand_id": "3bgz"
+  },
+  {
+    "file": "./demo_charges\\3bv9\\3bv9_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 95,
+    "num_heavy_atoms": 47,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 8.131328381990131e-05,
+    "processing_time": 0.009929656982421875,
+    "success": true,
+    "ligand_id": "3bv9"
+  },
+  {
+    "file": "./demo_charges\\3cj4\\3cj4_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 47,
+    "num_heavy_atoms": 25,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.015470805921053e-05,
+    "processing_time": 0.008478164672851562,
+    "success": true,
+    "ligand_id": "3cj4"
+  },
+  {
+    "file": "./demo_charges\\3coy\\3coy_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 57,
+    "num_heavy_atoms": 31,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.119725277549342e-05,
+    "processing_time": 0.00822138786315918,
+    "success": true,
+    "ligand_id": "3coy"
+  },
+  {
+    "file": "./demo_charges\\3coz\\3coz_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 54,
+    "num_heavy_atoms": 30,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.939029091282895e-05,
+    "processing_time": 0.008629798889160156,
+    "success": true,
+    "ligand_id": "3coz"
+  },
+  {
+    "file": "./demo_charges\\3d4z\\3d4z_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 27,
+    "num_heavy_atoms": 14,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.5096692537006577e-05,
+    "processing_time": 0.010680437088012695,
+    "success": true,
+    "ligand_id": "3d4z"
+  },
+  {
+    "file": "./demo_charges\\3d6q\\3d6q_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 44,
+    "num_heavy_atoms": 22,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.995393451891447e-05,
+    "processing_time": 0.011540651321411133,
+    "success": true,
+    "ligand_id": "3d6q"
+  },
+  {
+    "file": "./demo_charges\\3dd0\\3dd0_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 26,
+    "num_heavy_atoms": 16,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.4293598375822368e-05,
+    "processing_time": 0.008450746536254883,
+    "success": true,
+    "ligand_id": "3dd0"
+  },
+  {
+    "file": "./demo_charges\\3dx2\\3dx2_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 26,
+    "num_heavy_atoms": 12,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.308895713404605e-05,
+    "processing_time": 0.00876307487487793,
+    "success": true,
+    "ligand_id": "3dx2"
+  },
+  {
+    "file": "./demo_charges\\3dxg\\3dxg_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 32,
+    "num_heavy_atoms": 21,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.071835166529605e-05,
+    "processing_time": 0.008878469467163086,
+    "success": true,
+    "ligand_id": "3dxg"
+  },
+  {
+    "file": "./demo_charges\\3e5a\\3e5a_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 63,
+    "num_heavy_atoms": 33,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.8425100226151316e-05,
+    "processing_time": 0.012419700622558594,
+    "success": true,
+    "ligand_id": "3e5a"
+  },
+  {
+    "file": "./demo_charges\\3e92\\3e92_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 47,
+    "num_heavy_atoms": 26,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.23632170024671e-05,
+    "processing_time": 0.009339332580566406,
+    "success": true,
+    "ligand_id": "3e92"
+  },
+  {
+    "file": "./demo_charges\\3e93\\3e93_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 70,
+    "num_heavy_atoms": 37,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 6.545217413651316e-05,
+    "processing_time": 0.010545730590820312,
+    "success": true,
+    "ligand_id": "3e93"
+  },
+  {
+    "file": "./demo_charges\\3ehy\\3ehy_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 29,
+    "num_heavy_atoms": 17,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.6100560238486842e-05,
+    "processing_time": 0.007845640182495117,
+    "success": true,
+    "ligand_id": "3ehy"
+  },
+  {
+    "file": "./demo_charges\\3f3a\\3f3a_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 27,
+    "num_heavy_atoms": 15,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.4895918996710526e-05,
+    "processing_time": 0.007335662841796875,
+    "success": true,
+    "ligand_id": "3f3a"
+  },
+  {
+    "file": "./demo_charges\\3f3c\\3f3c_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 23,
+    "num_heavy_atoms": 13,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.0679674650493423e-05,
+    "processing_time": 0.007748842239379883,
+    "success": true,
+    "ligand_id": "3f3c"
+  },
+  {
+    "file": "./demo_charges\\3f3d\\3f3d_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 20,
+    "num_heavy_atoms": 9,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 1.5861109683388158e-05,
+    "processing_time": 0.007490873336791992,
+    "success": true,
+    "ligand_id": "3f3d"
+  },
+  {
+    "file": "./demo_charges\\3f3e\\3f3e_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 22,
+    "num_heavy_atoms": 9,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 1.7266524465460526e-05,
+    "processing_time": 0.00703120231628418,
+    "success": true,
+    "ligand_id": "3f3e"
+  },
+  {
+    "file": "./demo_charges\\3fcq\\3fcq_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 23,
+    "num_heavy_atoms": 14,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.0478901110197368e-05,
+    "processing_time": 0.0072023868560791016,
+    "success": true,
+    "ligand_id": "3fcq"
+  },
+  {
+    "file": "./demo_charges\\3fur\\3fur_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 43,
+    "num_heavy_atoms": 31,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.376863178453947e-05,
+    "processing_time": 0.008306264877319336,
+    "success": true,
+    "ligand_id": "3fur"
+  },
+  {
+    "file": "./demo_charges\\3fv1\\3fv1_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 41,
+    "num_heavy_atoms": 21,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.634001079358553e-05,
+    "processing_time": 0.007730960845947266,
+    "success": true,
+    "ligand_id": "3fv1"
+  },
+  {
+    "file": "./demo_charges\\3fv2\\3fv2_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 36,
+    "num_heavy_atoms": 20,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.252531352796053e-05,
+    "processing_time": 0.007376909255981445,
+    "success": true,
+    "ligand_id": "3fv2"
+  },
+  {
+    "file": "./demo_charges\\3g0w\\3g0w_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 37,
+    "num_heavy_atoms": 24,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.4934596011513155e-05,
+    "processing_time": 0.007549762725830078,
+    "success": true,
+    "ligand_id": "3g0w"
+  },
+  {
+    "file": "./demo_charges\\3g2z\\3g2z_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 23,
+    "num_heavy_atoms": 13,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.208508943256579e-05,
+    "processing_time": 0.007857084274291992,
+    "success": true,
+    "ligand_id": "3g2z"
+  },
+  {
+    "file": "./demo_charges\\3g31\\3g31_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 31,
+    "num_heavy_atoms": 17,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.7305201480263158e-05,
+    "processing_time": 0.007198333740234375,
+    "success": true,
+    "ligand_id": "3g31"
+  },
+  {
+    "file": "./demo_charges\\3gbb\\3gbb_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 34,
+    "num_heavy_atoms": 18,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.971448396381579e-05,
+    "processing_time": 0.007292747497558594,
+    "success": true,
+    "ligand_id": "3gbb"
+  },
+  {
+    "file": "./demo_charges\\3gc5\\3gc5_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 38,
+    "num_heavy_atoms": 20,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.513536955180921e-05,
+    "processing_time": 0.009060859680175781,
+    "success": true,
+    "ligand_id": "3gc5"
+  },
+  {
+    "file": "./demo_charges\\3ge7\\3ge7_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 54,
+    "num_heavy_atoms": 26,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.8587196751644735e-05,
+    "processing_time": 0.00879979133605957,
+    "success": true,
+    "ligand_id": "3ge7"
+  },
+  {
+    "file": "./demo_charges\\3gnw\\3gnw_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 76,
+    "num_heavy_atoms": 44,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 7.16761538856908e-05,
+    "processing_time": 0.008608818054199219,
+    "success": true,
+    "ligand_id": "3gnw"
+  },
+  {
+    "file": "./demo_charges\\3gr2\\3gr2_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 24,
+    "num_heavy_atoms": 14,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.268741005345395e-05,
+    "processing_time": 0.0075418949127197266,
+    "success": true,
+    "ligand_id": "3gr2"
+  },
+  {
+    "file": "./demo_charges\\3gv9\\3gv9_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 18,
+    "num_heavy_atoms": 12,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 1.6864977384868423e-05,
+    "processing_time": 0.007118701934814453,
+    "success": true,
+    "ligand_id": "3gv9"
+  },
+  {
+    "file": "./demo_charges\\3gy4\\3gy4_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 20,
+    "num_heavy_atoms": 10,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 1.827039216694079e-05,
+    "processing_time": 0.007858991622924805,
+    "success": true,
+    "ligand_id": "3gy4"
+  },
+  {
+    "file": "./demo_charges\\3ivg\\3ivg_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 46,
+    "num_heavy_atoms": 29,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.396940532483553e-05,
+    "processing_time": 0.007575273513793945,
+    "success": true,
+    "ligand_id": "3ivg"
+  },
+  {
+    "file": "./demo_charges\\3jvr\\3jvr_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 36,
+    "num_heavy_atoms": 23,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.453304893092105e-05,
+    "processing_time": 0.007986783981323242,
+    "success": true,
+    "ligand_id": "3jvr"
+  },
+  {
+    "file": "./demo_charges\\3jvs\\3jvs_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 52,
+    "num_heavy_atoms": 30,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.6981008429276316e-05,
+    "processing_time": 0.008161306381225586,
+    "success": true,
+    "ligand_id": "3jvs"
+  },
+  {
+    "file": "./demo_charges\\3jya\\3jya_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 20,
+    "num_heavy_atoms": 16,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.1482768811677632e-05,
+    "processing_time": 0.007068634033203125,
+    "success": true,
+    "ligand_id": "3jya"
+  },
+  {
+    "file": "./demo_charges\\3k5v\\3k5v_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 40,
+    "num_heavy_atoms": 27,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.8749293277138155e-05,
+    "processing_time": 0.007738590240478516,
+    "success": true,
+    "ligand_id": "3k5v"
+  },
+  {
+    "file": "./demo_charges\\3kgp\\3kgp_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 20,
+    "num_heavy_atoms": 11,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 1.8069618626644735e-05,
+    "processing_time": 0.008426427841186523,
+    "success": true,
+    "ligand_id": "3kgp"
+  },
+  {
+    "file": "./demo_charges\\3kr8\\3kr8_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 32,
+    "num_heavy_atoms": 21,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.971448396381579e-05,
+    "processing_time": 0.009201765060424805,
+    "success": true,
+    "ligand_id": "3kr8"
+  },
+  {
+    "file": "./demo_charges\\3kwa\\3kwa_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 44,
+    "num_heavy_atoms": 14,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.413150185032895e-05,
+    "processing_time": 0.008868217468261719,
+    "success": true,
+    "ligand_id": "3kwa"
+  },
+  {
+    "file": "./demo_charges\\3lka\\3lka_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 21,
+    "num_heavy_atoms": 12,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 1.9475033408717107e-05,
+    "processing_time": 0.007692098617553711,
+    "success": true,
+    "ligand_id": "3lka"
+  },
+  {
+    "file": "./demo_charges\\3mss\\3mss_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 42,
+    "num_heavy_atoms": 21,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.7143104954769735e-05,
+    "processing_time": 0.008449554443359375,
+    "success": true,
+    "ligand_id": "3mss"
+  },
+  {
+    "file": "./demo_charges\\3myg\\3myg_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 57,
+    "num_heavy_atoms": 30,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.260266755756579e-05,
+    "processing_time": 0.00866556167602539,
+    "success": true,
+    "ligand_id": "3myg"
+  },
+  {
+    "file": "./demo_charges\\3n76\\3n76_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 39,
+    "num_heavy_atoms": 22,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.5336143092105265e-05,
+    "processing_time": 0.00781559944152832,
+    "success": true,
+    "ligand_id": "3n76"
+  },
+  {
+    "file": "./demo_charges\\3n7a\\3n7a_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 21,
+    "num_heavy_atoms": 12,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 1.9073486328125e-05,
+    "processing_time": 0.0072476863861083984,
+    "success": true,
+    "ligand_id": "3n7a"
+  },
+  {
+    "file": "./demo_charges\\3n86\\3n86_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 39,
+    "num_heavy_atoms": 23,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.5536916632401316e-05,
+    "processing_time": 0.007432699203491211,
+    "success": true,
+    "ligand_id": "3n86"
+  },
+  {
+    "file": "./demo_charges\\3nq9\\3nq9_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 25,
+    "num_heavy_atoms": 10,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 1.8471165707236842e-05,
+    "processing_time": 0.007415056228637695,
+    "success": true,
+    "ligand_id": "3nq9"
+  },
+  {
+    "file": "./demo_charges\\3nw9\\3nw9_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 62,
+    "num_heavy_atoms": 38,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.882664730674342e-05,
+    "processing_time": 0.0084381103515625,
+    "success": true,
+    "ligand_id": "3nw9"
+  },
+  {
+    "file": "./demo_charges\\3nx7\\3nx7_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 36,
+    "num_heavy_atoms": 20,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.232453998766447e-05,
+    "processing_time": 0.007920980453491211,
+    "success": true,
+    "ligand_id": "3nx7"
+  },
+  {
+    "file": "./demo_charges\\3o9i\\3o9i_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 81,
+    "num_heavy_atoms": 42,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 7.127460680509869e-05,
+    "processing_time": 0.009166955947875977,
+    "success": true,
+    "ligand_id": "3o9i"
+  },
+  {
+    "file": "./demo_charges\\3oe4\\3oe4_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 51,
+    "num_heavy_atoms": 33,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.91895173725329e-05,
+    "processing_time": 0.008453130722045898,
+    "success": true,
+    "ligand_id": "3oe4"
+  },
+  {
+    "file": "./demo_charges\\3oe5\\3oe5_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 50,
+    "num_heavy_atoms": 31,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.758332905016447e-05,
+    "processing_time": 0.008685111999511719,
+    "success": true,
+    "ligand_id": "3oe5"
+  },
+  {
+    "file": "./demo_charges\\3ozs\\3ozs_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 50,
+    "num_heavy_atoms": 33,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.778410259046053e-05,
+    "processing_time": 0.008632183074951172,
+    "success": true,
+    "ligand_id": "3ozs"
+  },
+  {
+    "file": "./demo_charges\\3ozt\\3ozt_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 50,
+    "num_heavy_atoms": 31,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.718178196957237e-05,
+    "processing_time": 0.008473396301269531,
+    "success": true,
+    "ligand_id": "3ozt"
+  },
+  {
+    "file": "./demo_charges\\3p5o\\3p5o_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 52,
+    "num_heavy_atoms": 30,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.8386423211348684e-05,
+    "processing_time": 0.009329557418823242,
+    "success": true,
+    "ligand_id": "3p5o"
+  },
+  {
+    "file": "./demo_charges\\3prs\\3prs_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 98,
+    "num_heavy_atoms": 50,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 8.412411338404606e-05,
+    "processing_time": 0.010802268981933594,
+    "success": true,
+    "ligand_id": "3prs"
+  },
+  {
+    "file": "./demo_charges\\3pww\\3pww_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 100,
+    "num_heavy_atoms": 49,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 8.653339586759869e-05,
+    "processing_time": 0.010628700256347656,
+    "success": true,
+    "ligand_id": "3pww"
+  },
+  {
+    "file": "./demo_charges\\3pxf\\3pxf_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 33,
+    "num_heavy_atoms": 21,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.212376644736842e-05,
+    "processing_time": 0.00826406478881836,
+    "success": true,
+    "ligand_id": "3pxf"
+  },
+  {
+    "file": "./demo_charges\\3pyy\\3pyy_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 38,
+    "num_heavy_atoms": 25,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.814697265625e-05,
+    "processing_time": 0.007845640182495117,
+    "success": true,
+    "ligand_id": "3pyy"
+  },
+  {
+    "file": "./demo_charges\\3qgy\\3qgy_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 54,
+    "num_heavy_atoms": 30,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.0594932154605265e-05,
+    "processing_time": 0.009226322174072266,
+    "success": true,
+    "ligand_id": "3qgy"
+  },
+  {
+    "file": "./demo_charges\\3qqs\\3qqs_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 28,
+    "num_heavy_atoms": 19,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.690365439967105e-05,
+    "processing_time": 0.008268117904663086,
+    "success": true,
+    "ligand_id": "3qqs"
+  },
+  {
+    "file": "./demo_charges\\3r88\\3r88_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 24,
+    "num_heavy_atoms": 14,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.1884315892269735e-05,
+    "processing_time": 0.008645057678222656,
+    "success": true,
+    "ligand_id": "3r88"
+  },
+  {
+    "file": "./demo_charges\\3rlr\\3rlr_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 35,
+    "num_heavy_atoms": 23,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.39307283100329e-05,
+    "processing_time": 0.00870823860168457,
+    "success": true,
+    "ligand_id": "3rlr"
+  },
+  {
+    "file": "./demo_charges\\3rr4\\3rr4_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 32,
+    "num_heavy_atoms": 18,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.0517578125e-05,
+    "processing_time": 0.009038686752319336,
+    "success": true,
+    "ligand_id": "3rr4"
+  },
+  {
+    "file": "./demo_charges\\3rsx\\3rsx_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 26,
+    "num_heavy_atoms": 16,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.5699013157894735e-05,
+    "processing_time": 0.008337259292602539,
+    "success": true,
+    "ligand_id": "3rsx"
+  },
+  {
+    "file": "./demo_charges\\3ryj\\3ryj_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 27,
+    "num_heavy_atoms": 18,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.4695145456414474e-05,
+    "processing_time": 0.008113622665405273,
+    "success": true,
+    "ligand_id": "3ryj"
+  },
+  {
+    "file": "./demo_charges\\3tsk\\3tsk_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 71,
+    "num_heavy_atoms": 40,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 6.264134457236843e-05,
+    "processing_time": 0.009754657745361328,
+    "success": true,
+    "ligand_id": "3tsk"
+  },
+  {
+    "file": "./demo_charges\\3twp\\3twp_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 15,
+    "num_heavy_atoms": 10,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 1.4254921361019737e-05,
+    "processing_time": 0.008503198623657227,
+    "success": true,
+    "ligand_id": "3twp"
+  },
+  {
+    "file": "./demo_charges\\3u5j\\3u5j_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 35,
+    "num_heavy_atoms": 22,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.453304893092105e-05,
+    "processing_time": 0.009118795394897461,
+    "success": true,
+    "ligand_id": "3u5j"
+  },
+  {
+    "file": "./demo_charges\\3u8n\\3u8n_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 36,
+    "num_heavy_atoms": 17,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.232453998766447e-05,
+    "processing_time": 0.00925302505493164,
+    "success": true,
+    "ligand_id": "3u8n"
+  },
+  {
+    "file": "./demo_charges\\3u9q\\3u9q_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 31,
+    "num_heavy_atoms": 12,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.3289730674342107e-05,
+    "processing_time": 0.008553266525268555,
+    "success": true,
+    "ligand_id": "3u9q"
+  },
+  {
+    "file": "./demo_charges\\3udh\\3udh_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 27,
+    "num_heavy_atoms": 14,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.5297466077302632e-05,
+    "processing_time": 0.008947610855102539,
+    "success": true,
+    "ligand_id": "3udh"
+  },
+  {
+    "file": "./demo_charges\\3ueu\\3ueu_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 37,
+    "num_heavy_atoms": 14,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.7706748560855265e-05,
+    "processing_time": 0.008439302444458008,
+    "success": true,
+    "ligand_id": "3ueu"
+  },
+  {
+    "file": "./demo_charges\\3uev\\3uev_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 43,
+    "num_heavy_atoms": 16,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.212376644736842e-05,
+    "processing_time": 0.008435726165771484,
+    "success": true,
+    "ligand_id": "3uev"
+  },
+  {
+    "file": "./demo_charges\\3uew\\3uew_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 49,
+    "num_heavy_atoms": 18,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.654078433388158e-05,
+    "processing_time": 0.009057760238647461,
+    "success": true,
+    "ligand_id": "3uew"
+  },
+  {
+    "file": "./demo_charges\\3uex\\3uex_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 55,
+    "num_heavy_atoms": 20,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.0957802220394735e-05,
+    "processing_time": 0.00942087173461914,
+    "success": true,
+    "ligand_id": "3uex"
+  },
+  {
+    "file": "./demo_charges\\3ui7\\3ui7_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 47,
+    "num_heavy_atoms": 24,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.336708470394737e-05,
+    "processing_time": 0.010228395462036133,
+    "success": true,
+    "ligand_id": "3ui7"
+  },
+  {
+    "file": "./demo_charges\\3uo4\\3uo4_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 46,
+    "num_heavy_atoms": 29,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.417017886513158e-05,
+    "processing_time": 0.01073908805847168,
+    "success": true,
+    "ligand_id": "3uo4"
+  },
+  {
+    "file": "./demo_charges\\3up2\\3up2_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 40,
+    "num_heavy_atoms": 28,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.895006681743421e-05,
+    "processing_time": 0.009383916854858398,
+    "success": true,
+    "ligand_id": "3up2"
+  },
+  {
+    "file": "./demo_charges\\3uri\\3uri_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 131,
+    "num_heavy_atoms": 65,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 0.00011243318256578947,
+    "processing_time": 0.01220846176147461,
+    "success": true,
+    "ligand_id": "3uri"
+  },
+  {
+    "file": "./demo_charges\\3utu\\3utu_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 82,
+    "num_heavy_atoms": 47,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 7.448698344983553e-05,
+    "processing_time": 0.011564016342163086,
+    "success": true,
+    "ligand_id": "3utu"
+  },
+  {
+    "file": "./demo_charges\\3uuo\\3uuo_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 45,
+    "num_heavy_atoms": 23,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.1961669921875e-05,
+    "processing_time": 0.01035451889038086,
+    "success": true,
+    "ligand_id": "3uuo"
+  },
+  {
+    "file": "./demo_charges\\3wtj\\3wtj_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 25,
+    "num_heavy_atoms": 16,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.3892051295230265e-05,
+    "processing_time": 0.009547948837280273,
+    "success": true,
+    "ligand_id": "3wtj"
+  },
+  {
+    "file": "./demo_charges\\3wz8\\3wz8_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 58,
+    "num_heavy_atoms": 33,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.2803441097861845e-05,
+    "processing_time": 0.010137081146240234,
+    "success": true,
+    "ligand_id": "3wz8"
+  },
+  {
+    "file": "./demo_charges\\3zdg\\3zdg_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 34,
+    "num_heavy_atoms": 13,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.650210731907895e-05,
+    "processing_time": 0.008895397186279297,
+    "success": true,
+    "ligand_id": "3zdg"
+  },
+  {
+    "file": "./demo_charges\\3zso\\3zso_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 78,
+    "num_heavy_atoms": 44,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 7.087305972450657e-05,
+    "processing_time": 0.00937962532043457,
+    "success": true,
+    "ligand_id": "3zso"
+  },
+  {
+    "file": "./demo_charges\\3zsx\\3zsx_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 60,
+    "num_heavy_atoms": 34,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.4409629420230265e-05,
+    "processing_time": 0.008856058120727539,
+    "success": true,
+    "ligand_id": "3zsx"
+  },
+  {
+    "file": "./demo_charges\\3zt2\\3zt2_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 34,
+    "num_heavy_atoms": 23,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.292686060855263e-05,
+    "processing_time": 0.008495807647705078,
+    "success": true,
+    "ligand_id": "3zt2"
+  },
+  {
+    "file": "./demo_charges\\4abg\\4abg_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 36,
+    "num_heavy_atoms": 15,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.1722219366776316e-05,
+    "processing_time": 0.008445262908935547,
+    "success": true,
+    "ligand_id": "4abg"
+  },
+  {
+    "file": "./demo_charges\\4agn\\4agn_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 52,
+    "num_heavy_atoms": 24,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.4772499486019735e-05,
+    "processing_time": 0.008917570114135742,
+    "success": true,
+    "ligand_id": "4agn"
+  },
+  {
+    "file": "./demo_charges\\4agp\\4agp_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 62,
+    "num_heavy_atoms": 30,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.4409629420230265e-05,
+    "processing_time": 0.008626937866210938,
+    "success": true,
+    "ligand_id": "4agp"
+  },
+  {
+    "file": "./demo_charges\\4agq\\4agq_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 63,
+    "num_heavy_atoms": 30,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.320498817845395e-05,
+    "processing_time": 0.008947610855102539,
+    "success": true,
+    "ligand_id": "4agq"
+  },
+  {
+    "file": "./demo_charges\\4cig\\4cig_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 67,
+    "num_heavy_atoms": 37,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.9830515008223684e-05,
+    "processing_time": 0.009534358978271484,
+    "success": true,
+    "ligand_id": "4cig"
+  },
+  {
+    "file": "./demo_charges\\4cr9\\4cr9_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 25,
+    "num_heavy_atoms": 13,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.3289730674342107e-05,
+    "processing_time": 0.010347127914428711,
+    "success": true,
+    "ligand_id": "4cr9"
+  },
+  {
+    "file": "./demo_charges\\4cra\\4cra_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 63,
+    "num_heavy_atoms": 38,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.962974146792763e-05,
+    "processing_time": 0.009226799011230469,
+    "success": true,
+    "ligand_id": "4cra"
+  },
+  {
+    "file": "./demo_charges\\4crc\\4crc_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 60,
+    "num_heavy_atoms": 39,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.8224326685855265e-05,
+    "processing_time": 0.010022401809692383,
+    "success": true,
+    "ligand_id": "4crc"
+  },
+  {
+    "file": "./demo_charges\\4ddh\\4ddh_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 24,
+    "num_heavy_atoms": 15,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.2486636513157893e-05,
+    "processing_time": 0.008044958114624023,
+    "success": true,
+    "ligand_id": "4ddh"
+  },
+  {
+    "file": "./demo_charges\\4ddk\\4ddk_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 17,
+    "num_heavy_atoms": 12,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 1.6864977384868423e-05,
+    "processing_time": 0.008246183395385742,
+    "success": true,
+    "ligand_id": "4ddk"
+  },
+  {
+    "file": "./demo_charges\\4de1\\4de1_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 34,
+    "num_heavy_atoms": 23,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.4332275390625e-05,
+    "processing_time": 0.008083581924438477,
+    "success": true,
+    "ligand_id": "4de1"
+  },
+  {
+    "file": "./demo_charges\\4de2\\4de2_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 43,
+    "num_heavy_atoms": 24,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.015470805921053e-05,
+    "processing_time": 0.007981538772583008,
+    "success": true,
+    "ligand_id": "4de2"
+  },
+  {
+    "file": "./demo_charges\\4de3\\4de3_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 31,
+    "num_heavy_atoms": 21,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.071835166529605e-05,
+    "processing_time": 0.007796525955200195,
+    "success": true,
+    "ligand_id": "4de3"
+  },
+  {
+    "file": "./demo_charges\\4djv\\4djv_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 50,
+    "num_heavy_atoms": 28,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.6780234888980265e-05,
+    "processing_time": 0.008091211318969727,
+    "success": true,
+    "ligand_id": "4djv"
+  },
+  {
+    "file": "./demo_charges\\4dld\\4dld_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 33,
+    "num_heavy_atoms": 21,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.9915257504111842e-05,
+    "processing_time": 0.007807731628417969,
+    "success": true,
+    "ligand_id": "4dld"
+  },
+  {
+    "file": "./demo_charges\\4e5w\\4e5w_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 57,
+    "num_heavy_atoms": 28,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.139802631578947e-05,
+    "processing_time": 0.00887608528137207,
+    "success": true,
+    "ligand_id": "4e5w"
+  },
+  {
+    "file": "./demo_charges\\4ea2\\4ea2_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 64,
+    "num_heavy_atoms": 24,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.099647923519737e-05,
+    "processing_time": 0.013690948486328125,
+    "success": true,
+    "ligand_id": "4ea2"
+  },
+  {
+    "file": "./demo_charges\\4eo8\\4eo8_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 56,
+    "num_heavy_atoms": 27,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.738255550986842e-05,
+    "processing_time": 0.012739181518554688,
+    "success": true,
+    "ligand_id": "4eo8"
+  },
+  {
+    "file": "./demo_charges\\4eor\\4eor_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 50,
+    "num_heavy_atoms": 28,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.6780234888980265e-05,
+    "processing_time": 0.00975656509399414,
+    "success": true,
+    "ligand_id": "4eor"
+  },
+  {
+    "file": "./demo_charges\\4f09\\4f09_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 37,
+    "num_heavy_atoms": 19,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.4934596011513155e-05,
+    "processing_time": 0.00948190689086914,
+    "success": true,
+    "ligand_id": "4f09"
+  },
+  {
+    "file": "./demo_charges\\4f2w\\4f2w_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 40,
+    "num_heavy_atoms": 20,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.674155787417763e-05,
+    "processing_time": 0.010004043579101562,
+    "success": true,
+    "ligand_id": "4f2w"
+  },
+  {
+    "file": "./demo_charges\\4f3c\\4f3c_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 49,
+    "num_heavy_atoms": 23,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.336708470394737e-05,
+    "processing_time": 0.009809732437133789,
+    "success": true,
+    "ligand_id": "4f3c"
+  },
+  {
+    "file": "./demo_charges\\4f9w\\4f9w_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 43,
+    "num_heavy_atoms": 25,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.0757028680098684e-05,
+    "processing_time": 0.009383440017700195,
+    "success": true,
+    "ligand_id": "4f9w"
+  },
+  {
+    "file": "./demo_charges\\4gfm\\4gfm_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 26,
+    "num_heavy_atoms": 18,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.5699013157894735e-05,
+    "processing_time": 0.009233713150024414,
+    "success": true,
+    "ligand_id": "4gfm"
+  },
+  {
+    "file": "./demo_charges\\4gid\\4gid_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 95,
+    "num_heavy_atoms": 47,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 8.171483090049343e-05,
+    "processing_time": 0.01124882698059082,
+    "success": true,
+    "ligand_id": "4gid"
+  },
+  {
+    "file": "./demo_charges\\4gkm\\4gkm_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 31,
+    "num_heavy_atoms": 20,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.8108295641447368e-05,
+    "processing_time": 0.008382081985473633,
+    "success": true,
+    "ligand_id": "4gkm"
+  },
+  {
+    "file": "./demo_charges\\4gr0\\4gr0_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 74,
+    "num_heavy_atoms": 44,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 6.745990953947369e-05,
+    "processing_time": 0.011469125747680664,
+    "success": true,
+    "ligand_id": "4gr0"
+  },
+  {
+    "file": "./demo_charges\\4hge\\4hge_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 38,
+    "num_heavy_atoms": 25,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.814697265625e-05,
+    "processing_time": 0.011715173721313477,
+    "success": true,
+    "ligand_id": "4hge"
+  },
+  {
+    "file": "./demo_charges\\4ih5\\4ih5_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 27,
+    "num_heavy_atoms": 17,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.7305201480263158e-05,
+    "processing_time": 0.008516550064086914,
+    "success": true,
+    "ligand_id": "4ih5"
+  },
+  {
+    "file": "./demo_charges\\4ih7\\4ih7_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 34,
+    "num_heavy_atoms": 17,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.9915257504111842e-05,
+    "processing_time": 0.009190559387207031,
+    "success": true,
+    "ligand_id": "4ih7"
+  },
+  {
+    "file": "./demo_charges\\4ivb\\4ivb_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 42,
+    "num_heavy_atoms": 23,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.9150840357730265e-05,
+    "processing_time": 0.009126901626586914,
+    "success": true,
+    "ligand_id": "4ivb"
+  },
+  {
+    "file": "./demo_charges\\4ivc\\4ivc_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 45,
+    "num_heavy_atoms": 24,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.0957802220394735e-05,
+    "processing_time": 0.009311914443969727,
+    "success": true,
+    "ligand_id": "4ivc"
+  },
+  {
+    "file": "./demo_charges\\4j21\\4j21_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 33,
+    "num_heavy_atoms": 20,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.1722219366776316e-05,
+    "processing_time": 0.009804487228393555,
+    "success": true,
+    "ligand_id": "4j21"
+  },
+  {
+    "file": "./demo_charges\\4j28\\4j28_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 33,
+    "num_heavy_atoms": 17,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.09191252055921e-05,
+    "processing_time": 0.008914470672607422,
+    "success": true,
+    "ligand_id": "4j28"
+  },
+  {
+    "file": "./demo_charges\\4j3l\\4j3l_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 45,
+    "num_heavy_atoms": 26,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.0957802220394735e-05,
+    "processing_time": 0.011188268661499023,
+    "success": true,
+    "ligand_id": "4j3l"
+  },
+  {
+    "file": "./demo_charges\\4jfs\\4jfs_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 37,
+    "num_heavy_atoms": 17,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.252531352796053e-05,
+    "processing_time": 0.009506940841674805,
+    "success": true,
+    "ligand_id": "4jfs"
+  },
+  {
+    "file": "./demo_charges\\4jia\\4jia_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 58,
+    "num_heavy_atoms": 31,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.4610402960526316e-05,
+    "processing_time": 0.011034965515136719,
+    "success": true,
+    "ligand_id": "4jia"
+  },
+  {
+    "file": "./demo_charges\\4jsz\\4jsz_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 17,
+    "num_heavy_atoms": 10,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 1.606188322368421e-05,
+    "processing_time": 0.01187586784362793,
+    "success": true,
+    "ligand_id": "4jsz"
+  },
+  {
+    "file": "./demo_charges\\4jxs\\4jxs_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 31,
+    "num_heavy_atoms": 22,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.0116031044407893e-05,
+    "processing_time": 0.013439178466796875,
+    "success": true,
+    "ligand_id": "4jxs"
+  },
+  {
+    "file": "./demo_charges\\4k18\\4k18_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 43,
+    "num_heavy_atoms": 29,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.2563990542763155e-05,
+    "processing_time": 0.009981155395507812,
+    "success": true,
+    "ligand_id": "4k18"
+  },
+  {
+    "file": "./demo_charges\\4k77\\4k77_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 34,
+    "num_heavy_atoms": 18,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.1521445826480265e-05,
+    "processing_time": 0.00997781753540039,
+    "success": true,
+    "ligand_id": "4k77"
+  },
+  {
+    "file": "./demo_charges\\4kz6\\4kz6_ligand.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 31,
+    "num_heavy_atoms": 15,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.5297466077302632e-05,
+    "processing_time": 0.00870060920715332,
+    "success": true,
+    "ligand_id": "4kz6"
+  }
+]

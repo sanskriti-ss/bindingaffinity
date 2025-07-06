@@ -1,0 +1,4182 @@
+[
+  {
+    "file": "./demo_charges\\1a30\\1a30_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1278,
+    "num_heavy_atoms": 600,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.6100560238486842e-05,
+    "processing_time": 0.024729490280151367,
+    "success": true,
+    "pocket_id": "1a30",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1bcu\\1bcu_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 842,
+    "num_heavy_atoms": 429,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.4332275390625e-05,
+    "processing_time": 0.017949581146240234,
+    "success": true,
+    "pocket_id": "1bcu",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1bzc\\1bzc_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1004,
+    "num_heavy_atoms": 491,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.4695145456414474e-05,
+    "processing_time": 0.018806934356689453,
+    "success": true,
+    "pocket_id": "1bzc",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1c5z\\1c5z_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 881,
+    "num_heavy_atoms": 439,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.8988743832236845e-05,
+    "processing_time": 0.018125295639038086,
+    "success": true,
+    "pocket_id": "1c5z",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1eby\\1eby_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1509,
+    "num_heavy_atoms": 710,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.3729954769736845e-05,
+    "processing_time": 0.02689647674560547,
+    "success": true,
+    "pocket_id": "1eby",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1g2k\\1g2k_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1471,
+    "num_heavy_atoms": 690,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.8911389802631577e-05,
+    "processing_time": 0.028866291046142578,
+    "success": true,
+    "pocket_id": "1g2k",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1k1i\\1k1i_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1132,
+    "num_heavy_atoms": 567,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.1081221731085526e-05,
+    "processing_time": 0.0225067138671875,
+    "success": true,
+    "pocket_id": "1k1i",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1lpg\\1lpg_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1233,
+    "num_heavy_atoms": 619,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.1884315892269735e-05,
+    "processing_time": 0.023981332778930664,
+    "success": true,
+    "pocket_id": "1lpg",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1mq6\\1mq6_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1143,
+    "num_heavy_atoms": 576,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.6301333778782893e-05,
+    "processing_time": 0.021303176879882812,
+    "success": true,
+    "pocket_id": "1mq6",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1nc1\\1nc1_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1288,
+    "num_heavy_atoms": 637,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.814697265625e-05,
+    "processing_time": 0.023787975311279297,
+    "success": true,
+    "pocket_id": "1nc1",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1nc3\\1nc3_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1305,
+    "num_heavy_atoms": 645,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.356785824424342e-05,
+    "processing_time": 0.021781206130981445,
+    "success": true,
+    "pocket_id": "1nc3",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1nvq\\1nvq_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1173,
+    "num_heavy_atoms": 573,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.2486636513157893e-05,
+    "processing_time": 0.023005247116088867,
+    "success": true,
+    "pocket_id": "1nvq",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1o0h\\1o0h_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1012,
+    "num_heavy_atoms": 478,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.7143104954769735e-05,
+    "processing_time": 0.02327108383178711,
+    "success": true,
+    "pocket_id": "1o0h",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1o3f\\1o3f_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1070,
+    "num_heavy_atoms": 538,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.413150185032895e-05,
+    "processing_time": 0.0251467227935791,
+    "success": true,
+    "pocket_id": "1o3f",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1o5b\\1o5b_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 943,
+    "num_heavy_atoms": 469,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.5174046566611845e-05,
+    "processing_time": 0.024265527725219727,
+    "success": true,
+    "pocket_id": "1o5b",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1owh\\1owh_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1114,
+    "num_heavy_atoms": 563,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.4934596011513155e-05,
+    "processing_time": 0.025391340255737305,
+    "success": true,
+    "pocket_id": "1owh",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1oyt\\1oyt_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1327,
+    "num_heavy_atoms": 660,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.09191252055921e-05,
+    "processing_time": 0.02865290641784668,
+    "success": true,
+    "pocket_id": "1oyt",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1p1n\\1p1n_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1310,
+    "num_heavy_atoms": 641,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.2563990542763155e-05,
+    "processing_time": 0.030963897705078125,
+    "success": true,
+    "pocket_id": "1p1n",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1p1q\\1p1q_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1312,
+    "num_heavy_atoms": 643,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.8386423211348684e-05,
+    "processing_time": 0.0272674560546875,
+    "success": true,
+    "pocket_id": "1p1q",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1ps3\\1ps3_pocket.mol2",
+    "errors": [
+      "Failed to load molecule from both MOL2 and SDF formats"
+    ],
+    "loading_success": false,
+    "sanitization_success": false,
+    "success": false,
+    "processing_time": 0.007396697998046875
+  },
+  {
+    "file": "./demo_charges\\1pxn\\1pxn_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1253,
+    "num_heavy_atoms": 595,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.4571725945723684e-05,
+    "processing_time": 0.027795076370239258,
+    "success": true,
+    "pocket_id": "1pxn",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1q8u\\1q8u_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1284,
+    "num_heavy_atoms": 631,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.7305201480263158e-05,
+    "processing_time": 0.029587745666503906,
+    "success": true,
+    "pocket_id": "1q8u",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1qf1\\1qf1_pocket.mol2",
+    "errors": [
+      "Failed to load molecule from both MOL2 and SDF formats"
+    ],
+    "loading_success": false,
+    "sanitization_success": false,
+    "success": false,
+    "processing_time": 0.005805015563964844
+  },
+  {
+    "file": "./demo_charges\\1qkt\\1qkt_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1326,
+    "num_heavy_atoms": 631,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.9312936883223684e-05,
+    "processing_time": 0.027638673782348633,
+    "success": true,
+    "pocket_id": "1qkt",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1r5y\\1r5y_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1071,
+    "num_heavy_atoms": 531,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.4571725945723684e-05,
+    "processing_time": 0.025713443756103516,
+    "success": true,
+    "pocket_id": "1r5y",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1s38\\1s38_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1113,
+    "num_heavy_atoms": 550,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.437095240542763e-05,
+    "processing_time": 0.017134428024291992,
+    "success": true,
+    "pocket_id": "1s38",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1sqa\\1sqa_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1200,
+    "num_heavy_atoms": 615,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.3490504214638158e-05,
+    "processing_time": 0.019377946853637695,
+    "success": true,
+    "pocket_id": "1sqa",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1syi\\1syi_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1348,
+    "num_heavy_atoms": 663,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.955238743832237e-05,
+    "processing_time": 0.023241043090820312,
+    "success": true,
+    "pocket_id": "1syi",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1u1b\\1u1b_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1047,
+    "num_heavy_atoms": 525,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 1.987658048930921e-05,
+    "processing_time": 0.019195079803466797,
+    "success": true,
+    "pocket_id": "1u1b",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1uto\\1uto_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 855,
+    "num_heavy_atoms": 431,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.597714072779605e-05,
+    "processing_time": 0.016962051391601562,
+    "success": true,
+    "pocket_id": "1uto",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1vso\\1vso_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1384,
+    "num_heavy_atoms": 665,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.3729954769736845e-05,
+    "processing_time": 0.020672082901000977,
+    "success": true,
+    "pocket_id": "1vso",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1w4o\\1w4o_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 920,
+    "num_heavy_atoms": 454,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.4332275390625e-05,
+    "processing_time": 0.01618504524230957,
+    "success": true,
+    "pocket_id": "1w4o",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1y6r\\1y6r_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1288,
+    "num_heavy_atoms": 637,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.055625513980263e-05,
+    "processing_time": 0.019379138946533203,
+    "success": true,
+    "pocket_id": "1y6r",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1yc1\\1yc1_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1477,
+    "num_heavy_atoms": 707,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.7907522101151316e-05,
+    "processing_time": 0.027062654495239258,
+    "success": true,
+    "pocket_id": "1yc1",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1ydr\\1ydr_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1207,
+    "num_heavy_atoms": 599,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.8509842722039474e-05,
+    "processing_time": 0.020288467407226562,
+    "success": true,
+    "pocket_id": "1ydr",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1ydt\\1ydt_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1437,
+    "num_heavy_atoms": 708,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.1722219366776316e-05,
+    "processing_time": 0.02843952178955078,
+    "success": true,
+    "pocket_id": "1ydt",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1z6e\\1z6e_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1212,
+    "num_heavy_atoms": 616,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.1521445826480265e-05,
+    "processing_time": 0.031087875366210938,
+    "success": true,
+    "pocket_id": "1z6e",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1z95\\1z95_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1777,
+    "num_heavy_atoms": 865,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.3892051295230265e-05,
+    "processing_time": 0.03184938430786133,
+    "success": true,
+    "pocket_id": "1z95",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\1z9g\\1z9g_pocket.mol2",
+    "errors": [
+      "Failed to load molecule from both MOL2 and SDF formats"
+    ],
+    "loading_success": false,
+    "sanitization_success": false,
+    "success": false,
+    "processing_time": 0.004301548004150391
+  },
+  {
+    "file": "./demo_charges\\2al5\\2al5_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1347,
+    "num_heavy_atoms": 659,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.0193385074013155e-05,
+    "processing_time": 0.022138118743896484,
+    "success": true,
+    "pocket_id": "2al5",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2br1\\2br1_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1066,
+    "num_heavy_atoms": 516,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.674155787417763e-05,
+    "processing_time": 0.01977229118347168,
+    "success": true,
+    "pocket_id": "2br1",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2brb\\2brb_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1026,
+    "num_heavy_atoms": 501,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.750597502055921e-05,
+    "processing_time": 0.018642187118530273,
+    "success": true,
+    "pocket_id": "2brb",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2c3i\\2c3i_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1075,
+    "num_heavy_atoms": 516,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.7305201480263158e-05,
+    "processing_time": 0.01883864402770996,
+    "success": true,
+    "pocket_id": "2c3i",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2cbv\\2cbv_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1197,
+    "num_heavy_atoms": 613,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.179957339638158e-05,
+    "processing_time": 0.021059513092041016,
+    "success": true,
+    "pocket_id": "2cbv",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2fvd\\2fvd_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1380,
+    "num_heavy_atoms": 646,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.7706748560855265e-05,
+    "processing_time": 0.02283620834350586,
+    "success": true,
+    "pocket_id": "2fvd",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2fxs\\2fxs_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1344,
+    "num_heavy_atoms": 636,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.0517578125e-05,
+    "processing_time": 0.023758649826049805,
+    "success": true,
+    "pocket_id": "2fxs",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2hb1\\2hb1_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 970,
+    "num_heavy_atoms": 479,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.8386423211348684e-05,
+    "processing_time": 0.0187222957611084,
+    "success": true,
+    "pocket_id": "2hb1",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2iwx\\2iwx_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1340,
+    "num_heavy_atoms": 635,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.750597502055921e-05,
+    "processing_time": 0.022780179977416992,
+    "success": true,
+    "pocket_id": "2iwx",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2j7h\\2j7h_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1217,
+    "num_heavy_atoms": 622,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.340576171875e-05,
+    "processing_time": 0.02297806739807129,
+    "success": true,
+    "pocket_id": "2j7h",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2p15\\2p15_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1617,
+    "num_heavy_atoms": 772,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 1.9073486328125e-05,
+    "processing_time": 0.026748180389404297,
+    "success": true,
+    "pocket_id": "2p15",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2p4y\\2p4y_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1631,
+    "num_heavy_atoms": 798,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.8911389802631577e-05,
+    "processing_time": 0.025173664093017578,
+    "success": true,
+    "pocket_id": "2p4y",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2pog\\2pog_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1307,
+    "num_heavy_atoms": 630,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.8108295641447368e-05,
+    "processing_time": 0.02298116683959961,
+    "success": true,
+    "pocket_id": "2pog",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2qbp\\2qbp_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1323,
+    "num_heavy_atoms": 657,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.8911389802631577e-05,
+    "processing_time": 0.02590322494506836,
+    "success": true,
+    "pocket_id": "2qbp",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2qbq\\2qbq_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1239,
+    "num_heavy_atoms": 605,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.4895918996710526e-05,
+    "processing_time": 0.021725177764892578,
+    "success": true,
+    "pocket_id": "2qbq",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2qbr\\2qbr_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1222,
+    "num_heavy_atoms": 601,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.1683542351973684e-05,
+    "processing_time": 0.02232980728149414,
+    "success": true,
+    "pocket_id": "2qbr",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2qe4\\2qe4_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1287,
+    "num_heavy_atoms": 630,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.8911389802631577e-05,
+    "processing_time": 0.022212505340576172,
+    "success": true,
+    "pocket_id": "2qe4",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2qnq\\2qnq_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1292,
+    "num_heavy_atoms": 613,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.268741005345395e-05,
+    "processing_time": 0.02453303337097168,
+    "success": true,
+    "pocket_id": "2qnq",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2r9w\\2r9w_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1219,
+    "num_heavy_atoms": 589,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 1.7266524465460526e-05,
+    "processing_time": 0.024404525756835938,
+    "success": true,
+    "pocket_id": "2r9w",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2v00\\2v00_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1160,
+    "num_heavy_atoms": 587,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.674155787417763e-05,
+    "processing_time": 0.021394968032836914,
+    "success": true,
+    "pocket_id": "2v00",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2v7a\\2v7a_pocket.mol2",
+    "errors": [
+      "Failed to load molecule from both MOL2 and SDF formats"
+    ],
+    "loading_success": false,
+    "sanitization_success": false,
+    "success": false,
+    "processing_time": 0.0057294368743896484
+  },
+  {
+    "file": "./demo_charges\\2vkm\\2vkm_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1899,
+    "num_heavy_atoms": 932,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.634001079358553e-05,
+    "processing_time": 0.030508041381835938,
+    "success": true,
+    "pocket_id": "2vkm",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2vvn\\2vvn_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1302,
+    "num_heavy_atoms": 659,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.979183799342105e-05,
+    "processing_time": 0.023424625396728516,
+    "success": true,
+    "pocket_id": "2vvn",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2vw5\\2vw5_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1398,
+    "num_heavy_atoms": 665,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 1.2447959498355263e-05,
+    "processing_time": 0.025143861770629883,
+    "success": true,
+    "pocket_id": "2vw5",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2w4x\\2w4x_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1110,
+    "num_heavy_atoms": 567,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.8509842722039474e-05,
+    "processing_time": 0.021580934524536133,
+    "success": true,
+    "pocket_id": "2w4x",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2w66\\2w66_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1159,
+    "num_heavy_atoms": 593,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.975316097861842e-05,
+    "processing_time": 0.023259878158569336,
+    "success": true,
+    "pocket_id": "2w66",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2wbg\\2wbg_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1587,
+    "num_heavy_atoms": 803,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.674155787417763e-05,
+    "processing_time": 0.026018857955932617,
+    "success": true,
+    "pocket_id": "2wbg",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2wca\\2wca_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1172,
+    "num_heavy_atoms": 598,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.1683542351973684e-05,
+    "processing_time": 0.02266979217529297,
+    "success": true,
+    "pocket_id": "2wca",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2weg\\2weg_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1091,
+    "num_heavy_atoms": 553,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.437095240542763e-05,
+    "processing_time": 0.0215914249420166,
+    "success": true,
+    "pocket_id": "2weg",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2wer\\2wer_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1289,
+    "num_heavy_atoms": 617,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.369127775493421e-05,
+    "processing_time": 0.02347254753112793,
+    "success": true,
+    "pocket_id": "2wer",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2wnc\\2wnc_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1184,
+    "num_heavy_atoms": 589,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.654078433388158e-05,
+    "processing_time": 0.02215290069580078,
+    "success": true,
+    "pocket_id": "2wnc",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2wvt\\2wvt_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1098,
+    "num_heavy_atoms": 569,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.0795705694901316e-05,
+    "processing_time": 0.021657228469848633,
+    "success": true,
+    "pocket_id": "2wvt",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2x00\\2x00_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1458,
+    "num_heavy_atoms": 732,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.2285862972861842e-05,
+    "processing_time": 0.024273157119750977,
+    "success": true,
+    "pocket_id": "2x00",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2xb8\\2xb8_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1356,
+    "num_heavy_atoms": 667,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.9150840357730265e-05,
+    "processing_time": 0.0246427059173584,
+    "success": true,
+    "pocket_id": "2xb8",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2xbv\\2xbv_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1286,
+    "num_heavy_atoms": 643,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.292686060855263e-05,
+    "processing_time": 0.023154735565185547,
+    "success": true,
+    "pocket_id": "2xbv",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2xdl\\2xdl_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1317,
+    "num_heavy_atoms": 622,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.212376644736842e-05,
+    "processing_time": 0.021904945373535156,
+    "success": true,
+    "pocket_id": "2xdl",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2xii\\2xii_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1317,
+    "num_heavy_atoms": 671,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.8108295641447368e-05,
+    "processing_time": 0.022432327270507812,
+    "success": true,
+    "pocket_id": "2xii",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2xj7\\2xj7_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1159,
+    "num_heavy_atoms": 598,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.1359349300986845e-05,
+    "processing_time": 0.021322965621948242,
+    "success": true,
+    "pocket_id": "2xj7",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2xnb\\2xnb_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1301,
+    "num_heavy_atoms": 610,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.5536916632401316e-05,
+    "processing_time": 0.02189159393310547,
+    "success": true,
+    "pocket_id": "2xnb",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2xys\\2xys_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1255,
+    "num_heavy_atoms": 618,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.192299290707237e-05,
+    "processing_time": 0.021285057067871094,
+    "success": true,
+    "pocket_id": "2xys",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2y5h\\2y5h_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1162,
+    "num_heavy_atoms": 588,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.9915257504111842e-05,
+    "processing_time": 0.0210723876953125,
+    "success": true,
+    "pocket_id": "2y5h",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2yfe\\2yfe_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1371,
+    "num_heavy_atoms": 674,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.1119898745888155e-05,
+    "processing_time": 0.02142477035522461,
+    "success": true,
+    "pocket_id": "2yfe",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2yge\\2yge_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1373,
+    "num_heavy_atoms": 656,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 9.034809313322368e-06,
+    "processing_time": 0.02254939079284668,
+    "success": true,
+    "pocket_id": "2yge",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2yki\\2yki_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1628,
+    "num_heavy_atoms": 783,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.09191252055921e-05,
+    "processing_time": 0.033535003662109375,
+    "success": true,
+    "pocket_id": "2yki",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2ymd\\2ymd_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1100,
+    "num_heavy_atoms": 557,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.356785824424342e-05,
+    "processing_time": 0.023920297622680664,
+    "success": true,
+    "pocket_id": "2ymd",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2zb1\\2zb1_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1366,
+    "num_heavy_atoms": 658,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.995393451891447e-05,
+    "processing_time": 0.027326345443725586,
+    "success": true,
+    "pocket_id": "2zb1",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2zda\\2zda_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1319,
+    "num_heavy_atoms": 659,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.750597502055921e-05,
+    "processing_time": 0.024405717849731445,
+    "success": true,
+    "pocket_id": "2zda",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\2zy1\\2zy1_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1685,
+    "num_heavy_atoms": 811,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.955238743832237e-05,
+    "processing_time": 0.026100635528564453,
+    "success": true,
+    "pocket_id": "2zy1",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3acw\\3acw_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1408,
+    "num_heavy_atoms": 680,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.734387849506579e-05,
+    "processing_time": 0.02310657501220703,
+    "success": true,
+    "pocket_id": "3acw",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3ao4\\3ao4_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1050,
+    "num_heavy_atoms": 522,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.634001079358553e-05,
+    "processing_time": 0.018865585327148438,
+    "success": true,
+    "pocket_id": "3ao4",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3arp\\3arp_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1613,
+    "num_heavy_atoms": 797,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.7143104954769735e-05,
+    "processing_time": 0.02553844451904297,
+    "success": true,
+    "pocket_id": "3arp",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3arq\\3arq_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1241,
+    "num_heavy_atoms": 617,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.9513710423519735e-05,
+    "processing_time": 0.022501707077026367,
+    "success": true,
+    "pocket_id": "3arq",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3aru\\3aru_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1121,
+    "num_heavy_atoms": 565,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.192299290707237e-05,
+    "processing_time": 0.02075982093811035,
+    "success": true,
+    "pocket_id": "3aru",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3arv\\3arv_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 995,
+    "num_heavy_atoms": 498,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.654078433388158e-05,
+    "processing_time": 0.020153284072875977,
+    "success": true,
+    "pocket_id": "3arv",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3ary\\3ary_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1015,
+    "num_heavy_atoms": 504,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.834774619654605e-05,
+    "processing_time": 0.018769264221191406,
+    "success": true,
+    "pocket_id": "3ary",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3b1m\\3b1m_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1465,
+    "num_heavy_atoms": 710,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.071835166529605e-05,
+    "processing_time": 0.02588033676147461,
+    "success": true,
+    "pocket_id": "3b1m",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3b27\\3b27_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1264,
+    "num_heavy_atoms": 605,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.4934596011513155e-05,
+    "processing_time": 0.024453401565551758,
+    "success": true,
+    "pocket_id": "3b27",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3b5r\\3b5r_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1785,
+    "num_heavy_atoms": 867,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.4895918996710526e-05,
+    "processing_time": 0.027768611907958984,
+    "success": true,
+    "pocket_id": "3b5r",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3b65\\3b65_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1774,
+    "num_heavy_atoms": 863,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.971448396381579e-05,
+    "processing_time": 0.025410890579223633,
+    "success": true,
+    "pocket_id": "3b65",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3b68\\3b68_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1757,
+    "num_heavy_atoms": 856,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.3127634148848684e-05,
+    "processing_time": 0.02642512321472168,
+    "success": true,
+    "pocket_id": "3b68",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3bgz\\3bgz_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1087,
+    "num_heavy_atoms": 528,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.4895918996710526e-05,
+    "processing_time": 0.019940853118896484,
+    "success": true,
+    "pocket_id": "3bgz",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3bv9\\3bv9_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1288,
+    "num_heavy_atoms": 647,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 1.3251053659539474e-05,
+    "processing_time": 0.023516178131103516,
+    "success": true,
+    "pocket_id": "3bv9",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3cj4\\3cj4_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1023,
+    "num_heavy_atoms": 503,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 1.6664203844572368e-05,
+    "processing_time": 0.021524429321289062,
+    "success": true,
+    "pocket_id": "3cj4",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3coy\\3coy_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1541,
+    "num_heavy_atoms": 739,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.212376644736842e-05,
+    "processing_time": 0.02478504180908203,
+    "success": true,
+    "pocket_id": "3coy",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3coz\\3coz_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1549,
+    "num_heavy_atoms": 742,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.212376644736842e-05,
+    "processing_time": 0.025160789489746094,
+    "success": true,
+    "pocket_id": "3coz",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3d4z\\3d4z_pocket.mol2",
+    "errors": [
+      "Failed to load molecule from both MOL2 and SDF formats"
+    ],
+    "loading_success": false,
+    "sanitization_success": false,
+    "success": false,
+    "processing_time": 0.005115032196044922
+  },
+  {
+    "file": "./demo_charges\\3d6q\\3d6q_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 823,
+    "num_heavy_atoms": 387,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.288818359375e-05,
+    "processing_time": 0.017923355102539062,
+    "success": true,
+    "pocket_id": "3d6q",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3dd0\\3dd0_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1210,
+    "num_heavy_atoms": 612,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.6942331414473684e-05,
+    "processing_time": 0.02157115936279297,
+    "success": true,
+    "pocket_id": "3dd0",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3dx2\\3dx2_pocket.mol2",
+    "errors": [
+      "Failed to load molecule from both MOL2 and SDF formats"
+    ],
+    "loading_success": false,
+    "sanitization_success": false,
+    "success": false,
+    "processing_time": 0.005796909332275391
+  },
+  {
+    "file": "./demo_charges\\3dxg\\3dxg_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 848,
+    "num_heavy_atoms": 398,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.634001079358553e-05,
+    "processing_time": 0.018195629119873047,
+    "success": true,
+    "pocket_id": "3dxg",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3e5a\\3e5a_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1179,
+    "num_heavy_atoms": 565,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.232453998766447e-05,
+    "processing_time": 0.02185225486755371,
+    "success": true,
+    "pocket_id": "3e5a",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3e92\\3e92_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1490,
+    "num_heavy_atoms": 715,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.1722219366776316e-05,
+    "processing_time": 0.024457454681396484,
+    "success": true,
+    "pocket_id": "3e92",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3e93\\3e93_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1690,
+    "num_heavy_atoms": 801,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.336708470394737e-05,
+    "processing_time": 0.026530742645263672,
+    "success": true,
+    "pocket_id": "3e93",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3ehy\\3ehy_pocket.mol2",
+    "errors": [
+      "Failed to load molecule from both MOL2 and SDF formats"
+    ],
+    "loading_success": false,
+    "sanitization_success": false,
+    "success": false,
+    "processing_time": 0.0043048858642578125
+  },
+  {
+    "file": "./demo_charges\\3f3a\\3f3a_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1298,
+    "num_heavy_atoms": 643,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.939029091282895e-05,
+    "processing_time": 0.024852752685546875,
+    "success": true,
+    "pocket_id": "3f3a",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3f3c\\3f3c_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1356,
+    "num_heavy_atoms": 672,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.481117650082237e-05,
+    "processing_time": 0.022952795028686523,
+    "success": true,
+    "pocket_id": "3f3c",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3f3d\\3f3d_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1249,
+    "num_heavy_atoms": 623,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.882664730674342e-05,
+    "processing_time": 0.020688772201538086,
+    "success": true,
+    "pocket_id": "3f3d",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3f3e\\3f3e_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1157,
+    "num_heavy_atoms": 575,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.962974146792763e-05,
+    "processing_time": 0.02193427085876465,
+    "success": true,
+    "pocket_id": "3f3e",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3fcq\\3fcq_pocket.mol2",
+    "errors": [
+      "Failed to load molecule from both MOL2 and SDF formats"
+    ],
+    "loading_success": false,
+    "sanitization_success": false,
+    "success": false,
+    "processing_time": 0.004739999771118164
+  },
+  {
+    "file": "./demo_charges\\3fur\\3fur_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1432,
+    "num_heavy_atoms": 696,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.4895918996710526e-05,
+    "processing_time": 0.022266149520874023,
+    "success": true,
+    "pocket_id": "3fur",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3fv1\\3fv1_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1535,
+    "num_heavy_atoms": 749,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.4571725945723684e-05,
+    "processing_time": 0.023915767669677734,
+    "success": true,
+    "pocket_id": "3fv1",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3fv2\\3fv2_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1517,
+    "num_heavy_atoms": 738,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.396940532483553e-05,
+    "processing_time": 0.023825645446777344,
+    "success": true,
+    "pocket_id": "3fv2",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3g0w\\3g0w_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1680,
+    "num_heavy_atoms": 820,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.8509842722039474e-05,
+    "processing_time": 0.02453923225402832,
+    "success": true,
+    "pocket_id": "3g0w",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3g2z\\3g2z_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 892,
+    "num_heavy_atoms": 437,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.654078433388158e-05,
+    "processing_time": 0.0167086124420166,
+    "success": true,
+    "pocket_id": "3g2z",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3g31\\3g31_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 511,
+    "num_heavy_atoms": 254,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 1.9675806949013158e-05,
+    "processing_time": 0.013519287109375,
+    "success": true,
+    "pocket_id": "3g31",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3gbb\\3gbb_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1391,
+    "num_heavy_atoms": 680,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.61779142680921e-05,
+    "processing_time": 0.023437976837158203,
+    "success": true,
+    "pocket_id": "3gbb",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3gc5\\3gc5_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1290,
+    "num_heavy_atoms": 634,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.035548159950658e-05,
+    "processing_time": 0.021768569946289062,
+    "success": true,
+    "pocket_id": "3gc5",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3ge7\\3ge7_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1473,
+    "num_heavy_atoms": 724,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.47338224712171e-05,
+    "processing_time": 0.02485370635986328,
+    "success": true,
+    "pocket_id": "3ge7",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3gnw\\3gnw_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1742,
+    "num_heavy_atoms": 859,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.1482768811677632e-05,
+    "processing_time": 0.10164952278137207,
+    "success": true,
+    "pocket_id": "3gnw",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3gr2\\3gr2_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 940,
+    "num_heavy_atoms": 460,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.8108295641447368e-05,
+    "processing_time": 0.018307209014892578,
+    "success": true,
+    "pocket_id": "3gr2",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3gv9\\3gv9_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1059,
+    "num_heavy_atoms": 515,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.09191252055921e-05,
+    "processing_time": 0.01988697052001953,
+    "success": true,
+    "pocket_id": "3gv9",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3gy4\\3gy4_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 941,
+    "num_heavy_atoms": 468,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.0594932154605265e-05,
+    "processing_time": 0.018283367156982422,
+    "success": true,
+    "pocket_id": "3gy4",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3ivg\\3ivg_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1546,
+    "num_heavy_atoms": 738,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.252531352796053e-05,
+    "processing_time": 0.024419307708740234,
+    "success": true,
+    "pocket_id": "3ivg",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3jvr\\3jvr_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 724,
+    "num_heavy_atoms": 348,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.634001079358553e-05,
+    "processing_time": 0.016789674758911133,
+    "success": true,
+    "pocket_id": "3jvr",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3jvs\\3jvs_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 785,
+    "num_heavy_atoms": 378,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.7143104954769735e-05,
+    "processing_time": 0.01764535903930664,
+    "success": true,
+    "pocket_id": "3jvs",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3jya\\3jya_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 968,
+    "num_heavy_atoms": 475,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.7104427939967107e-05,
+    "processing_time": 0.017727136611938477,
+    "success": true,
+    "pocket_id": "3jya",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3k5v\\3k5v_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1146,
+    "num_heavy_atoms": 561,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.834774619654605e-05,
+    "processing_time": 0.019860029220581055,
+    "success": true,
+    "pocket_id": "3k5v",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3kgp\\3kgp_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 959,
+    "num_heavy_atoms": 477,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.2965537623355265e-05,
+    "processing_time": 0.017893314361572266,
+    "success": true,
+    "pocket_id": "3kgp",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3kr8\\3kr8_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1136,
+    "num_heavy_atoms": 568,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.3166311163651316e-05,
+    "processing_time": 0.019211530685424805,
+    "success": true,
+    "pocket_id": "3kr8",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3kwa\\3kwa_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1169,
+    "num_heavy_atoms": 591,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.1359349300986845e-05,
+    "processing_time": 0.021582365036010742,
+    "success": true,
+    "pocket_id": "3kwa",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3lka\\3lka_pocket.mol2",
+    "errors": [
+      "Failed to load molecule from both MOL2 and SDF formats"
+    ],
+    "loading_success": false,
+    "sanitization_success": false,
+    "success": false,
+    "processing_time": 0.004018306732177734
+  },
+  {
+    "file": "./demo_charges\\3mss\\3mss_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 837,
+    "num_heavy_atoms": 406,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.8509842722039474e-05,
+    "processing_time": 0.017179012298583984,
+    "success": true,
+    "pocket_id": "3mss",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3myg\\3myg_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1145,
+    "num_heavy_atoms": 546,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.336708470394737e-05,
+    "processing_time": 0.021142005920410156,
+    "success": true,
+    "pocket_id": "3myg",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3n76\\3n76_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1432,
+    "num_heavy_atoms": 698,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.6942331414473684e-05,
+    "processing_time": 0.02197885513305664,
+    "success": true,
+    "pocket_id": "3n76",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3n7a\\3n7a_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1168,
+    "num_heavy_atoms": 576,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.2965537623355265e-05,
+    "processing_time": 0.01977992057800293,
+    "success": true,
+    "pocket_id": "3n7a",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3n86\\3n86_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1441,
+    "num_heavy_atoms": 701,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.6942331414473684e-05,
+    "processing_time": 0.022539138793945312,
+    "success": true,
+    "pocket_id": "3n86",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3nq9\\3nq9_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 961,
+    "num_heavy_atoms": 459,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.5699013157894735e-05,
+    "processing_time": 0.01813530921936035,
+    "success": true,
+    "pocket_id": "3nq9",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3nw9\\3nw9_pocket.mol2",
+    "errors": [
+      "Failed to load molecule from both MOL2 and SDF formats"
+    ],
+    "loading_success": false,
+    "sanitization_success": false,
+    "success": false,
+    "processing_time": 0.005822658538818359
+  },
+  {
+    "file": "./demo_charges\\3nx7\\3nx7_pocket.mol2",
+    "errors": [
+      "Failed to load molecule from both MOL2 and SDF formats"
+    ],
+    "loading_success": false,
+    "sanitization_success": false,
+    "success": false,
+    "processing_time": 0.006258726119995117
+  },
+  {
+    "file": "./demo_charges\\3o9i\\3o9i_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1521,
+    "num_heavy_atoms": 704,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.8710616262335526e-05,
+    "processing_time": 0.0244140625,
+    "success": true,
+    "pocket_id": "3o9i",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3oe4\\3oe4_pocket.mol2",
+    "errors": [
+      "Failed to load molecule from both MOL2 and SDF formats"
+    ],
+    "loading_success": false,
+    "sanitization_success": false,
+    "success": false,
+    "processing_time": 0.005861520767211914
+  },
+  {
+    "file": "./demo_charges\\3oe5\\3oe5_pocket.mol2",
+    "errors": [
+      "Failed to load molecule from both MOL2 and SDF formats"
+    ],
+    "loading_success": false,
+    "sanitization_success": false,
+    "success": false,
+    "processing_time": 0.005901813507080078
+  },
+  {
+    "file": "./demo_charges\\3ozs\\3ozs_pocket.mol2",
+    "errors": [
+      "Failed to load molecule from both MOL2 and SDF formats"
+    ],
+    "loading_success": false,
+    "sanitization_success": false,
+    "success": false,
+    "processing_time": 0.005982160568237305
+  },
+  {
+    "file": "./demo_charges\\3ozt\\3ozt_pocket.mol2",
+    "errors": [
+      "Failed to load molecule from both MOL2 and SDF formats"
+    ],
+    "loading_success": false,
+    "sanitization_success": false,
+    "success": false,
+    "processing_time": 0.00537872314453125
+  },
+  {
+    "file": "./demo_charges\\3p5o\\3p5o_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 950,
+    "num_heavy_atoms": 458,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.6100560238486842e-05,
+    "processing_time": 0.01921987533569336,
+    "success": true,
+    "pocket_id": "3p5o",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3prs\\3prs_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1558,
+    "num_heavy_atoms": 790,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.09191252055921e-05,
+    "processing_time": 0.02713942527770996,
+    "success": true,
+    "pocket_id": "3prs",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3pww\\3pww_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1496,
+    "num_heavy_atoms": 760,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.192299290707237e-05,
+    "processing_time": 0.024813413619995117,
+    "success": true,
+    "pocket_id": "3pww",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3pxf\\3pxf_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1358,
+    "num_heavy_atoms": 641,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.232453998766447e-05,
+    "processing_time": 0.021778583526611328,
+    "success": true,
+    "pocket_id": "3pxf",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3pyy\\3pyy_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 943,
+    "num_heavy_atoms": 465,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.6942331414473684e-05,
+    "processing_time": 0.019828319549560547,
+    "success": true,
+    "pocket_id": "3pyy",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3qgy\\3qgy_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1251,
+    "num_heavy_atoms": 605,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.734387849506579e-05,
+    "processing_time": 0.02338552474975586,
+    "success": true,
+    "pocket_id": "3qgy",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3qqs\\3qqs_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 990,
+    "num_heavy_atoms": 485,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.8749293277138155e-05,
+    "processing_time": 0.018666744232177734,
+    "success": true,
+    "pocket_id": "3qqs",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3r88\\3r88_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 833,
+    "num_heavy_atoms": 405,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.276476408305921e-05,
+    "processing_time": 0.016913652420043945,
+    "success": true,
+    "pocket_id": "3r88",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3rlr\\3rlr_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1440,
+    "num_heavy_atoms": 692,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.252531352796053e-05,
+    "processing_time": 0.02168416976928711,
+    "success": true,
+    "pocket_id": "3rlr",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3rr4\\3rr4_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1257,
+    "num_heavy_atoms": 616,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.396940532483553e-05,
+    "processing_time": 0.020356416702270508,
+    "success": true,
+    "pocket_id": "3rr4",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3rsx\\3rsx_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 966,
+    "num_heavy_atoms": 482,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.3892051295230265e-05,
+    "processing_time": 0.016939878463745117,
+    "success": true,
+    "pocket_id": "3rsx",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3ryj\\3ryj_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1287,
+    "num_heavy_atoms": 644,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.5536916632401316e-05,
+    "processing_time": 0.025827646255493164,
+    "success": true,
+    "pocket_id": "3ryj",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3tsk\\3tsk_pocket.mol2",
+    "errors": [
+      "Failed to load molecule from both MOL2 and SDF formats"
+    ],
+    "loading_success": false,
+    "sanitization_success": false,
+    "success": false,
+    "processing_time": 0.00468754768371582
+  },
+  {
+    "file": "./demo_charges\\3twp\\3twp_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 700,
+    "num_heavy_atoms": 343,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.176089638157895e-05,
+    "processing_time": 0.014731168746948242,
+    "success": true,
+    "pocket_id": "3twp",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3u5j\\3u5j_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 885,
+    "num_heavy_atoms": 433,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.7907522101151316e-05,
+    "processing_time": 0.016511917114257812,
+    "success": true,
+    "pocket_id": "3u5j",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3u8n\\3u8n_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1226,
+    "num_heavy_atoms": 607,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.975316097861842e-05,
+    "processing_time": 0.02002716064453125,
+    "success": true,
+    "pocket_id": "3u8n",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3u9q\\3u9q_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1323,
+    "num_heavy_atoms": 634,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.975316097861842e-05,
+    "processing_time": 0.05713343620300293,
+    "success": true,
+    "pocket_id": "3u9q",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3udh\\3udh_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1017,
+    "num_heavy_atoms": 500,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.413150185032895e-05,
+    "processing_time": 0.05350017547607422,
+    "success": true,
+    "pocket_id": "3udh",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3ueu\\3ueu_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1371,
+    "num_heavy_atoms": 664,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.39307283100329e-05,
+    "processing_time": 0.023131847381591797,
+    "success": true,
+    "pocket_id": "3ueu",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3uev\\3uev_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1345,
+    "num_heavy_atoms": 654,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.6942331414473684e-05,
+    "processing_time": 0.02205801010131836,
+    "success": true,
+    "pocket_id": "3uev",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3uew\\3uew_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1424,
+    "num_heavy_atoms": 698,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.4934596011513155e-05,
+    "processing_time": 0.022742271423339844,
+    "success": true,
+    "pocket_id": "3uew",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3uex\\3uex_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1522,
+    "num_heavy_atoms": 741,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.5536916632401316e-05,
+    "processing_time": 0.023328781127929688,
+    "success": true,
+    "pocket_id": "3uex",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3ui7\\3ui7_pocket.mol2",
+    "errors": [
+      "Failed to load molecule from both MOL2 and SDF formats"
+    ],
+    "loading_success": false,
+    "sanitization_success": false,
+    "success": false,
+    "processing_time": 0.005156278610229492
+  },
+  {
+    "file": "./demo_charges\\3uo4\\3uo4_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1144,
+    "num_heavy_atoms": 547,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.9312936883223684e-05,
+    "processing_time": 0.01934194564819336,
+    "success": true,
+    "pocket_id": "3uo4",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3up2\\3up2_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1155,
+    "num_heavy_atoms": 549,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.6942331414473684e-05,
+    "processing_time": 0.020277738571166992,
+    "success": true,
+    "pocket_id": "3up2",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3uri\\3uri_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1830,
+    "num_heavy_atoms": 922,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.288818359375e-05,
+    "processing_time": 0.02775263786315918,
+    "success": true,
+    "pocket_id": "3uri",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3utu\\3utu_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1251,
+    "num_heavy_atoms": 634,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.4494371916118423e-05,
+    "processing_time": 0.0220339298248291,
+    "success": true,
+    "pocket_id": "3utu",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3uuo\\3uuo_pocket.mol2",
+    "errors": [
+      "Failed to load molecule from both MOL2 and SDF formats"
+    ],
+    "loading_success": false,
+    "sanitization_success": false,
+    "success": false,
+    "processing_time": 0.005068540573120117
+  },
+  {
+    "file": "./demo_charges\\3wtj\\3wtj_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1119,
+    "num_heavy_atoms": 563,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.2965537623355265e-05,
+    "processing_time": 0.01848149299621582,
+    "success": true,
+    "pocket_id": "3wtj",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3wz8\\3wz8_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1346,
+    "num_heavy_atoms": 670,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.071835166529605e-05,
+    "processing_time": 0.023045063018798828,
+    "success": true,
+    "pocket_id": "3wz8",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3zdg\\3zdg_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1133,
+    "num_heavy_atoms": 567,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.356785824424342e-05,
+    "processing_time": 0.01945972442626953,
+    "success": true,
+    "pocket_id": "3zdg",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3zso\\3zso_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 892,
+    "num_heavy_atoms": 427,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 1.8069618626644735e-05,
+    "processing_time": 0.017588376998901367,
+    "success": true,
+    "pocket_id": "3zso",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3zsx\\3zsx_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 822,
+    "num_heavy_atoms": 396,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 1.6864977384868423e-05,
+    "processing_time": 0.01663684844970703,
+    "success": true,
+    "pocket_id": "3zsx",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\3zt2\\3zt2_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 862,
+    "num_heavy_atoms": 415,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.690365439967105e-05,
+    "processing_time": 0.01990032196044922,
+    "success": true,
+    "pocket_id": "3zt2",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4abg\\4abg_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 929,
+    "num_heavy_atoms": 469,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.7143104954769735e-05,
+    "processing_time": 0.018012046813964844,
+    "success": true,
+    "pocket_id": "4abg",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4agn\\4agn_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 830,
+    "num_heavy_atoms": 390,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.035548159950658e-05,
+    "processing_time": 0.01889348030090332,
+    "success": true,
+    "pocket_id": "4agn",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4agp\\4agp_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 788,
+    "num_heavy_atoms": 376,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.031680458470395e-05,
+    "processing_time": 0.01929187774658203,
+    "success": true,
+    "pocket_id": "4agp",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4agq\\4agq_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 794,
+    "num_heavy_atoms": 378,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.071835166529605e-05,
+    "processing_time": 0.019806861877441406,
+    "success": true,
+    "pocket_id": "4agq",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4cig\\4cig_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 833,
+    "num_heavy_atoms": 398,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.208508943256579e-05,
+    "processing_time": 0.018478870391845703,
+    "success": true,
+    "pocket_id": "4cig",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4cr9\\4cr9_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 946,
+    "num_heavy_atoms": 464,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.4571725945723684e-05,
+    "processing_time": 0.01874852180480957,
+    "success": true,
+    "pocket_id": "4cr9",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4cra\\4cra_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1371,
+    "num_heavy_atoms": 676,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.0116031044407893e-05,
+    "processing_time": 0.023857593536376953,
+    "success": true,
+    "pocket_id": "4cra",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4crc\\4crc_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1447,
+    "num_heavy_atoms": 708,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.9915257504111842e-05,
+    "processing_time": 0.025675535202026367,
+    "success": true,
+    "pocket_id": "4crc",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4ddh\\4ddh_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1119,
+    "num_heavy_atoms": 539,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.099647923519737e-05,
+    "processing_time": 0.022481679916381836,
+    "success": true,
+    "pocket_id": "4ddh",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4ddk\\4ddk_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 988,
+    "num_heavy_atoms": 470,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 5.641736482319079e-05,
+    "processing_time": 0.021340131759643555,
+    "success": true,
+    "pocket_id": "4ddk",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4de1\\4de1_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1137,
+    "num_heavy_atoms": 554,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.413150185032895e-05,
+    "processing_time": 0.018830060958862305,
+    "success": true,
+    "pocket_id": "4de1",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4de2\\4de2_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1162,
+    "num_heavy_atoms": 568,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.513536955180921e-05,
+    "processing_time": 0.01958465576171875,
+    "success": true,
+    "pocket_id": "4de2",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4de3\\4de3_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1155,
+    "num_heavy_atoms": 568,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.292686060855263e-05,
+    "processing_time": 0.022982358932495117,
+    "success": true,
+    "pocket_id": "4de3",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4djv\\4djv_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1433,
+    "num_heavy_atoms": 694,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 1.6463430304276316e-05,
+    "processing_time": 0.023144245147705078,
+    "success": true,
+    "pocket_id": "4djv",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4dld\\4dld_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1422,
+    "num_heavy_atoms": 686,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.216244346217105e-05,
+    "processing_time": 0.02272200584411621,
+    "success": true,
+    "pocket_id": "4dld",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4e5w\\4e5w_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1221,
+    "num_heavy_atoms": 584,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.794619911595395e-05,
+    "processing_time": 0.022922277450561523,
+    "success": true,
+    "pocket_id": "4e5w",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4ea2\\4ea2_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1503,
+    "num_heavy_atoms": 730,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.6100560238486842e-05,
+    "processing_time": 0.026789188385009766,
+    "success": true,
+    "pocket_id": "4ea2",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4eo8\\4eo8_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1106,
+    "num_heavy_atoms": 537,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 1.9675806949013158e-05,
+    "processing_time": 0.020742177963256836,
+    "success": true,
+    "pocket_id": "4eo8",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4eor\\4eor_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1143,
+    "num_heavy_atoms": 547,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.6100560238486842e-05,
+    "processing_time": 0.020140647888183594,
+    "success": true,
+    "pocket_id": "4eor",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4f09\\4f09_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 999,
+    "num_heavy_atoms": 484,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.212376644736842e-05,
+    "processing_time": 0.019871950149536133,
+    "success": true,
+    "pocket_id": "4f09",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4f2w\\4f2w_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1276,
+    "num_heavy_atoms": 632,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.955238743832237e-05,
+    "processing_time": 0.023611783981323242,
+    "success": true,
+    "pocket_id": "4f2w",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4f3c\\4f3c_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1287,
+    "num_heavy_atoms": 639,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.5336143092105265e-05,
+    "processing_time": 0.024028539657592773,
+    "success": true,
+    "pocket_id": "4f3c",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4f9w\\4f9w_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1217,
+    "num_heavy_atoms": 584,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.232453998766447e-05,
+    "processing_time": 0.0245664119720459,
+    "success": true,
+    "pocket_id": "4f9w",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4gfm\\4gfm_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1071,
+    "num_heavy_atoms": 514,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.232453998766447e-05,
+    "processing_time": 0.020620107650756836,
+    "success": true,
+    "pocket_id": "4gfm",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4gid\\4gid_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1843,
+    "num_heavy_atoms": 904,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.834774619654605e-05,
+    "processing_time": 0.0277554988861084,
+    "success": true,
+    "pocket_id": "4gid",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4gkm\\4gkm_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1011,
+    "num_heavy_atoms": 492,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.3166311163651316e-05,
+    "processing_time": 0.023037195205688477,
+    "success": true,
+    "pocket_id": "4gkm",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4gr0\\4gr0_pocket.mol2",
+    "errors": [
+      "Failed to load molecule from both MOL2 and SDF formats"
+    ],
+    "loading_success": false,
+    "sanitization_success": false,
+    "success": false,
+    "processing_time": 0.005293130874633789
+  },
+  {
+    "file": "./demo_charges\\4hge\\4hge_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1130,
+    "num_heavy_atoms": 542,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.292686060855263e-05,
+    "processing_time": 0.019930601119995117,
+    "success": true,
+    "pocket_id": "4hge",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4ih5\\4ih5_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1249,
+    "num_heavy_atoms": 622,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.212376644736842e-05,
+    "processing_time": 0.02042675018310547,
+    "success": true,
+    "pocket_id": "4ih5",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4ih7\\4ih7_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1291,
+    "num_heavy_atoms": 649,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.7907522101151316e-05,
+    "processing_time": 0.022006750106811523,
+    "success": true,
+    "pocket_id": "4ih7",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4ivb\\4ivb_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1159,
+    "num_heavy_atoms": 551,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.232453998766447e-05,
+    "processing_time": 0.020653724670410156,
+    "success": true,
+    "pocket_id": "4ivb",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4ivc\\4ivc_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1120,
+    "num_heavy_atoms": 535,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.750597502055921e-05,
+    "processing_time": 0.02012014389038086,
+    "success": true,
+    "pocket_id": "4ivc",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4j21\\4j21_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1101,
+    "num_heavy_atoms": 547,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.53748201069079e-05,
+    "processing_time": 0.019916296005249023,
+    "success": true,
+    "pocket_id": "4j21",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4j28\\4j28_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1086,
+    "num_heavy_atoms": 570,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.4934596011513155e-05,
+    "processing_time": 0.02097940444946289,
+    "success": true,
+    "pocket_id": "4j28",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4j3l\\4j3l_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1100,
+    "num_heavy_atoms": 546,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 4.216244346217105e-05,
+    "processing_time": 0.020731687545776367,
+    "success": true,
+    "pocket_id": "4j3l",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4jfs\\4jfs_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1074,
+    "num_heavy_atoms": 561,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.5336143092105265e-05,
+    "processing_time": 0.020495176315307617,
+    "success": true,
+    "pocket_id": "4jfs",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4jia\\4jia_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1096,
+    "num_heavy_atoms": 530,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.031680458470395e-05,
+    "processing_time": 0.020262956619262695,
+    "success": true,
+    "pocket_id": "4jia",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4jsz\\4jsz_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 506,
+    "num_heavy_atoms": 252,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.895006681743421e-05,
+    "processing_time": 0.015582561492919922,
+    "success": true,
+    "pocket_id": "4jsz",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4jxs\\4jxs_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1236,
+    "num_heavy_atoms": 604,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.9915257504111842e-05,
+    "processing_time": 0.020750999450683594,
+    "success": true,
+    "pocket_id": "4jxs",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4k18\\4k18_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1125,
+    "num_heavy_atoms": 543,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.3490504214638158e-05,
+    "processing_time": 0.01978278160095215,
+    "success": true,
+    "pocket_id": "4k18",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4k77\\4k77_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1052,
+    "num_heavy_atoms": 505,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 3.634001079358553e-05,
+    "processing_time": 0.019039154052734375,
+    "success": true,
+    "pocket_id": "4k77",
+    "used_ligand_center": true
+  },
+  {
+    "file": "./demo_charges\\4kz6\\4kz6_pocket.mol2",
+    "errors": [],
+    "loading_success": true,
+    "sanitization_success": true,
+    "num_atoms": 1098,
+    "num_heavy_atoms": 534,
+    "grid_shape": [
+      19,
+      64,
+      64,
+      64
+    ],
+    "grid_occupancy": 2.9513710423519735e-05,
+    "processing_time": 0.019528865814208984,
+    "success": true,
+    "pocket_id": "4kz6",
+    "used_ligand_center": true
+  }
+]
