@@ -1,0 +1,5 @@
+processed_pocket_data/pocket_grids.npy
+processed_pocket_data/protein_grids.npy
+processed_ligand_data/ligand_grids.npy
+processed_protein_data/protein_grids.npy
+processed_protein_data/protein_grids_CLEAN.npy
