@@ -36,9 +36,9 @@ class ProteinGridDataset(Dataset):
         
         # Load grid data
         print("Loading grid data...")
-        self.protein_grids = np.load(protein_grids_path)
-        self.ligand_grids = np.load(ligand_grids_path) 
-        self.pocket_grids = np.load(pocket_grids_path)
+        self.protein_grids = np.load(protein_grids_path, allow_pickle=True) 
+        self.ligand_grids = np.load(ligand_grids_path, allow_pickle=True) 
+        self.pocket_grids = np.load(pocket_grids_path, allow_pickle=True)
         
         # Load metadata
         print("Loading metadata...")
