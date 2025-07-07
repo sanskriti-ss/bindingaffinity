@@ -69,9 +69,9 @@ We've implemented cutting-edge neural architectures for binding affinity predict
 | Model | Test R² | Test MAE | Status |
 |-------|---------|----------|--------|
 | HybridCNNGNN | 0.13 | 1.24 |  Best |
-| StableMultiComponentCNN | 0.09 | 1.31 | Good |
-| MemoryEfficientCNN | 0.07 | 1.35 | Decent |
-| SimpleBidirectionalCNN | 0.04 | 1.42 | Baseline |
+| StableMultiComponentCNN | 0.09 | 1.31 | Meh |
+| MemoryEfficientCNN | 0.07 | 1.35 | bad |
+| SimpleBidirectionalCNN | 0.04 | 1.42 | very bad |
 
 *Note: Training is ongoing for advanced models (AdvancedTransformerCNN, ResidualTransformerCNN, QuantumEnhanced models)*
 
