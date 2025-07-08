@@ -17,7 +17,8 @@ from torch.utils.data import DataLoader, random_split, Subset
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
 # Import our CNN models and data reader
-from models import StableMultiComponentCNN, MemoryEfficientCNN, SimpleBindingCNN, get_model, model_summary
+from models import (StableMultiComponentCNN, MemoryEfficientCNN, SimpleBindingCNN, HybridCNNGNN, 
+                   AttentionEnhancedCNN, LightweightAttentionCNN, get_model, model_summary)
 from protein_data_reader import ProteinGridDataset
 
 
@@ -348,7 +349,14 @@ def evaluate_model(model, test_loader, device):
             ligand_grids = batch['ligand'].to(device)
             pocket_grids = batch['pocket'].to(device)
             
-            outputs = model(protein_grids, ligand_grids, pocket_grids).squeeze()
+            # Handle different model types
+            if isinstance(model, HybridCNNGNN):
+                # For hybrid models, create placeholder graph data
+                graph_data = create_graph_data_from_grids(protein_grids, ligand_grids, pocket_grids)
+                outputs = model(protein_grids, ligand_grids, pocket_grids, graph_data).squeeze()
+            else:
+                # Standard CNN models
+                outputs = model(protein_grids, ligand_grids, pocket_grids).squeeze()
             
             # Handle both scalar and tensor outputs
             if outputs.dim() == 0:  # Single scalar output
@@ -472,6 +480,504 @@ def print_dataset_stats(dataset):
         print("  No normalization parameters available")
 
 
+def create_graph_data_from_grids(protein_grid, ligand_grid, pocket_grid, 
+                                distance_threshold=5.0, max_nodes=1000):
+    """
+    Convert 3D grids to graph representation for graph neural networks.
+    
+    This function extracts nodes from high-density grid points and creates
+    molecular graphs based on spatial proximity and chemical features.
+    
+    Args:
+        protein_grid: 3D tensor representing protein (B, C, D, H, W)
+        ligand_grid: 3D tensor representing ligand (B, C, D, H, W)
+        pocket_grid: 3D tensor representing pocket (B, C, D, H, W)
+        distance_threshold: Maximum distance for edge creation (Angstroms)
+        max_nodes: Maximum number of nodes per graph to prevent memory issues
+    
+    Returns:
+        torch_geometric.data.Data or torch_geometric.data.Batch: Graph data object(s)
+    """
+    try:
+        from torch_geometric.data import Data, Batch
+        import torch.nn.functional as F
+    except ImportError:
+        print("Warning: torch_geometric not available, returning None")
+        return None
+    
+    # Handle batch dimensions
+    if protein_grid.dim() == 5:  # Batched input (B, C, D, H, W)
+        batch_size = protein_grid.size(0)
+        graph_list = []
+        
+        for b in range(batch_size):
+            # Process each sample in the batch
+            single_graph = create_single_graph_from_grids(
+                protein_grid[b], ligand_grid[b], pocket_grid[b],
+                distance_threshold, max_nodes
+            )
+            if single_graph is not None:
+                graph_list.append(single_graph)
+        
+        if len(graph_list) == 0:
+            return None
+        elif len(graph_list) == 1:
+            return graph_list[0]
+        else:
+            return Batch.from_data_list(graph_list)
+    
+    else:  # Single sample (C, D, H, W)
+        return create_single_graph_from_grids(
+            protein_grid, ligand_grid, pocket_grid,
+            distance_threshold, max_nodes
+        )
+
+
+def create_single_graph_from_grids(protein_grid, ligand_grid, pocket_grid,
+                                  distance_threshold=5.0, max_nodes=1000):
+    """
+    Create a single graph from individual 3D grids.
+    
+    Args:
+        protein_grid: 3D tensor (C, D, H, W)
+        ligand_grid: 3D tensor (C, D, H, W) 
+        pocket_grid: 3D tensor (C, D, H, W)
+        distance_threshold: Maximum distance for edge creation
+        max_nodes: Maximum number of nodes
+    
+    Returns:
+        torch_geometric.data.Data: Single graph object
+    """
+    try:
+        from torch_geometric.data import Data
+        import torch
+        
+        device = protein_grid.device
+        
+        # Extract nodes and features from grids
+        nodes, features = extract_nodes_from_grids(
+            protein_grid, ligand_grid, pocket_grid, max_nodes
+        )
+        
+        if nodes.size(0) == 0:
+            # Create minimal graph if no nodes found
+            nodes = torch.zeros(1, 3, device=device)
+            features = torch.zeros(1, protein_grid.size(0) * 3, device=device)
+        
+        # Create edges based on spatial proximity
+        edge_index, edge_attr = create_edges_from_positions(
+            nodes, distance_threshold
+        )
+        
+        # Create graph data object
+        graph_data = Data(
+            x=features,           # Node features
+            edge_index=edge_index, # Edge connectivity  
+            edge_attr=edge_attr,   # Edge features
+            pos=nodes             # 3D positions (optional)
+        )
+        
+        return graph_data
+        
+    except Exception as e:
+        print(f"Warning: Error creating graph from grids: {e}")
+        return None
+
+
+def extract_nodes_from_grids(protein_grid, ligand_grid, pocket_grid, max_nodes=1000):
+    """
+    Extract node positions and features from 3D grids.
+    
+    Strategy:
+    1. Find high-density grid points as potential nodes
+    2. Extract multi-channel features at those positions
+    3. Combine features from protein, ligand, and pocket grids
+    
+    Args:
+        protein_grid: 3D tensor (C, D, H, W)
+        ligand_grid: 3D tensor (C, D, H, W)
+        pocket_grid: 3D tensor (C, D, H, W)
+        max_nodes: Maximum number of nodes to extract
+    
+    Returns:
+        tuple: (node_positions, node_features)
+            - node_positions: tensor of shape (N, 3) - 3D coordinates
+            - node_features: tensor of shape (N, F) - feature vectors
+    """
+    import torch
+    
+    device = protein_grid.device
+    grid_shape = protein_grid.shape[1:]  # (D, H, W)
+    
+    # Compute density maps by summing across channels
+    protein_density = torch.sum(torch.abs(protein_grid), dim=0)  # (D, H, W)
+    ligand_density = torch.sum(torch.abs(ligand_grid), dim=0)
+    pocket_density = torch.sum(torch.abs(pocket_grid), dim=0)
+    
+    # Combined density map
+    combined_density = protein_density + ligand_density + pocket_density
+    
+    # Check if there's any significant density
+    non_zero_values = combined_density[combined_density > 1e-6]
+    
+    if non_zero_values.numel() == 0:
+        # All grids are essentially zero - create a minimal graph at the center
+        center_coord = torch.tensor([[d//2, h//2, w//2] for d, h, w in [grid_shape]], 
+                                   device=device, dtype=torch.float)
+        grid_center = torch.tensor([(d-1)/2 for d in grid_shape], device=device)
+        positions = center_coord - grid_center.unsqueeze(0)
+        
+        # Create minimal features (all zeros)
+        num_channels_total = protein_grid.size(0) + ligand_grid.size(0) + pocket_grid.size(0)
+        features = torch.zeros(1, num_channels_total, device=device)
+        
+        return positions, features
+    
+    # Find significant points (above threshold)
+    density_threshold = torch.quantile(non_zero_values, min(0.7, 1.0 - 1.0/non_zero_values.numel()))
+    significant_mask = combined_density > density_threshold
+    
+    # Get 3D coordinates of significant points
+    coords = torch.nonzero(significant_mask, as_tuple=False).float()  # (N, 3)
+    
+    if coords.size(0) == 0:
+        # Fallback: use grid center if no significant points found
+        center = torch.tensor([d//2 for d in grid_shape], device=device).float().unsqueeze(0)
+        coords = center
+    
+    # Limit number of nodes
+    if coords.size(0) > max_nodes:
+        # Sample randomly or take highest density points
+        densities_at_coords = combined_density[significant_mask]
+        _, top_indices = torch.topk(densities_at_coords, max_nodes)
+        coords = coords[top_indices]
+    
+    # Convert grid coordinates to actual 3D positions (assuming 1 Angstrom per grid unit)
+    # Center the coordinates around the grid center
+    grid_center = torch.tensor([(d-1)/2 for d in grid_shape], device=device)
+    positions = coords - grid_center.unsqueeze(0)  # Center around origin
+    
+    # Extract features at each coordinate
+    num_nodes = coords.size(0)
+    num_channels_total = protein_grid.size(0) + ligand_grid.size(0) + pocket_grid.size(0)
+    features = torch.zeros(num_nodes, num_channels_total, device=device)
+    
+    for i, coord in enumerate(coords):
+        d, h, w = coord.long()
+        # Ensure coordinates are within bounds
+        d = torch.clamp(d, 0, grid_shape[0] - 1)
+        h = torch.clamp(h, 0, grid_shape[1] - 1)
+        w = torch.clamp(w, 0, grid_shape[2] - 1)
+        
+        # Extract features from all three grids
+        protein_feat = protein_grid[:, d, h, w]
+        ligand_feat = ligand_grid[:, d, h, w]
+        pocket_feat = pocket_grid[:, d, h, w]
+        
+        # Concatenate features
+        features[i] = torch.cat([protein_feat, ligand_feat, pocket_feat])
+    
+    return positions, features
+
+
+def create_edges_from_positions(positions, distance_threshold=5.0):
+    """
+    Create edges between nodes based on spatial proximity.
+    
+    Args:
+        positions: tensor of shape (N, 3) - 3D coordinates
+        distance_threshold: Maximum distance for edge creation
+    
+    Returns:
+        tuple: (edge_index, edge_attr)
+            - edge_index: tensor of shape (2, E) - edge connectivity
+            - edge_attr: tensor of shape (E, F) - edge features
+    """
+    import torch
+    
+    device = positions.device
+    num_nodes = positions.size(0)
+    
+    if num_nodes <= 1:
+        # No edges possible
+        edge_index = torch.empty(2, 0, dtype=torch.long, device=device)
+        edge_attr = torch.empty(0, 1, device=device)
+        return edge_index, edge_attr
+    
+    # Compute pairwise distances
+    dist_matrix = torch.cdist(positions, positions)  # (N, N)
+    
+    # Create adjacency matrix based on distance threshold
+    adj_matrix = (dist_matrix < distance_threshold) & (dist_matrix > 0)  # Exclude self-loops
+    
+    # Extract edge indices
+    edge_indices = torch.nonzero(adj_matrix, as_tuple=False)  # (E, 2)
+    
+    if edge_indices.size(0) == 0:
+        # No edges found, create minimal connectivity
+        # Connect each node to its nearest neighbor
+        _, nearest_indices = torch.topk(dist_matrix + torch.eye(num_nodes, device=device) * 1e6, 
+                                       k=min(2, num_nodes), dim=1, largest=False)
+        
+        edge_list = []
+        for i in range(num_nodes):
+            for j in range(min(2, num_nodes)):
+                neighbor = nearest_indices[i, j]
+                if neighbor != i:
+                    edge_list.append([i, neighbor.item()])
+        
+        if edge_list:
+            edge_indices = torch.tensor(edge_list, device=device)
+        else:
+            edge_index = torch.empty(2, 0, dtype=torch.long, device=device)
+            edge_attr = torch.empty(0, 1, device=device)
+            return edge_index, edge_attr
+    
+    # Transpose to get edge_index format (2, E)
+    edge_index = edge_indices.t().contiguous()
+    
+    # Compute edge features (distances and relative positions)
+    edge_distances = dist_matrix[edge_indices[:, 0], edge_indices[:, 1]].unsqueeze(1)
+    
+    # Relative position vectors
+    source_positions = positions[edge_indices[:, 0]]
+    target_positions = positions[edge_indices[:, 1]]
+    relative_positions = target_positions - source_positions
+    
+    # Normalize relative positions by distance
+    distances_for_norm = edge_distances + 1e-8  # Avoid division by zero
+    normalized_relative_pos = relative_positions / distances_for_norm
+    
+    # Combine distance and normalized relative position as edge features
+    edge_attr = torch.cat([edge_distances, normalized_relative_pos], dim=1)  # (E, 4)
+    
+    return edge_index, edge_attr
+
+
+def enhanced_train_model(model, train_loader, val_loader, config, use_graph_data=True):
+    """
+    Enhanced training function that can handle both CNN and hybrid CNN-GNN models.
+    
+    Args:
+        model: PyTorch model to train
+        train_loader: Training data loader
+        val_loader: Validation data loader  
+        config: Training configuration dictionary
+        use_graph_data: Whether to use graph data (for hybrid models)
+    
+    Returns:
+        dict: Training history and final model
+    """
+    
+    device = config.get('device', 'cuda' if torch.cuda.is_available() else 'cpu')
+    model = model.to(device)
+    
+    # Setup optimizer and loss
+    optimizer = torch.optim.Adam(
+        model.parameters(), 
+        lr=config.get('learning_rate', 0.001),
+        weight_decay=config.get('weight_decay', 1e-5)
+    )
+    
+    criterion = nn.MSELoss()
+    
+    # Learning rate scheduler
+    scheduler = torch.optim.lr_scheduler.StepLR(
+        optimizer, 
+        step_size=config.get('scheduler_step', 10), 
+        gamma=config.get('scheduler_gamma', 0.7)
+    )
+    
+    # Training history
+    history = {
+        'train_loss': [],
+        'val_loss': [],
+        'val_mse': [],
+        'val_mae': [],
+        'val_r2': [],
+        'learning_rates': []
+    }
+    
+    num_epochs = config.get('num_epochs', 50)
+    print(f"Starting training for {num_epochs} epochs...")
+    print(f"Device: {device}")
+    print(f"Model parameters: {sum(p.numel() for p in model.parameters()):,}")
+    print(f"Graph data enabled: {use_graph_data}")
+    
+    best_val_loss = float('inf')
+    patience = config.get('early_stopping_patience', 15)
+    patience_counter = 0
+    
+    for epoch in range(num_epochs):
+        # Training phase
+        model.train()
+        train_loss = 0.0
+        num_batches = 0
+        
+        for batch_idx, batch in enumerate(train_loader):
+            protein_grids = batch['protein'].to(device)
+            ligand_grids = batch['ligand'].to(device)
+            pocket_grids = batch['pocket'].to(device)
+            binding_energies = batch['binding_energy'].squeeze().to(device)
+            
+            # Check for NaN in inputs
+            if torch.isnan(protein_grids).any() or torch.isnan(ligand_grids).any() or torch.isnan(pocket_grids).any():
+                print(f"Warning: NaN detected in input data at epoch {epoch+1}, batch {batch_idx}")
+                continue
+                
+            if torch.isnan(binding_energies).any():
+                print(f"Warning: NaN detected in target data at epoch {epoch+1}, batch {batch_idx}")
+                continue
+            
+            # Forward pass
+            optimizer.zero_grad()
+            
+            # Create graph data if using hybrid model
+            graph_data = None
+            if use_graph_data and hasattr(model, 'use_gnn') and model.use_gnn:
+                graph_data = create_graph_data_from_grids(protein_grids, ligand_grids, pocket_grids)
+            
+            # Model forward pass
+            if isinstance(model, HybridCNNGNN):
+                outputs = model(protein_grids, ligand_grids, pocket_grids, graph_data).squeeze()
+            else:
+                outputs = model(protein_grids, ligand_grids, pocket_grids).squeeze()
+            
+            # Check for NaN in outputs before loss calculation
+            if torch.isnan(outputs).any() or torch.isinf(outputs).any():
+                print(f"Warning: NaN/Inf in model outputs at epoch {epoch+1}, batch {batch_idx}")
+                print(f"  Output stats: min={outputs.min():.6f}, max={outputs.max():.6f}, mean={outputs.mean():.6f}")
+                continue
+            
+            loss = criterion(outputs, binding_energies)
+            
+            # Check for NaN/Inf loss
+            if torch.isnan(loss) or torch.isinf(loss):
+                print(f"Warning: NaN/Inf loss detected at epoch {epoch+1}, batch {batch_idx}")
+                print(f"  Loss value: {loss.item()}")
+                print(f"  Output range: [{outputs.min():.6f}, {outputs.max():.6f}]")
+                print(f"  Target range: [{binding_energies.min():.6f}, {binding_energies.max():.6f}]")
+                continue
+            
+            # Backward pass
+            loss.backward()
+            
+            # Check gradients for NaN/Inf
+            grad_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=config.get('gradient_clip', 1.0))
+            if torch.isnan(grad_norm) or torch.isinf(grad_norm):
+                print(f"Warning: NaN/Inf gradients detected at epoch {epoch+1}, batch {batch_idx}")
+                continue
+            
+            optimizer.step()
+            
+            train_loss += loss.item()
+            num_batches += 1
+        
+        avg_train_loss = train_loss / max(num_batches, 1)
+        history['train_loss'].append(avg_train_loss)
+        
+        # Validation phase
+        model.eval()
+        val_loss = 0.0
+        val_predictions = []
+        val_targets = []
+        
+        with torch.no_grad():
+            for batch in val_loader:
+                protein_grids = batch['protein'].to(device)
+                ligand_grids = batch['ligand'].to(device)
+                pocket_grids = batch['pocket'].to(device)
+                binding_energies = batch['binding_energy'].squeeze().to(device)
+                
+                # Create graph data if using hybrid model
+                graph_data = None
+                if use_graph_data and hasattr(model, 'use_gnn') and model.use_gnn:
+                    graph_data = create_graph_data_from_grids(protein_grids, ligand_grids, pocket_grids)
+                
+                # Model forward pass
+                if isinstance(model, HybridCNNGNN):
+                    outputs = model(protein_grids, ligand_grids, pocket_grids, graph_data).squeeze()
+                else:
+                    outputs = model(protein_grids, ligand_grids, pocket_grids).squeeze()
+                
+                # Check for NaN in validation outputs
+                if torch.isnan(outputs).any() or torch.isinf(outputs).any():
+                    print(f"Warning: NaN/Inf in validation outputs")
+                    continue
+                
+                loss = criterion(outputs, binding_energies)
+                
+                if not (torch.isnan(loss) or torch.isinf(loss)):
+                    val_loss += loss.item()
+                    
+                    # Handle both scalar and tensor outputs
+                    if outputs.dim() == 0:  # Single scalar output
+                        val_predictions.append(outputs.cpu().numpy().item())
+                    else:  # Multiple outputs
+                        val_predictions.extend(outputs.cpu().numpy())
+                    
+                    # Handle targets similarly
+                    if binding_energies.dim() == 0:  # Single scalar target
+                        val_targets.append(binding_energies.cpu().numpy().item())
+                    else:  # Multiple targets
+                        val_targets.extend(binding_energies.cpu().numpy())
+        
+        avg_val_loss = val_loss / max(len(val_loader), 1)
+        history['val_loss'].append(avg_val_loss)
+        
+        # Calculate validation metrics only if we have valid predictions
+        if len(val_predictions) > 0 and len(val_targets) > 0:
+            val_predictions = np.array(val_predictions)
+            val_targets = np.array(val_targets)
+            
+            # Check for NaN in the arrays before computing metrics
+            if not (np.isnan(val_predictions).any() or np.isnan(val_targets).any()):
+                val_mse = mean_squared_error(val_targets, val_predictions)
+                val_mae = mean_absolute_error(val_targets, val_predictions)
+                val_r2 = r2_score(val_targets, val_predictions) if len(val_targets) > 1 else 0.0
+            else:
+                print(f"Warning: NaN detected in validation arrays at epoch {epoch+1}")
+                val_mse = float('inf')
+                val_mae = float('inf')
+                val_r2 = -float('inf')
+        else:
+            print(f"Warning: No valid validation predictions at epoch {epoch+1}")
+            val_mse = float('inf')
+            val_mae = float('inf')
+            val_r2 = -float('inf')
+        
+        history['val_mse'].append(val_mse)
+        history['val_mae'].append(val_mae)
+        history['val_r2'].append(val_r2)
+        history['learning_rates'].append(optimizer.param_groups[0]['lr'])
+        
+        # Print progress
+        if (epoch + 1) % 5 == 0 or epoch == 0:
+            print(f"Epoch {epoch+1:3d}/{num_epochs}: "
+                  f"Train Loss: {avg_train_loss:.4f}, "
+                  f"Val Loss: {avg_val_loss:.4f}, "
+                  f"Val MAE: {val_mae:.4f}, "
+                  f"Val R²: {val_r2:.4f}")
+        
+        # Early stopping
+        if avg_val_loss < best_val_loss:
+            best_val_loss = avg_val_loss
+            patience_counter = 0
+            # Save best model
+            if config.get('save_best_model', True):
+                torch.save(model.state_dict(), f"best_{model.__class__.__name__.lower()}_model.pth")
+        else:
+            patience_counter += 1
+            if patience_counter >= patience:
+                print(f"Early stopping triggered after {epoch+1} epochs")
+                break
+        
+        # Step scheduler
+        scheduler.step()
+    
+    return history, model
+
+
 def main():
     """Main training and evaluation pipeline"""
     print("Starting Integrated CNN Training Pipeline")
@@ -564,11 +1070,16 @@ def main():
     val_loader = DataLoader(val_dataset, batch_size=config['batch_size'], shuffle=False)
     test_loader = DataLoader(test_dataset, batch_size=config['batch_size'], shuffle=False)
     
-    # Models to train
+    # Models to train - including new attention-enhanced models
     models_to_train = [
-        ('StableMultiComponentCNN', StableMultiComponentCNN()),
-        ('MemoryEfficientCNN', MemoryEfficientCNN()),
-        ('SimpleBindingCNN', SimpleBindingCNN())
+        # ('AttentionEnhancedCNN', AttentionEnhancedCNN()),  # New attention model from paper
+        ('LightweightAttentionCNN', LightweightAttentionCNN()),  # Lightweight attention model
+        # ('StableMultiComponentCNN', StableMultiComponentCNN()),
+        ('StableMultiComponentCNN_Attention', StableMultiComponentCNN(use_attention=True)),  # Enhanced with attention
+        # ('MemoryEfficientCNN', MemoryEfficientCNN()),
+        ('MemoryEfficientCNN_Attention', MemoryEfficientCNN(use_attention=True)),  # Enhanced with attention
+        # ('HybridCNNGNN', HybridCNNGNN(use_gnn=True)),  
+        # ('SimpleBindingCNN', SimpleBindingCNN()),
     ]
     
     results = {}
@@ -591,9 +1102,14 @@ def main():
         # Show model summary
         model_summary(model)
         
-        # Train model
+        # Train model using enhanced training function for hybrid models
         start_time = time.time()
-        history, trained_model = train_model(model, train_loader, val_loader, config)
+        if isinstance(model, HybridCNNGNN):
+            # Use enhanced training for hybrid models with graph data enabled
+            history, trained_model = enhanced_train_model(model, train_loader, val_loader, config, use_graph_data=True)
+        else:
+            # Use standard training for CNN models
+            history, trained_model = train_model(model, train_loader, val_loader, config)
         training_time = time.time() - start_time
         
         print(f"Training completed in {training_time:.1f} seconds")
@@ -645,7 +1161,7 @@ def main():
         'Training_Time': [results[name]['training_time'] for name in results.keys()]
     })
     
-    summary_df.to_csv('model_comparison_results.csv', index=False)
+    summary_df.to_csv('model_comparison_results_1.csv', index=False)
     print(f"\nResults saved to 'model_comparison_results.csv'")
     
     print("\nTraining pipeline completed successfully!")
