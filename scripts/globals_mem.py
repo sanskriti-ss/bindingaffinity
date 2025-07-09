@@ -1,3 +1,6 @@
+""" Find mem usage of global variables to reduce RAM usage
+"""
+
 import sys
 
 # Get all global variables
