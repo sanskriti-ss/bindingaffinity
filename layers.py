@@ -108,7 +108,31 @@ class QuantumFCLayer:
         Generates the circuit that performs amplitude encoding.
             feature_vector (array): Input data
         """
-        qml.AmplitudeEmbedding(features=feature_vector, wires=range(self.nqbits),normalize=True)
+        # Convert to numpy if it's a tensor
+        if hasattr(feature_vector, 'detach'):
+            feature_vector = feature_vector.detach().cpu().numpy()
+        
+        # Ensure feature vector is 1D
+        if len(feature_vector.shape) > 1:
+            feature_vector = feature_vector.flatten()
+        
+        # Ensure feature vector has the right length for amplitude encoding
+        required_length = 2 ** self.nqbits
+        if len(feature_vector) < required_length:
+            # Pad with zeros to reach required length
+            padded_vector = np.zeros(required_length)
+            padded_vector[:len(feature_vector)] = feature_vector
+            feature_vector = padded_vector
+        elif len(feature_vector) > required_length:
+            # Truncate if too long
+            feature_vector = feature_vector[:required_length]
+        
+        # Ensure values are normalized for amplitude encoding
+        norm = np.linalg.norm(feature_vector)
+        if norm > 0:
+            feature_vector = feature_vector / norm
+        
+        qml.AmplitudeEmbedding(features=feature_vector, wires=range(self.nqbits), normalize=True, pad_with=0.0)
 
     def _QAOA_encoding(self, feature_vector, input_weights):
         """
