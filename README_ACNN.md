@@ -16,7 +16,6 @@ The scripts implement Atomic Convolutional Neural Networks (ACNNs) for predictin
 
 ## Quick Start
 
-⚠️ **Important**: This project requires Python 3.9-3.12. TensorFlow and DeepChem do not yet support Python 3.13+.
 
 ### 1. Check Python Version
 
@@ -101,7 +100,7 @@ This will:
 ### 3. Run the Complete Version (with Quantum Extensions)
 
 ```powershell
-# First install quantum dependencies (optional)
+# First install quantum dependencies =
 pip install qiskit qiskit-machine-learning
 
 # Run the full script
@@ -133,7 +132,8 @@ Based on the original paper (Gomes et al., 2017):
 - Training R² ≈ 0.91
 - Test R² ≈ 0.45
 
-The model demonstrates good learning capability but may overfit on small datasets.
+## Our optimized Results [WIP]
+ - 
 
 ## Customization
 
@@ -201,13 +201,6 @@ conda env create -f environment.yml
 conda activate acnn_env
 ```
 
-### Python Version Compatibility
-
-**Error**: `ERROR: Could not find a version that satisfies the requirement tensorflow>=2.8.0`
-
-**Cause**: You're using Python 3.13+, but TensorFlow doesn't support it yet.
-
-**Solutions**:
 
 1. **Use conda with Python 3.11** (recommended):
 ```powershell
@@ -249,7 +242,7 @@ conda install -c conda-forge deepchem
 pip install --pre deepchem
 ```
 
-### Quantum Dependencies (Optional)
+### Quantum Dependencies 
 
 ```powershell
 pip install qiskit qiskit-machine-learning
