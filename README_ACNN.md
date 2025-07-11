@@ -11,29 +11,10 @@ The scripts implement Atomic Convolutional Neural Networks (ACNNs) for predictin
 - `atomic_convolutions_simple.py` - Streamlined version focusing only on classical ACNN
 - `atomic_convolutions_protein_ligand.py` - Complete version with quantum neural network extensions
 - `requirements_acnn.txt` - Python dependencies (Python 3.9-3.12)
-- `check_compatibility.py` - Python version compatibility checker
 - `README_ACNN.md` - This documentation
 
 ## Quick Start
 
-
-### 1. Check Python Version
-
-First, check if your Python version is compatible:
-
-```powershell
-# Run the compatibility checker
-python check_compatibility.py
-```
-
-This will tell you if your Python version works with the required dependencies.
-
-```powershell
-python --version
-# Should show Python 3.9.x, 3.10.x, 3.11.x, or 3.12.x
-```
-
-If you have Python 3.13+, you'll need to install a compatible version. Options:
 
 #### Option A: Use pyenv (recommended)
 ```powershell
