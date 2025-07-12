@@ -15,8 +15,8 @@ import h5py
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--input-hdf", default='')
-parser.add_argument("--output-npy", default='')
+parser.add_argument("--input-hdf", default='eval_sgcnn.hdf')
+parser.add_argument("--output-npy", default='eval_sgcnn_feat.npy')
 args = parser.parse_args()
 
 
@@ -40,7 +40,7 @@ for com_id in input_hdf.keys():
 			
 		input_pose = input_com[str(pose_id)]
 		feat = input_pose['hidden_features'][:].ravel()
-		feat = feat[28:40]
+		feat = feat[-6:] # For Fc6, for FC-12 in FAST its 28:40
 		feat_list.append(feat)
 		pred = input_pose.attrs['y_pred'].ravel()
 		pred_list.append(pred)
