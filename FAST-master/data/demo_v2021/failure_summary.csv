@@ -1,0 +1,403 @@
+name,partition,set,error
+4tmn,docking,pdbbind,4tmn does not contain any pose data
+4tmn,crystal,pdbbind,no ligand for 4tmn (pdbbind set)
+5tmn,docking,pdbbind,5tmn does not contain any pose data
+5tmn,crystal,pdbbind,no ligand for 5tmn (pdbbind set)
+1ydr,docking,pdbbind,1ydr does not contain any pose data
+1ydt,docking,pdbbind,1ydt does not contain any pose data
+1bcu,docking,pdbbind,1bcu does not contain any pose data
+1a30,docking,pdbbind,1a30 does not contain any pose data
+1bzc,docking,pdbbind,1bzc does not contain any pose data
+1qf1,docking,pdbbind,1qf1 does not contain any pose data
+1qkt,docking,pdbbind,1qkt does not contain any pose data
+1qkt,crystal,pdbbind,invalid charges for the ligand 1qkt (pdbbind set)
+1c5z,docking,pdbbind,1c5z does not contain any pose data
+1k1i,docking,pdbbind,1k1i does not contain any pose data
+1e66,docking,pdbbind,1e66 does not contain any pose data
+1g2k,docking,pdbbind,1g2k does not contain any pose data
+1g2k,crystal,pdbbind,invalid charges for the ligand 1g2k (pdbbind set)
+1eby,docking,pdbbind,1eby does not contain any pose data
+1eby,crystal,pdbbind,invalid charges for the ligand 1eby (pdbbind set)
+1gpn,docking,pdbbind,1gpn does not contain any pose data
+1h22,docking,pdbbind,1h22 does not contain any pose data
+1gpk,docking,pdbbind,1gpk does not contain any pose data
+1h23,docking,pdbbind,1h23 does not contain any pose data
+1p1n,docking,pdbbind,1p1n does not contain any pose data
+1q8u,docking,pdbbind,1q8u does not contain any pose data
+1p1q,docking,pdbbind,1p1q does not contain any pose data
+1q8t,docking,pdbbind,1q8t does not contain any pose data
+1o3f,docking,pdbbind,1o3f does not contain any pose data
+1oyt,docking,pdbbind,1oyt does not contain any pose data
+1nc1,docking,pdbbind,1nc1 does not contain any pose data
+1nc1,crystal,pdbbind,invalid charges for the ligand 1nc1 (pdbbind set)
+1o0h,docking,pdbbind,1o0h does not contain any pose data
+1nc3,docking,pdbbind,1nc3 does not contain any pose data
+1nc3,crystal,pdbbind,invalid charges for the ligand 1nc3 (pdbbind set)
+1owh,docking,pdbbind,1owh does not contain any pose data
+1ps3,docking,pdbbind,1ps3 does not contain any pose data
+1ps3,crystal,pdbbind,invalid charges for the ligand 1ps3 (pdbbind set)
+1nvq,docking,pdbbind,1nvq does not contain any pose data
+1mq6,docking,pdbbind,1mq6 does not contain any pose data
+1mq6,crystal,pdbbind,invalid charges for the ligand 1mq6 (pdbbind set)
+1lpg,docking,pdbbind,1lpg does not contain any pose data
+1uto,docking,pdbbind,1uto does not contain any pose data
+1pxn,docking,pdbbind,1pxn does not contain any pose data
+1pxn,crystal,pdbbind,invalid charges for the ligand 1pxn (pdbbind set)
+1r5y,docking,pdbbind,1r5y does not contain any pose data
+1r5y,crystal,pdbbind,invalid charges for the ligand 1r5y (pdbbind set)
+1sqa,docking,pdbbind,1sqa does not contain any pose data
+1o5b,docking,pdbbind,1o5b does not contain any pose data
+1s38,docking,pdbbind,1s38 does not contain any pose data
+1s38,crystal,pdbbind,invalid charges for the ligand 1s38 (pdbbind set)
+1u1b,docking,pdbbind,1u1b does not contain any pose data
+2c3i,docking,pdbbind,2c3i does not contain any pose data
+2c3i,crystal,pdbbind,invalid charges for the ligand 2c3i (pdbbind set)
+1yc1,docking,pdbbind,1yc1 does not contain any pose data
+2brb,docking,pdbbind,2brb does not contain any pose data
+2brb,crystal,pdbbind,invalid charges for the ligand 2brb (pdbbind set)
+1z9g,docking,pdbbind,1z9g does not contain any pose data
+1syi,docking,pdbbind,1syi does not contain any pose data
+2al5,docking,pdbbind,2al5 does not contain any pose data
+1w4o,docking,pdbbind,1w4o does not contain any pose data
+2br1,docking,pdbbind,2br1 does not contain any pose data
+2br1,crystal,pdbbind,invalid charges for the ligand 2br1 (pdbbind set)
+1z95,docking,pdbbind,1z95 does not contain any pose data
+1z95,crystal,pdbbind,invalid charges for the ligand 1z95 (pdbbind set)
+1y6r,docking,pdbbind,1y6r does not contain any pose data
+2iwx,docking,pdbbind,2iwx does not contain any pose data
+2cbv,docking,pdbbind,2cbv does not contain any pose data
+2j78,docking,pdbbind,2j78 does not contain any pose data
+2j78,crystal,pdbbind,no pocket for 2j78 (pdbbind set)
+2j7h,docking,pdbbind,2j7h does not contain any pose data
+2j7h,crystal,pdbbind,invalid charges for the ligand 2j7h (pdbbind set)
+2cet,docking,pdbbind,2cet does not contain any pose data
+2cet,crystal,pdbbind,no pocket for 2cet (pdbbind set)
+1z6e,docking,pdbbind,1z6e does not contain any pose data
+2hb1,docking,pdbbind,2hb1 does not contain any pose data
+2fvd,docking,pdbbind,2fvd does not contain any pose data
+2fvd,crystal,pdbbind,invalid charges for the ligand 2fvd (pdbbind set)
+2v7a,docking,pdbbind,2v7a does not contain any pose data
+2v7a,crystal,pdbbind,invalid charges for the ligand 2v7a (pdbbind set)
+2v00,docking,pdbbind,2v00 does not contain any pose data
+2v00,crystal,pdbbind,invalid charges for the ligand 2v00 (pdbbind set)
+2fxs,docking,pdbbind,2fxs does not contain any pose data
+2p15,docking,pdbbind,2p15 does not contain any pose data
+2p15,crystal,pdbbind,invalid charges for the ligand 2p15 (pdbbind set)
+2pog,docking,pdbbind,2pog does not contain any pose data
+2pog,crystal,pdbbind,invalid charges for the ligand 2pog (pdbbind set)
+3bgz,docking,pdbbind,3bgz does not contain any pose data
+2qe4,docking,pdbbind,2qe4 does not contain any pose data
+2qe4,crystal,pdbbind,invalid charges for the ligand 2qe4 (pdbbind set)
+1vso,docking,pdbbind,1vso does not contain any pose data
+3cj4,docking,pdbbind,3cj4 does not contain any pose data
+2zb1,docking,pdbbind,2zb1 does not contain any pose data
+2zb1,crystal,pdbbind,invalid charges for the ligand 2zb1 (pdbbind set)
+3coy,docking,pdbbind,3coy does not contain any pose data
+3coz,docking,pdbbind,3coz does not contain any pose data
+3f3e,docking,pdbbind,3f3e does not contain any pose data
+2vw5,docking,pdbbind,2vw5 does not contain any pose data
+2vw5,crystal,pdbbind,invalid charges for the ligand 2vw5 (pdbbind set)
+2vvn,docking,pdbbind,2vvn does not contain any pose data
+2vvn,crystal,pdbbind,invalid charges for the ligand 2vvn (pdbbind set)
+3f3d,docking,pdbbind,3f3d does not contain any pose data
+2qbp,docking,pdbbind,2qbp does not contain any pose data
+2qbq,docking,pdbbind,2qbq does not contain any pose data
+2qbr,docking,pdbbind,2qbr does not contain any pose data
+3b65,docking,pdbbind,3b65 does not contain any pose data
+3b65,crystal,pdbbind,invalid charges for the ligand 3b65 (pdbbind set)
+2qnq,docking,pdbbind,2qnq does not contain any pose data
+3e93,docking,pdbbind,3e93 does not contain any pose data
+2zcq,docking,pdbbind,2zcq does not contain any pose data
+3b5r,docking,pdbbind,3b5r does not contain any pose data
+3b5r,crystal,pdbbind,invalid charges for the ligand 3b5r (pdbbind set)
+2vkm,docking,pdbbind,2vkm does not contain any pose data
+3e92,docking,pdbbind,3e92 does not contain any pose data
+3e92,crystal,pdbbind,invalid charges for the ligand 3e92 (pdbbind set)
+2zcr,docking,pdbbind,2zcr does not contain any pose data
+3d4z,docking,pdbbind,3d4z does not contain any pose data
+2p4y,docking,pdbbind,2p4y does not contain any pose data
+3bv9,docking,pdbbind,3bv9 does not contain any pose data
+2zda,docking,pdbbind,2zda does not contain any pose data
+3b68,docking,pdbbind,3b68 does not contain any pose data
+3e5a,docking,pdbbind,3e5a does not contain any pose data
+3f3a,docking,pdbbind,3f3a does not contain any pose data
+2r9w,docking,pdbbind,2r9w does not contain any pose data
+3f3c,docking,pdbbind,3f3c does not contain any pose data
+3jvs,docking,pdbbind,3jvs does not contain any pose data
+3gnw,docking,pdbbind,3gnw does not contain any pose data
+3gnw,crystal,pdbbind,invalid charges for the ligand 3gnw (pdbbind set)
+2w4x,docking,pdbbind,2w4x does not contain any pose data
+2w4x,crystal,pdbbind,invalid charges for the ligand 2w4x (pdbbind set)
+2wn9,docking,pdbbind,2wn9 does not contain any pose data
+2weg,docking,pdbbind,2weg does not contain any pose data
+2weg,crystal,pdbbind,invalid charges for the ligand 2weg (pdbbind set)
+2wnc,docking,pdbbind,2wnc does not contain any pose data
+3ivg,docking,pdbbind,3ivg does not contain any pose data
+3kr8,docking,pdbbind,3kr8 does not contain any pose data
+3kr8,crystal,pdbbind,invalid charges for the ligand 3kr8 (pdbbind set)
+2wer,docking,pdbbind,2wer does not contain any pose data
+2zy1,docking,pdbbind,2zy1 does not contain any pose data
+3jya,docking,pdbbind,3jya does not contain any pose data
+3jya,crystal,pdbbind,invalid charges for the ligand 3jya (pdbbind set)
+3g0w,docking,pdbbind,3g0w does not contain any pose data
+3g0w,crystal,pdbbind,invalid charges for the ligand 3g0w (pdbbind set)
+3ebp,docking,pdbbind,3ebp does not contain any pose data
+3g31,docking,pdbbind,3g31 does not contain any pose data
+3ehy,docking,pdbbind,3ehy does not contain any pose data
+3fcq,docking,pdbbind,3fcq does not contain any pose data
+3jvr,docking,pdbbind,3jvr does not contain any pose data
+3jvr,crystal,pdbbind,invalid charges for the ligand 3jvr (pdbbind set)
+3fur,docking,pdbbind,3fur does not contain any pose data
+3fur,crystal,pdbbind,invalid charges for the ligand 3fur (pdbbind set)
+3gbb,docking,pdbbind,3gbb does not contain any pose data
+3dx2,docking,pdbbind,3dx2 does not contain any pose data
+3d6q,docking,pdbbind,3d6q does not contain any pose data
+3dd0,docking,pdbbind,3dd0 does not contain any pose data
+3dd0,crystal,pdbbind,invalid charges for the ligand 3dd0 (pdbbind set)
+2wca,docking,pdbbind,2wca does not contain any pose data
+2wca,crystal,pdbbind,invalid charges for the ligand 2wca (pdbbind set)
+3kgp,docking,pdbbind,3kgp does not contain any pose data
+3ejr,docking,pdbbind,3ejr does not contain any pose data
+3dx1,docking,pdbbind,3dx1 does not contain any pose data
+3ge7,docking,pdbbind,3ge7 does not contain any pose data
+2wbg,docking,pdbbind,2wbg does not contain any pose data
+3gr2,docking,pdbbind,3gr2 does not contain any pose data
+3dxg,docking,pdbbind,3dxg does not contain any pose data
+3g2z,docking,pdbbind,3g2z does not contain any pose data
+3g2z,crystal,pdbbind,invalid charges for the ligand 3g2z (pdbbind set)
+3gc5,docking,pdbbind,3gc5 does not contain any pose data
+3gv9,docking,pdbbind,3gv9 does not contain any pose data
+2w66,docking,pdbbind,2w66 does not contain any pose data
+3myg,docking,pdbbind,3myg does not contain any pose data
+3k5v,docking,pdbbind,3k5v does not contain any pose data
+3k5v,crystal,pdbbind,invalid charges for the ligand 3k5v (pdbbind set)
+3lka,docking,pdbbind,3lka does not contain any pose data
+3lka,crystal,pdbbind,invalid charges for the ligand 3lka (pdbbind set)
+3mss,docking,pdbbind,3mss does not contain any pose data
+2xbv,docking,pdbbind,2xbv does not contain any pose data
+2xbv,crystal,pdbbind,invalid charges for the ligand 2xbv (pdbbind set)
+2x00,docking,pdbbind,2x00 does not contain any pose data
+3p5o,docking,pdbbind,3p5o does not contain any pose data
+3p5o,crystal,pdbbind,invalid charges for the ligand 3p5o (pdbbind set)
+2xii,docking,pdbbind,2xii does not contain any pose data
+3nx7,docking,pdbbind,3nx7 does not contain any pose data
+3nx7,crystal,pdbbind,invalid charges for the ligand 3nx7 (pdbbind set)
+2wvt,docking,pdbbind,2wvt does not contain any pose data
+2xdl,docking,pdbbind,2xdl does not contain any pose data
+2xdl,crystal,pdbbind,invalid charges for the ligand 2xdl (pdbbind set)
+3gy4,docking,pdbbind,3gy4 does not contain any pose data
+3nq9,docking,pdbbind,3nq9 does not contain any pose data
+3fv1,docking,pdbbind,3fv1 does not contain any pose data
+2wtv,docking,pdbbind,2wtv does not contain any pose data
+2xnb,docking,pdbbind,2xnb does not contain any pose data
+3acw,docking,pdbbind,3acw does not contain any pose data
+2xj7,docking,pdbbind,2xj7 does not contain any pose data
+2xb8,docking,pdbbind,2xb8 does not contain any pose data
+3l7b,docking,pdbbind,3l7b does not contain any pose data
+3l7b,crystal,pdbbind,no ligand for 3l7b (pdbbind set)
+3fv2,docking,pdbbind,3fv2 does not contain any pose data
+3g2n,docking,pdbbind,3g2n does not contain any pose data
+3g2n,crystal,pdbbind,no ligand for 3g2n (pdbbind set)
+3kwa,docking,pdbbind,3kwa does not contain any pose data
+3ag9,docking,pdbbind,3ag9 does not contain any pose data
+3ag9,crystal,pdbbind,no pocket for 3ag9 (pdbbind set)
+3arp,docking,pdbbind,3arp does not contain any pose data
+3uex,docking,pdbbind,3uex does not contain any pose data
+2yki,docking,pdbbind,2yki does not contain any pose data
+2yki,crystal,pdbbind,invalid charges for the ligand 2yki (pdbbind set)
+3uew,docking,pdbbind,3uew does not contain any pose data
+3arq,docking,pdbbind,3arq does not contain any pose data
+3ary,docking,pdbbind,3ary does not contain any pose data
+3uev,docking,pdbbind,3uev does not contain any pose data
+3pyy,docking,pdbbind,3pyy does not contain any pose data
+3pyy,crystal,pdbbind,invalid charges for the ligand 3pyy (pdbbind set)
+3ryj,docking,pdbbind,3ryj does not contain any pose data
+3ryj,crystal,pdbbind,invalid charges for the ligand 3ryj (pdbbind set)
+3arv,docking,pdbbind,3arv does not contain any pose data
+3u5j,docking,pdbbind,3u5j does not contain any pose data
+3u5j,crystal,pdbbind,invalid charges for the ligand 3u5j (pdbbind set)
+3pxf,docking,pdbbind,3pxf does not contain any pose data
+3rsx,docking,pdbbind,3rsx does not contain any pose data
+3rsx,crystal,pdbbind,invalid charges for the ligand 3rsx (pdbbind set)
+3ueu,docking,pdbbind,3ueu does not contain any pose data
+3b27,docking,pdbbind,3b27 does not contain any pose data
+3b27,crystal,pdbbind,invalid charges for the ligand 3b27 (pdbbind set)
+3aru,docking,pdbbind,3aru does not contain any pose data
+3aru,crystal,pdbbind,invalid charges for the ligand 3aru (pdbbind set)
+3ao4,docking,pdbbind,3ao4 does not contain any pose data
+3ao4,crystal,pdbbind,invalid charges for the ligand 3ao4 (pdbbind set)
+2yge,docking,pdbbind,2yge does not contain any pose data
+2yge,crystal,pdbbind,invalid charges for the ligand 2yge (pdbbind set)
+3u8n,docking,pdbbind,3u8n does not contain any pose data
+3n76,docking,pdbbind,3n76 does not contain any pose data
+3o9i,docking,pdbbind,3o9i does not contain any pose data
+3o9i,crystal,pdbbind,invalid charges for the ligand 3o9i (pdbbind set)
+3oe5,docking,pdbbind,3oe5 does not contain any pose data
+3prs,docking,pdbbind,3prs does not contain any pose data
+3prs,crystal,pdbbind,invalid charges for the ligand 3prs (pdbbind set)
+2y5h,docking,pdbbind,2y5h does not contain any pose data
+3qgy,docking,pdbbind,3qgy does not contain any pose data
+3qgy,crystal,pdbbind,invalid charges for the ligand 3qgy (pdbbind set)
+3nw9,docking,pdbbind,3nw9 does not contain any pose data
+3nw9,crystal,pdbbind,invalid charges for the ligand 3nw9 (pdbbind set)
+3ui7,docking,pdbbind,3ui7 does not contain any pose data
+3ui7,crystal,pdbbind,invalid charges for the ligand 3ui7 (pdbbind set)
+3u8k,docking,pdbbind,3u8k does not contain any pose data
+3n86,docking,pdbbind,3n86 does not contain any pose data
+3n7a,docking,pdbbind,3n7a does not contain any pose data
+3b1m,docking,pdbbind,3b1m does not contain any pose data
+3rlr,docking,pdbbind,3rlr does not contain any pose data
+3rlr,crystal,pdbbind,invalid charges for the ligand 3rlr (pdbbind set)
+3oe4,docking,pdbbind,3oe4 does not contain any pose data
+2xys,docking,pdbbind,2xys does not contain any pose data
+3u9q,docking,pdbbind,3u9q does not contain any pose data
+3ozs,docking,pdbbind,3ozs does not contain any pose data
+3pww,docking,pdbbind,3pww does not contain any pose data
+3ozt,docking,pdbbind,3ozt does not contain any pose data
+3udh,docking,pdbbind,3udh does not contain any pose data
+4agn,docking,pdbbind,4agn does not contain any pose data
+3zt2,docking,pdbbind,3zt2 does not contain any pose data
+4agp,docking,pdbbind,4agp does not contain any pose data
+4abg,docking,pdbbind,4abg does not contain any pose data
+3uo4,docking,pdbbind,3uo4 does not contain any pose data
+3up2,docking,pdbbind,3up2 does not contain any pose data
+3zsx,docking,pdbbind,3zsx does not contain any pose data
+3tsk,docking,pdbbind,3tsk does not contain any pose data
+2ymd,docking,pdbbind,2ymd does not contain any pose data
+3zso,docking,pdbbind,3zso does not contain any pose data
+4eo8,docking,pdbbind,4eo8 does not contain any pose data
+4agq,docking,pdbbind,4agq does not contain any pose data
+3utu,docking,pdbbind,3utu does not contain any pose data
+4gid,docking,pdbbind,4gid does not contain any pose data
+4djv,docking,pdbbind,4djv does not contain any pose data
+2yfe,docking,pdbbind,2yfe does not contain any pose data
+4ea2,docking,pdbbind,4ea2 does not contain any pose data
+4de1,docking,pdbbind,4de1 does not contain any pose data
+4de1,crystal,pdbbind,invalid charges for the ligand 4de1 (pdbbind set)
+3qqs,docking,pdbbind,3qqs does not contain any pose data
+4dld,docking,pdbbind,4dld does not contain any pose data
+4hge,docking,pdbbind,4hge does not contain any pose data
+4hge,crystal,pdbbind,invalid charges for the ligand 4hge (pdbbind set)
+3twp,docking,pdbbind,3twp does not contain any pose data
+3uuo,docking,pdbbind,3uuo does not contain any pose data
+3r88,docking,pdbbind,3r88 does not contain any pose data
+3uri,docking,pdbbind,3uri does not contain any pose data
+4f09,docking,pdbbind,4f09 does not contain any pose data
+4e5w,docking,pdbbind,4e5w does not contain any pose data
+3rr4,docking,pdbbind,3rr4 does not contain any pose data
+4de3,docking,pdbbind,4de3 does not contain any pose data
+4eky,docking,pdbbind,4eky does not contain any pose data
+4eky,crystal,pdbbind,no ligand for 4eky (pdbbind set)
+4e6q,docking,pdbbind,4e6q does not contain any pose data
+4e6q,crystal,pdbbind,no ligand for 4e6q (pdbbind set)
+3syr,docking,pdbbind,3syr does not contain any pose data
+3syr,crystal,pdbbind,no ligand for 3syr (pdbbind set)
+4de2,docking,pdbbind,4de2 does not contain any pose data
+4ddh,docking,pdbbind,4ddh does not contain any pose data
+4j3l,docking,pdbbind,4j3l does not contain any pose data
+4j3l,crystal,pdbbind,invalid charges for the ligand 4j3l (pdbbind set)
+4dli,docking,pdbbind,4dli does not contain any pose data
+4bkt,docking,pdbbind,4bkt does not contain any pose data
+4bkt,crystal,pdbbind,invalid charges for the ligand 4bkt (pdbbind set)
+4mme,docking,pdbbind,4mme does not contain any pose data
+4mme,crystal,pdbbind,no ligand for 4mme (pdbbind set)
+4j21,docking,pdbbind,4j21 does not contain any pose data
+4j21,crystal,pdbbind,invalid charges for the ligand 4j21 (pdbbind set)
+4ddk,docking,pdbbind,4ddk does not contain any pose data
+4ih7,docking,pdbbind,4ih7 does not contain any pose data
+4ih7,crystal,pdbbind,invalid charges for the ligand 4ih7 (pdbbind set)
+4kzq,docking,pdbbind,4kzq does not contain any pose data
+4kzq,crystal,pdbbind,no ligand for 4kzq (pdbbind set)
+4ih5,docking,pdbbind,4ih5 does not contain any pose data
+4ih5,crystal,pdbbind,invalid charges for the ligand 4ih5 (pdbbind set)
+4gfm,docking,pdbbind,4gfm does not contain any pose data
+4gfm,crystal,pdbbind,invalid charges for the ligand 4gfm (pdbbind set)
+4ivc,docking,pdbbind,4ivc does not contain any pose data
+4ivc,crystal,pdbbind,invalid charges for the ligand 4ivc (pdbbind set)
+4gr0,docking,pdbbind,4gr0 does not contain any pose data
+4ivd,docking,pdbbind,4ivd does not contain any pose data
+4ivd,crystal,pdbbind,invalid charges for the ligand 4ivd (pdbbind set)
+4jia,docking,pdbbind,4jia does not contain any pose data
+4k18,docking,pdbbind,4k18 does not contain any pose data
+4k18,crystal,pdbbind,invalid charges for the ligand 4k18 (pdbbind set)
+4f3c,docking,pdbbind,4f3c does not contain any pose data
+4ivb,docking,pdbbind,4ivb does not contain any pose data
+4ivb,crystal,pdbbind,invalid charges for the ligand 4ivb (pdbbind set)
+4f9w,docking,pdbbind,4f9w does not contain any pose data
+4f9w,crystal,pdbbind,invalid charges for the ligand 4f9w (pdbbind set)
+4j28,docking,pdbbind,4j28 does not contain any pose data
+4k77,docking,pdbbind,4k77 does not contain any pose data
+4k77,crystal,pdbbind,invalid charges for the ligand 4k77 (pdbbind set)
+4kzu,docking,pdbbind,4kzu does not contain any pose data
+4kzu,crystal,pdbbind,no ligand for 4kzu (pdbbind set)
+4f2w,docking,pdbbind,4f2w does not contain any pose data
+4jfs,docking,pdbbind,4jfs does not contain any pose data
+4jsz,docking,pdbbind,4jsz does not contain any pose data
+4jsz,crystal,pdbbind,invalid charges for the ligand 4jsz (pdbbind set)
+4eor,docking,pdbbind,4eor does not contain any pose data
+4eor,crystal,pdbbind,invalid charges for the ligand 4eor (pdbbind set)
+4gkm,docking,pdbbind,4gkm does not contain any pose data
+3zdg,docking,pdbbind,3zdg does not contain any pose data
+4w9h,docking,pdbbind,4w9h does not contain any pose data
+4w9h,crystal,pdbbind,no ligand for 4w9h (pdbbind set)
+4m0y,docking,pdbbind,4m0y does not contain any pose data
+4m0y,crystal,pdbbind,no ligand for 4m0y (pdbbind set)
+4qac,docking,pdbbind,4qac does not contain any pose data
+4qac,crystal,pdbbind,no ligand for 4qac (pdbbind set)
+4w9i,docking,pdbbind,4w9i does not contain any pose data
+4w9i,crystal,pdbbind,no ligand for 4w9i (pdbbind set)
+4u4s,docking,pdbbind,4u4s does not contain any pose data
+4u4s,crystal,pdbbind,no ligand for 4u4s (pdbbind set)
+4ogj,docking,pdbbind,4ogj does not contain any pose data
+4ogj,crystal,pdbbind,no ligand for 4ogj (pdbbind set)
+4lzs,docking,pdbbind,4lzs does not contain any pose data
+4lzs,crystal,pdbbind,no ligand for 4lzs (pdbbind set)
+4mgd,docking,pdbbind,4mgd does not contain any pose data
+4mgd,crystal,pdbbind,no ligand for 4mgd (pdbbind set)
+4cig,docking,pdbbind,4cig does not contain any pose data
+4w9c,docking,pdbbind,4w9c does not contain any pose data
+4w9c,crystal,pdbbind,no ligand for 4w9c (pdbbind set)
+4wiv,docking,pdbbind,4wiv does not contain any pose data
+4wiv,crystal,pdbbind,no ligand for 4wiv (pdbbind set)
+4m0z,docking,pdbbind,4m0z does not contain any pose data
+4m0z,crystal,pdbbind,no ligand for 4m0z (pdbbind set)
+4w9l,docking,pdbbind,4w9l does not contain any pose data
+4w9l,crystal,pdbbind,no ligand for 4w9l (pdbbind set)
+4ty7,docking,pdbbind,4ty7 does not contain any pose data
+4ty7,crystal,pdbbind,no ligand for 4ty7 (pdbbind set)
+4kz6,docking,pdbbind,4kz6 does not contain any pose data
+4owm,docking,pdbbind,4owm does not contain any pose data
+4owm,crystal,pdbbind,no ligand for 4owm (pdbbind set)
+4llx,docking,pdbbind,4llx does not contain any pose data
+4llx,crystal,pdbbind,no ligand for 4llx (pdbbind set)
+4pcs,docking,pdbbind,4pcs does not contain any pose data
+4pcs,crystal,pdbbind,no ligand for 4pcs (pdbbind set)
+4ciw,docking,pdbbind,4ciw does not contain any pose data
+4ciw,crystal,pdbbind,no pocket for 4ciw (pdbbind set)
+4jxs,docking,pdbbind,4jxs does not contain any pose data
+3wtj,docking,pdbbind,3wtj does not contain any pose data
+3wtj,crystal,pdbbind,invalid charges for the ligand 3wtj (pdbbind set)
+5aba,docking,pdbbind,5aba does not contain any pose data
+5aba,crystal,pdbbind,no ligand for 5aba (pdbbind set)
+5a7b,docking,pdbbind,5a7b does not contain any pose data
+5a7b,crystal,pdbbind,no ligand for 5a7b (pdbbind set)
+4crc,docking,pdbbind,4crc does not contain any pose data
+4cra,docking,pdbbind,4cra does not contain any pose data
+4cra,crystal,pdbbind,invalid charges for the ligand 4cra (pdbbind set)
+3wz8,docking,pdbbind,3wz8 does not contain any pose data
+3wz8,crystal,pdbbind,invalid charges for the ligand 3wz8 (pdbbind set)
+4twp,docking,pdbbind,4twp does not contain any pose data
+4twp,crystal,pdbbind,no ligand for 4twp (pdbbind set)
+5c28,docking,pdbbind,5c28 does not contain any pose data
+5c28,crystal,pdbbind,no ligand for 5c28 (pdbbind set)
+4qd6,docking,pdbbind,4qd6 does not contain any pose data
+4qd6,crystal,pdbbind,no ligand for 4qd6 (pdbbind set)
+4x6p,docking,pdbbind,4x6p does not contain any pose data
+4x6p,crystal,pdbbind,no ligand for 4x6p (pdbbind set)
+5dwr,docking,pdbbind,5dwr does not contain any pose data
+5dwr,crystal,pdbbind,no ligand for 5dwr (pdbbind set)
+5c2h,docking,pdbbind,5c2h does not contain any pose data
+5c2h,crystal,pdbbind,no ligand for 5c2h (pdbbind set)
+4cr9,docking,pdbbind,4cr9 does not contain any pose data
+4rfm,docking,pdbbind,4rfm does not contain any pose data
+4rfm,crystal,pdbbind,no ligand for 4rfm (pdbbind set)
