@@ -1,0 +1,253 @@
+(fetch-research-env) (base) manvi-agrawal@ManviAgrawal:~/BenzeneSimulation/fusion-repo/model/sgcnn/src/sgcnn$ python train.py --checkpoint=True --checkpoint-dir="checkpoint" --num-workers=1 --batch-size=10 --preprocessing-type=processed --feature-type=pybel --epochs=10 --lr=1e-3 --covalent-threshold=1.5 --non-covalent-threshold=4.5 --covalent-gather-width=16 --covalent-k=2 --non-covalent-gather-width=12 --non-covalent-k=2 --checkpoint-iter=1 --train-data  data/train.hdf --val-data data/val.hdf --dataset-name pdbbind
+found 1 datasets in input train-data
+/home/manvi-agrawal/miniconda3/envs/fetch-research-env/lib/python3.12/site-packages/torch_geometric/deprecation.py:26: UserWarning: 'data.DataListLoader' is deprecated, use 'loader.DataListLoader' instead
+  warnings.warn(out)
+8 complexes in training dataset
+2 complexes in validation dataset
+PotentialNetParallel(
+  (covalent_neighbor_threshold): GraphThreshold()
+  (non_covalent_neighbor_threshold): GraphThreshold()
+  (covalent_propagation): PotentialNetPropagation(
+    (neighbor_threshold): GraphThreshold()
+    (edge_network_nn): Sequential(
+      (0): Linear(in_features=1, out_features=10, bias=True)
+      (1): Softsign()
+      (2): Linear(in_features=10, out_features=20, bias=True)
+      (3): Softsign()
+    )
+    (edge_network): NNConv(20, 20, aggr=add, nn=Sequential(
+      (0): Linear(in_features=1, out_features=10, bias=True)
+      (1): Softsign()
+      (2): Linear(in_features=10, out_features=20, bias=True)
+      (3): Softsign()
+    ))
+    (gate): GatedGraphConv(20, num_layers=2)
+    (attention): PotentialNetAttention(
+      (net_i): Sequential(
+        (0): Linear(in_features=40, out_features=20, bias=True)
+        (1): Softsign()
+        (2): Linear(in_features=20, out_features=16, bias=True)
+        (3): Softsign()
+      )
+      (net_j): Sequential(
+        (0): Linear(in_features=20, out_features=16, bias=True)
+        (1): Softsign()
+      )
+    )
+  )
+  (non_covalent_propagation): PotentialNetPropagation(
+    (neighbor_threshold): GraphThreshold()
+    (edge_network_nn): Sequential(
+      (0): Linear(in_features=1, out_features=8, bias=True)
+      (1): Softsign()
+      (2): Linear(in_features=8, out_features=16, bias=True)
+      (3): Softsign()
+    )
+    (edge_network): NNConv(16, 16, aggr=add, nn=Sequential(
+      (0): Linear(in_features=1, out_features=8, bias=True)
+      (1): Softsign()
+      (2): Linear(in_features=8, out_features=16, bias=True)
+      (3): Softsign()
+    ))
+    (gate): GatedGraphConv(16, num_layers=2)
+    (attention): PotentialNetAttention(
+      (net_i): Sequential(
+        (0): Linear(in_features=32, out_features=16, bias=True)
+        (1): Softsign()
+        (2): Linear(in_features=16, out_features=12, bias=True)
+        (3): Softsign()
+      )
+      (net_j): Sequential(
+        (0): Linear(in_features=16, out_features=12, bias=True)
+        (1): Softsign()
+      )
+    )
+  )
+  (output): PotentialNetFullyConnected(
+    (output): Sequential(
+      (0): Linear(in_features=12, out_features=8, bias=True)
+      (1): ReLU()
+      (2): Linear(in_features=8, out_features=6, bias=True)
+      (3): ReLU()
+      (4): Linear(in_features=6, out_features=1, bias=True)
+    )
+  )
+)
+9151 trainable parameters.
+9151 total parameters.
+Epoch 0
+Length of train_dataloader: 1
+  0%|                                                                                                                                            | 0/1 [00:00<?, ?it/s]Train.py#L223 len batch: 8
+epoch: 0        loss:51.1134    r2: -10.0779     pearsonr: 0.5178       spearmanr: 0.3095       mae: 6.8246     pred stdev: 0.0349       pred mean: 0.3541      covalent_threshold: 1.5000     non covalent threshold: 4.5000
+epoch: 0        loss:51.1134    r2: -10.0779     pearsonr: 0.5178       spearmanr: 0.3095       mae: 6.8246     pred stdev: 0.0349       pred mean: 0.3541      covalent_threshold: 1.5000     non covalent threshold: 4.5000
+  0%|                                                                                                                                            | 0/1 [00:00<?, ?it/sTrain.py#L335 len batch: 2                                                                                                                        | 0/1 [00:00<?, ?it/s]
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 30.63it/s]
+Len y_true: 1
+Len y_pred: 1
+r2: -46.07402420043945  mae: 3.4620890617370605 mse: 12.243959426879883 pearsonr: PearsonRResult(statistic=np.float32(1.0), pvalue=np.float32(1.0))      spearmanr: SignificanceResult(statistic=np.float64(0.9999999999999999), pvalue=np.float64(nan))
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00,  2.66it/s]
+Args.checkpoint is True
+  0%|                                                                                                                                            | 0/1 [00:00<?, ?it/s]Train.py#L335 len batch: 2
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 87.91it/s]
+Len y_true: 1
+Len y_pred: 1
+r2: -45.93773651123047  mae: 3.45736026763916   mse: 12.208511352539062 pearsonr: PearsonRResult(statistic=np.float32(1.0), pvalue=np.float32(1.0))      spearmanr: SignificanceResult(statistic=np.float64(0.9999999999999999), pvalue=np.float64(nan))
+Epoch 1
+Length of train_dataloader: 1
+  0%|                                                                                                                                            | 0/1 [00:00<?, ?it/s]Train.py#L223 len batch: 8
+epoch: 1        loss:51.0157    r2: -10.0567     pearsonr: 0.5185       spearmanr: 0.3333       mae: 6.8181     pred stdev: 0.0390       pred mean: 0.3606      covalent_threshold: 1.5000     non covalent threshold: 4.5000
+epoch: 1        loss:51.0157    r2: -10.0567     pearsonr: 0.5185       spearmanr: 0.3333       mae: 6.8181     pred stdev: 0.0390       pred mean: 0.3606      covalent_threshold: 1.5000     non covalent threshold: 4.5000
+  0%|                                                                                                                                            | 0/1 [00:00<?, ?it/sTrain.py#L335 len batch: 2                                                                                                                        | 0/1 [00:00<?, ?it/s]
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 38.61it/s]
+Len y_true: 1
+Len y_pred: 1
+r2: -45.93773651123047  mae: 3.45736026763916   mse: 12.208511352539062 pearsonr: PearsonRResult(statistic=np.float32(1.0), pvalue=np.float32(1.0))      spearmanr: SignificanceResult(statistic=np.float64(0.9999999999999999), pvalue=np.float64(nan))
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00,  7.62it/s]
+Args.checkpoint is True
+  0%|                                                                                                                                            | 0/1 [00:00<?, ?it/s]Train.py#L335 len batch: 2
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 71.73it/s]
+Len y_true: 1
+Len y_pred: 1
+r2: -45.79996871948242  mae: 3.452580451965332  mse: 12.172677993774414 pearsonr: PearsonRResult(statistic=np.float32(1.0), pvalue=np.float32(1.0))      spearmanr: SignificanceResult(statistic=np.float64(0.9999999999999999), pvalue=np.float64(nan))
+Epoch 2
+Length of train_dataloader: 1
+  0%|                                                                                                                                            | 0/1 [00:00<?, ?it/s]Train.py#L223 len batch: 8
+epoch: 2        loss:50.9188    r2: -10.0357     pearsonr: 0.5177       spearmanr: 0.3333       mae: 6.8117     pred stdev: 0.0432       pred mean: 0.3671      covalent_threshold: 1.5000     non covalent threshold: 4.5000
+epoch: 2        loss:50.9188    r2: -10.0357     pearsonr: 0.5177       spearmanr: 0.3333       mae: 6.8117     pred stdev: 0.0432       pred mean: 0.3671      covalent_threshold: 1.5000     non covalent threshold: 4.5000
+  0%|                                                                                                                                            | 0/1 [00:00<?, ?it/sTrain.py#L335 len batch: 2                                                                                                                        | 0/1 [00:00<?, ?it/s]
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 72.49it/s]
+Len y_true: 1
+Len y_pred: 1
+r2: -45.79996871948242  mae: 3.452580451965332  mse: 12.172677993774414 pearsonr: PearsonRResult(statistic=np.float32(1.0), pvalue=np.float32(1.0))      spearmanr: SignificanceResult(statistic=np.float64(0.9999999999999999), pvalue=np.float64(nan))
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00,  8.10it/s]
+Args.checkpoint is True
+  0%|                                                                                                                                            | 0/1 [00:00<?, ?it/s]Train.py#L335 len batch: 2
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 67.14it/s]
+Len y_true: 1
+Len y_pred: 1
+r2: -45.663578033447266 mae: 3.447843551635742  mse: 12.137202262878418 pearsonr: PearsonRResult(statistic=np.float32(1.0), pvalue=np.float32(1.0))      spearmanr: SignificanceResult(statistic=np.float64(0.9999999999999999), pvalue=np.float64(nan))
+Epoch 3
+Length of train_dataloader: 1
+  0%|                                                                                                                                            | 0/1 [00:00<?, ?it/s]Train.py#L223 len batch: 8
+epoch: 3        loss:50.8237    r2: -10.0151     pearsonr: 0.5160       spearmanr: 0.3333       mae: 6.8053     pred stdev: 0.0472       pred mean: 0.3734      covalent_threshold: 1.5000     non covalent threshold: 4.5000
+epoch: 3        loss:50.8237    r2: -10.0151     pearsonr: 0.5160       spearmanr: 0.3333       mae: 6.8053     pred stdev: 0.0472       pred mean: 0.3734      covalent_threshold: 1.5000     non covalent threshold: 4.5000
+  0%|                                                                                                                                            | 0/1 [00:00<?, ?it/sTrain.py#L335 len batch: 2                                                                                                                        | 0/1 [00:00<?, ?it/s]
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 53.43it/s]
+Len y_true: 1
+Len y_pred: 1
+r2: -45.663578033447266 mae: 3.447843551635742  mse: 12.137202262878418 pearsonr: PearsonRResult(statistic=np.float32(1.0), pvalue=np.float32(1.0))      spearmanr: SignificanceResult(statistic=np.float64(0.9999999999999999), pvalue=np.float64(nan))
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 10.23it/s]
+Args.checkpoint is True
+  0%|                                                                                                                                            | 0/1 [00:00<?, ?it/s]Train.py#L335 len batch: 2
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 62.93it/s]
+Len y_true: 1
+Len y_pred: 1
+r2: -45.53064727783203  mae: 3.443218469619751  mse: 12.10262680053711  pearsonr: PearsonRResult(statistic=np.float32(1.0), pvalue=np.float32(1.0))      spearmanr: SignificanceResult(statistic=np.float64(0.9999999999999999), pvalue=np.float64(nan))
+Epoch 4
+Length of train_dataloader: 1
+  0%|                                                                                                                                            | 0/1 [00:00<?, ?it/s]Train.py#L223 len batch: 8
+epoch: 4        loss:50.7278    r2: -9.9944      pearsonr: 0.5283       spearmanr: 0.5000       mae: 6.7989     pred stdev: 0.0503       pred mean: 0.3798      covalent_threshold: 1.5000     non covalent threshold: 4.5000
+epoch: 4        loss:50.7278    r2: -9.9944      pearsonr: 0.5283       spearmanr: 0.5000       mae: 6.7989     pred stdev: 0.0503       pred mean: 0.3798      covalent_threshold: 1.5000     non covalent threshold: 4.5000
+  0%|                                                                                                                                            | 0/1 [00:00<?, ?it/sTrain.py#L335 len batch: 2                                                                                                                        | 0/1 [00:00<?, ?it/s]
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 68.19it/s]
+Len y_true: 1
+Len y_pred: 1
+r2: -45.53064727783203  mae: 3.443218469619751  mse: 12.10262680053711  pearsonr: PearsonRResult(statistic=np.float32(1.0), pvalue=np.float32(1.0))      spearmanr: SignificanceResult(statistic=np.float64(0.9999999999999999), pvalue=np.float64(nan))
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00,  9.77it/s]
+Args.checkpoint is True
+  0%|                                                                                                                                            | 0/1 [00:00<?, ?it/s]Train.py#L335 len batch: 2
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 65.22it/s]
+Len y_true: 1
+Len y_pred: 1
+r2: -45.39772033691406  mae: 3.4385671615600586 mse: 12.068053245544434 pearsonr: PearsonRResult(statistic=np.float32(1.0), pvalue=np.float32(1.0))      spearmanr: SignificanceResult(statistic=np.float64(0.9999999999999999), pvalue=np.float64(nan))
+Epoch 5
+Length of train_dataloader: 1
+  0%|                                                                                                                                            | 0/1 [00:00<?, ?it/s]Train.py#L223 len batch: 8
+epoch: 5        loss:50.6366    r2: -9.9746      pearsonr: 0.5407       spearmanr: 0.5000       mae: 6.7929     pred stdev: 0.0531       pred mean: 0.3859      covalent_threshold: 1.5000     non covalent threshold: 4.5000
+epoch: 5        loss:50.6366    r2: -9.9746      pearsonr: 0.5407       spearmanr: 0.5000       mae: 6.7929     pred stdev: 0.0531       pred mean: 0.3859      covalent_threshold: 1.5000     non covalent threshold: 4.5000
+  0%|                                                                                                                                            | 0/1 [00:00<?, ?it/sTrain.py#L335 len batch: 2                                                                                                                        | 0/1 [00:00<?, ?it/s]
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 80.28it/s]
+Len y_true: 1
+Len y_pred: 1
+r2: -45.39772033691406  mae: 3.4385671615600586 mse: 12.068053245544434 pearsonr: PearsonRResult(statistic=np.float32(1.0), pvalue=np.float32(1.0))      spearmanr: SignificanceResult(statistic=np.float64(0.9999999999999999), pvalue=np.float64(nan))
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00,  8.74it/s]
+Args.checkpoint is True
+  0%|                                                                                                                                            | 0/1 [00:00<?, ?it/s]Train.py#L335 len batch: 2
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 55.93it/s]
+Len y_true: 1
+Len y_pred: 1
+r2: -45.263790130615234 mae: 3.4338536262512207 mse: 12.033217430114746 pearsonr: PearsonRResult(statistic=np.float32(1.0), pvalue=np.float32(1.0))      spearmanr: SignificanceResult(statistic=np.float64(0.9999999999999999), pvalue=np.float64(nan))
+Epoch 6
+Length of train_dataloader: 1
+  0%|                                                                                                                                            | 0/1 [00:00<?, ?it/s]Train.py#L223 len batch: 8
+epoch: 6        loss:50.5437    r2: -9.9545      pearsonr: 0.5524       spearmanr: 0.5714       mae: 6.7867     pred stdev: 0.0558       pred mean: 0.3921      covalent_threshold: 1.5000     non covalent threshold: 4.5000
+epoch: 6        loss:50.5437    r2: -9.9545      pearsonr: 0.5524       spearmanr: 0.5714       mae: 6.7867     pred stdev: 0.0558       pred mean: 0.3921      covalent_threshold: 1.5000     non covalent threshold: 4.5000
+  0%|                                                                                                                                            | 0/1 [00:00<?, ?it/sTrain.py#L335 len batch: 2                                                                                                                        | 0/1 [00:00<?, ?it/s]
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 66.14it/s]
+Len y_true: 1
+Len y_pred: 1
+r2: -45.263790130615234 mae: 3.4338536262512207 mse: 12.033217430114746 pearsonr: PearsonRResult(statistic=np.float32(1.0), pvalue=np.float32(1.0))      spearmanr: SignificanceResult(statistic=np.float64(0.9999999999999999), pvalue=np.float64(nan))
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00,  8.10it/s]
+Args.checkpoint is True
+  0%|                                                                                                                                            | 0/1 [00:00<?, ?it/s]Train.py#L335 len batch: 2
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 47.01it/s]
+Len y_true: 1
+Len y_pred: 1
+r2: -45.130653381347656 mae: 3.4291648864746094 mse: 11.998588562011719 pearsonr: PearsonRResult(statistic=np.float32(1.0), pvalue=np.float32(1.0))      spearmanr: SignificanceResult(statistic=np.float64(0.9999999999999999), pvalue=np.float64(nan))
+Epoch 7
+Length of train_dataloader: 1
+  0%|                                                                                                                                            | 0/1 [00:00<?, ?it/s]Train.py#L223 len batch: 8
+epoch: 7        loss:50.4472    r2: -9.9335      pearsonr: 0.5636       spearmanr: 0.5714       mae: 6.7802     pred stdev: 0.0584       pred mean: 0.3985      covalent_threshold: 1.5000     non covalent threshold: 4.5000
+epoch: 7        loss:50.4472    r2: -9.9335      pearsonr: 0.5636       spearmanr: 0.5714       mae: 6.7802     pred stdev: 0.0584       pred mean: 0.3985      covalent_threshold: 1.5000     non covalent threshold: 4.5000
+  0%|                                                                                                                                            | 0/1 [00:00<?, ?it/sTrain.py#L335 len batch: 2                                                                                                                        | 0/1 [00:00<?, ?it/s]
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 60.51it/s]
+Len y_true: 1
+Len y_pred: 1
+r2: -45.130653381347656 mae: 3.4291648864746094 mse: 11.998588562011719 pearsonr: PearsonRResult(statistic=np.float32(1.0), pvalue=np.float32(1.0))      spearmanr: SignificanceResult(statistic=np.float64(0.9999999999999999), pvalue=np.float64(nan))
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 10.20it/s]
+Args.checkpoint is True
+  0%|                                                                                                                                            | 0/1 [00:00<?, ?it/s]Train.py#L335 len batch: 2
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 79.40it/s]
+Len y_true: 1
+Len y_pred: 1
+r2: -44.997920989990234 mae: 3.4244871139526367 mse: 11.964065551757812 pearsonr: PearsonRResult(statistic=np.float32(1.0), pvalue=np.float32(1.0))      spearmanr: SignificanceResult(statistic=np.float64(0.9999999999999999), pvalue=np.float64(nan))
+Epoch 8
+Length of train_dataloader: 1
+  0%|                                                                                                                                            | 0/1 [00:00<?, ?it/s]Train.py#L223 len batch: 8
+epoch: 8        loss:50.3473    r2: -9.9119      pearsonr: 0.5718       spearmanr: 0.6190       mae: 6.7734     pred stdev: 0.0606       pred mean: 0.4054      covalent_threshold: 1.5000     non covalent threshold: 4.5000
+epoch: 8        loss:50.3473    r2: -9.9119      pearsonr: 0.5718       spearmanr: 0.6190       mae: 6.7734     pred stdev: 0.0606       pred mean: 0.4054      covalent_threshold: 1.5000     non covalent threshold: 4.5000
+  0%|                                                                                                                                            | 0/1 [00:00<?, ?it/sTrain.py#L335 len batch: 2                                                                                                                        | 0/1 [00:00<?, ?it/s]
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 62.31it/s]
+Len y_true: 1
+Len y_pred: 1
+r2: -44.997920989990234 mae: 3.4244871139526367 mse: 11.964065551757812 pearsonr: PearsonRResult(statistic=np.float32(1.0), pvalue=np.float32(1.0))      spearmanr: SignificanceResult(statistic=np.float64(0.9999999999999999), pvalue=np.float64(nan))
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00,  9.23it/s]
+Args.checkpoint is True
+  0%|                                                                                                                                            | 0/1 [00:00<?, ?it/s]Train.py#L335 len batch: 2
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 61.27it/s]
+Len y_true: 1
+Len y_pred: 1
+r2: -44.8651008605957   mae: 3.4198036193847656 mse: 11.929518699645996 pearsonr: PearsonRResult(statistic=np.float32(1.0), pvalue=np.float32(1.0))      spearmanr: SignificanceResult(statistic=np.float64(0.9999999999999999), pvalue=np.float64(nan))
+Epoch 9
+Length of train_dataloader: 1
+  0%|                                                                                                                                            | 0/1 [00:00<?, ?it/s]Train.py#L223 len batch: 8
+epoch: 9        loss:50.2478    r2: -9.8903      pearsonr: 0.5789       spearmanr: 0.6190       mae: 6.7665     pred stdev: 0.0627       pred mean: 0.4122      covalent_threshold: 1.5000     non covalent threshold: 4.5000
+epoch: 9        loss:50.2478    r2: -9.8903      pearsonr: 0.5789       spearmanr: 0.6190       mae: 6.7665     pred stdev: 0.0627       pred mean: 0.4122      covalent_threshold: 1.5000     non covalent threshold: 4.5000
+  0%|                                                                                                                                            | 0/1 [00:00<?, ?it/sTrain.py#L335 len batch: 2                                                                                                                        | 0/1 [00:00<?, ?it/s]
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 67.89it/s]
+Len y_true: 1
+Len y_pred: 1
+r2: -44.8651008605957   mae: 3.4198036193847656 mse: 11.929518699645996 pearsonr: PearsonRResult(statistic=np.float32(1.0), pvalue=np.float32(1.0))      spearmanr: SignificanceResult(statistic=np.float64(0.9999999999999999), pvalue=np.float64(nan))
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 10.27it/s]
+Args.checkpoint is True
+  0%|                                                                                                                                            | 0/1 [00:00<?, ?it/s]Train.py#L335 len batch: 2
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 50.05it/s]
+Len y_true: 1
+Len y_pred: 1
+r2: -44.732421875       mae: 3.415121555328369  mse: 11.89500904083252  pearsonr: PearsonRResult(statistic=np.float32(1.0), pvalue=np.float32(1.0))      spearmanr: SignificanceResult(statistic=np.float64(0.9999999999999999), pvalue=np.float64(nan))
+  0%|                                                                                                                                            | 0/1 [00:00<?, ?it/s]Train.py#L335 len batch: 2
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 51.60it/s]
+Len y_true: 1
+Len y_pred: 1
+r2: -44.732421875       mae: 3.415121555328369  mse: 11.89500904083252  pearsonr: PearsonRResult(statistic=np.float32(1.0), pvalue=np.float32(1.0))      spearmanr: SignificanceResult(statistic=np.float64(0.9999999999999999), pvalue=np.float64(nan))
+best training checkpoint epoch 9/step 10 with r2: -44.732421875

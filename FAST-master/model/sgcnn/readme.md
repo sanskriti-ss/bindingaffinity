@@ -14,3 +14,16 @@ In order to train a model and later evaluate it, a concrete example is provided 
 python test.py --checkpoint "${checkpoint_dir}/best_checkpoint.pth"  --preprocessing-type=processed --feature-type=pybel --dataset-name pdbbind --num-workers 1 --output "${output_dir}" --test-data $test_data_path;
 
 ```
+
+
+python train.py --checkpoint-dir="checkpoint" --num-workers=1 --batch-size=10 --preprocessing-type=processed --feature-type=pybel --epochs=10 --lr=1e-3 --covalent-threshold=1.5 --non-covalent-threshold=4.5 --covalent-gather-width=16 --covalent-k=2 --non-covalent-gather-width=12 --non-covalent-k=2 --checkpoint=True --checkpoint-iter=1 --train-data  data/train.hdf --val-data data/val.hdf --dataset-name pdbbind
+
+cd into src folder
+
+python train.py --checkpoint=True --checkpoint-dir="checkpoint" --num-workers=1 --batch-size=10 --preprocessing-type=processed --feature-type=pybel --epochs=1 --lr=1e-3 --covalent-threshold=1.5 --non-covalent-threshold=4.5 --covalent-gather-width=16 --covalent-k=2 --non-covalent-gather-width=12 --non-covalent-k=2 --checkpoint-iter=1 --train-data  data/train.hdf --val-data data/val.hdf --dataset-name pdbbind
+
+
+python train.py --checkpoint=True --checkpoint-dir="checkpoint" --num-workers=5 --batch-size=10 --preprocessing-type=processed --feature-type=pybel --epochs=100 --lr=1e-3 --covalent-threshold=1.5 --non-covalent-threshold=4.5 --covalent-gather-width=16 --covalent-k=2 --non-covalent-gather-width=12 --non-covalent-k=2 --checkpoint-iter=1 --train-data  data/train.hdf --val-data data/val.hdf --dataset-name pdbbind
+
+
+
