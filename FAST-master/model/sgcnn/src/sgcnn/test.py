@@ -23,18 +23,31 @@ from glob import glob
 from torch_geometric.data import DataLoader as GeometricDataLoader
 from torch_geometric.nn import DataParallel as GeometricDataParallel
 from torch_geometric.data import Data, Batch, DataListLoader
+
+# from torch.nn.Parallel import DataParallel
+
 from data_utils import PDBBindDataset
 from model import PotentialNetParallel
+
+import scipy
+
+import numpy as np
+import functools
+torch.serialization.add_safe_globals([
+    functools.partial, getattr, scipy.stats._stats_py.PearsonRResultBase, scipy.stats._stats_py.PearsonRResult,
+    np._core.multiarray.scalar, np.dtype,
+    ])
+
 
 
 def test(args):
 
     if torch.cuda.is_available():
 
-        model_train_dict = torch.load(args.checkpoint)
+        model_train_dict = torch.load(args.checkpoint, weights_only=False)
 
     else:
-        model_train_dict = torch.load(args.checkpoint, map_location=torch.device('cpu'))
+        model_train_dict = torch.load(args.checkpoint, map_location=torch.device('cpu'), weights_only=False)
 
     '''
     model = GeometricDataParallel(
@@ -70,14 +83,28 @@ def test(args):
             ],
         ).float()
     
+
+    
     model_module = torch.nn.Module()
     model_module.add_module('module', model)
     model = model_module
 
     print(model_module, model)
+
+
+    # Add 'module.' prefix 
+    from collections import OrderedDict
+
+    new_state_dict = OrderedDict()
+    for k, v in model_train_dict["model_state_dict"].items():
+        new_key = "module." + k  # add module. prefix
+        new_state_dict[new_key] = v
+
+    # Load into model
+    model.load_state_dict(new_state_dict)
     
 
-    model.load_state_dict(model_train_dict["model_state_dict"])
+    # model.load_state_dict(model_train_dict["model_state_dict"])
 
     dataset_list = []
     
@@ -137,12 +164,12 @@ def test(args):
                 name_pose_grp.attrs["y_true"] = y
 
                 (
+                    y_,
                     covalent_feature,
                     non_covalent_feature,
                     pool_feature,
                     fc0_feature,
                     fc1_feature,
-                    y_,
                 ) = model.module(
                     Batch().from_data_list([data]), return_hidden_feature=True
                 )
@@ -158,6 +185,14 @@ def test(args):
                     ),
                     axis=1,
                 )
+
+                # print(
+                #     f"MANVI covalent: {covalent_feature.shape}", #16
+                #     f"non_covalent: {non_covalent_feature.shape}", #12
+                #     f"pool: {pool_feature.shape}", #12
+                #     f"fc0: {fc0_feature.shape}", #8
+                #     f"fc1: {fc1_feature.shape}", #6
+                # )
 
                 name_pose_grp.create_dataset(
                     "hidden_features",
