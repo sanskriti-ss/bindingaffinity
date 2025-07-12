@@ -198,6 +198,25 @@ class PotentialNetFullyConnected(torch.nn.Module):
             return self.output(data)
 
 
+class PotentialNetFullyConnected_v2(torch.nn.Module):
+    def __init__(self, in_channels, out_channels):
+        super(PotentialNetFullyConnected_v2, self).__init__()
+
+        self.fc1 = nn.Linear(in_channels, int(in_channels / 1.5)) # 12, 8
+        self.fc2 = nn.Linear(int(in_channels / 1.5), int(in_channels / 2)) # 8, 6
+        self.fc3 = nn.Linear(int(in_channels / 2), out_channels) # 6, 1
+
+    def forward(self, data, return_hidden_feature=False):
+        x1 = F.relu(self.fc1(data))
+        x2 = F.relu(self.fc2(x1))
+        out = self.fc3(x2)
+
+        if return_hidden_feature:
+            return x1, x2, out  # last hidden layer, earlier hidden, final output
+        else:
+            return out
+
+
 class PotentialNetParallel(torch.nn.Module):
     def __init__(
         self,
@@ -256,7 +275,7 @@ class PotentialNetParallel(torch.nn.Module):
 
         self.global_add_pool = global_add_pool
 
-        self.output = PotentialNetFullyConnected(
+        self.output = PotentialNetFullyConnected_v2(
             non_covalent_gather_width, out_channels
         )
 
@@ -275,8 +294,8 @@ class PotentialNetParallel(torch.nn.Module):
         # MANVI comment
         # if not is_undirected(data.edge_index):
         #     data.edge_index = to_undirected(data.edge_index)
-        from torch_geometric.data import Batch
-        data = Batch.from_data_list(data)
+        # from torch_geometric.data import Batch
+        # data = Batch.from_data_list(data)
         ## MANVI: END of new code
 
         
