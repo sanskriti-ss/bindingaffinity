@@ -48,11 +48,11 @@ from torch_geometric.utils import (
 )
 
 #from torch_scatter import scatter as scatter_
-from torch_geometric.utils import scatter_
+from torch_geometric.utils import scatter as scatter_
 
 from torch_geometric.nn import DataParallel as GeometricDataParallel
 from torch_geometric.data import Batch
-from .ggcnn import GatedGraphConv, PotentialNetAttention
+from ggcnn import GatedGraphConv, PotentialNetAttention
 from torch.nn import init
 
 
@@ -271,8 +271,15 @@ class PotentialNetParallel(torch.nn.Module):
             data.batch = data.batch.cuda()
 
         # make sure that we have undirected graph
-        if not is_undirected(data.edge_index):
-            data.edge_index = to_undirected(data.edge_index)
+        
+        # MANVI comment
+        # if not is_undirected(data.edge_index):
+        #     data.edge_index = to_undirected(data.edge_index)
+        from torch_geometric.data import Batch
+        data = Batch.from_data_list(data)
+        ## MANVI: END of new code
+
+        
 
         # make sure that nodes can propagate messages to themselves
         if not contains_self_loops(data.edge_index):
@@ -312,6 +319,6 @@ class PotentialNetParallel(torch.nn.Module):
 
             fc0_x, fc1_x, output_x = self.output(pool_x, return_hidden_feature=True)
 
-            return avg_covalent_x, avg_non_covalent_x, pool_x, fc0_x, fc1_x, output_x
+            return (output_x, avg_covalent_x, avg_non_covalent_x, pool_x, fc0_x, fc1_x,)
         else:
-            return self.output(pool_x)
+            return (self.output(pool_x),)

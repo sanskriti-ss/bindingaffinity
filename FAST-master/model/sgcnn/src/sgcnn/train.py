@@ -151,7 +151,7 @@ def train():
         batch_size=args.batch_size,
         shuffle=False,
         worker_init_fn=worker_init_fn,
-        drop_last=True,
+        drop_last=False,
     )  # just to keep batch sizes even, since shuffling is used
 
     val_dataloader = DataListLoader(
@@ -159,14 +159,13 @@ def train():
         batch_size=args.batch_size,
         shuffle=False,
         worker_init_fn=worker_init_fn,
-        drop_last=True,
+        drop_last=False,
     )
 
     tqdm.write("{} complexes in training dataset".format(len(train_dataset)))
     tqdm.write("{} complexes in validation dataset".format(len(val_dataset)))
 
-    model = GeometricDataParallel(
-        PotentialNetParallel(
+    potential_net_parallel = PotentialNetParallel(
             in_channels=feature_size,
             out_channels=1,
             covalent_gather_width=args.covalent_gather_width,
@@ -175,11 +174,31 @@ def train():
             non_covalent_k=args.non_covalent_k,
             covalent_neighbor_threshold=args.covalent_threshold,
             non_covalent_neighbor_threshold=args.non_covalent_threshold,
-        )
-    ).float()
+            always_return_hidden_feature=True,
+        ).float()
+
+    # model = GeometricDataParallel(
+    #     PotentialNetParallel(
+    #         in_channels=feature_size,
+    #         out_channels=1,
+    #         covalent_gather_width=args.covalent_gather_width,
+    #         non_covalent_gather_width=args.non_covalent_gather_width,
+    #         covalent_k=args.covalent_k,
+    #         non_covalent_k=args.non_covalent_k,
+    #         covalent_neighbor_threshold=args.covalent_threshold,
+    #         non_covalent_neighbor_threshold=args.non_covalent_threshold,
+    #     )
+    # ).float()
+
+    if torch.cuda.device_count() > 1:
+        model = GeometricDataParallel(
+            potential_net_parallel, device_ids=list(range(torch.cuda.device_count()))
+            ).float()
+        # model.to(0)
+    else:
+        model = potential_net_parallel.to('cuda' if torch.cuda.is_available() else 'cpu')
 
     model.train()
-    model.to(0)
     tqdm.write(str(model))
     tqdm.write(
         "{} trainable parameters.".format(
@@ -198,8 +217,16 @@ def train():
     best_checkpoint_step = 0
     best_checkpoint_r2 = -9e9
     step = 0
+
+    # if not os.path.exists(os.path.dirname('fc-layer/')):
+    #     os.makedirs(os.path.dirname('fc-layer/'))
+
+
     for epoch in range(args.epochs):
         losses = []
+        print(f"MANVI: Epoch {epoch}")
+        # print(f"Length of train_dataloader: {len(train_dataloader)}")
+
         for batch in tqdm(train_dataloader):
             batch = [x for x in batch if x is not None]
             if len(batch) < 1:
@@ -208,7 +235,18 @@ def train():
             optimizer.zero_grad()
 
             data = [x[2] for x in batch]
-            y_ = model(data)
+            yo_ = model(data)
+
+            if len(yo_) > 1:
+                import numpy as np
+                y_, avg_covalent_x, avg_non_covalent_x, pool_x, fc0_x, fc1_x = yo_
+                # np.save(f'fc-layer/fc-0-epoch-{epoch}-step-{step}.npy', fc0_x.cpu().detach().numpy())
+                # np.save(f'fc-layer/fc-1-epoch-{epoch}-step-{step}.npy', fc1_x.cpu().detach().numpy())
+            else:
+                y_, *_ = yo_
+
+            
+
             y = torch.cat([x[2].y for x in batch])
 
             loss = criterion(y.float(), y_.cpu().float())
@@ -224,6 +262,11 @@ def train():
             pearsonr = stats.pearsonr(y_true.reshape(-1), y_pred.reshape(-1))
             spearmanr = stats.spearmanr(y_true.reshape(-1), y_pred.reshape(-1))
 
+            # Handle both wrapped and unwrapped models
+            base_model = model.module if hasattr(model, 'module') else model
+
+            # threshold = base_model.covalent_neighbor_threshold.t.cpu().data.item()
+
             tqdm.write(
                 "epoch: {}\tloss:{:0.4f}\tr2: {:0.4f}\t pearsonr: {:0.4f}\tspearmanr: {:0.4f}\tmae: {:0.4f}\tpred stdev: {:0.4f}"
                 "\t pred mean: {:0.4f} \tcovalent_threshold: {:0.4f} \tnon covalent threshold: {:0.4f}".format(
@@ -235,8 +278,8 @@ def train():
                     float(mae),
                     np.std(y_pred),
                     np.mean(y_pred),
-                    model.module.covalent_neighbor_threshold.t.cpu().data.item(),
-                    model.module.non_covalent_neighbor_threshold.t.cpu().data.item(),
+                    base_model.covalent_neighbor_threshold.t.cpu().data.item(),
+                    base_model.non_covalent_neighbor_threshold.t.cpu().data.item(),
                 )
             )
 
@@ -309,13 +352,28 @@ def validate(model, val_dataloader):
 
     for batch in tqdm(val_dataloader):
         data = [x[2] for x in batch if x is not None]
-        y_ = model(data)
+
+
+        y_, *_ = model(data)
+
+        # device = 'cpu' if not torch.cuda.is_available() else 'cuda:0'
+
+        # batch_data = Batch.from_data_list(data).to(device)
+        # with torch.no_grad():
+        #     y_ = model(batch_data)
+
         y = torch.cat([x[2].y for x in batch])
 
         pdbid_list.extend([x[0] for x in batch])
         pose_list.extend([x[1] for x in batch])
-        y_true.append(y.cpu().data.numpy())
-        y_pred.append(y_.cpu().data.numpy())
+        
+        # y_true.append(y.cpu().data.numpy())
+        # y_pred.append(y_.cpu().data.numpy())
+        y_true.append(y.cpu().detach().numpy())
+        y_pred.append(y_.cpu().detach().numpy())
+
+    print(f"Len y_true: {len(y_true)}")
+    print(f"Len y_pred: {len(y_pred)}")
 
     y_true = np.concatenate(y_true).reshape(-1, 1)
     y_pred = np.concatenate(y_pred).reshape(-1, 1)
