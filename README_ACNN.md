@@ -15,6 +15,7 @@ The scripts implement Atomic Convolutional Neural Networks (ACNNs) for predictin
 
 ## Quick Start
 
+- If your own python doesn't work, try 3.9.23 :D
 
 #### Option A: Use pyenv (recommended)
 ```powershell
