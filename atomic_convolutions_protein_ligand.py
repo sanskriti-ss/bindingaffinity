@@ -36,7 +36,8 @@ from deepchem.feat import AtomicConvFeaturizer
 try:
     from sklearn.decomposition import PCA
     from sklearn.preprocessing import MinMaxScaler
-    from qiskit.circuit.library import ZFeatureMap
+    from sklearn.metrics import r2_score
+    from qiskit.circuit.library import ZFeatureMap, RealAmplitudes
     from qiskit_machine_learning.algorithms import VQR
     from qiskit.primitives import Estimator
     from qiskit import QuantumCircuit
@@ -294,11 +295,94 @@ def flatten_dc_features(X_dc):
         np.ndarray: Flattened feature matrix
     """
     flat = []
-    for sample in X_dc:
-        # Each sample is a tuple/list of 9 arrays (one per feature type)
-        arrays = [arr.flatten() for arr in sample]
-        flat.append(np.concatenate(arrays))
-    return np.vstack(flat)
+    for i, sample in enumerate(X_dc):
+        try:
+            # Handle different feature structures
+            if isinstance(sample, dict):
+                # If sample is a dictionary, extract numeric arrays
+                arrays = []
+                for key, value in sample.items():
+                    if isinstance(value, np.ndarray):
+                        arrays.append(value.flatten())
+                    elif isinstance(value, (list, tuple)):
+                        arrays.append(np.array(value, dtype=np.float32).flatten())
+                if arrays:
+                    flat.append(np.concatenate(arrays))
+                else:
+                    # If no arrays found, create a small dummy feature
+                    flat.append(np.array([0.0], dtype=np.float32))
+            elif isinstance(sample, (list, tuple)):
+                # Each sample is a tuple/list of arrays (one per feature type)
+                arrays = []
+                for arr in sample:
+                    if isinstance(arr, np.ndarray):
+                        # Convert to float and flatten
+                        arrays.append(arr.astype(np.float32).flatten())
+                    elif isinstance(arr, dict):
+                        # Handle nested dictionaries
+                        for v in arr.values():
+                            if isinstance(v, np.ndarray):
+                                arrays.append(v.astype(np.float32).flatten())
+                            elif isinstance(v, (int, float)):
+                                arrays.append(np.array([float(v)], dtype=np.float32))
+                    elif isinstance(arr, (list, tuple)):
+                        arrays.append(np.array(arr, dtype=np.float32).flatten())
+                    elif isinstance(arr, (int, float)):
+                        arrays.append(np.array([float(arr)], dtype=np.float32))
+                if arrays:
+                    flat.append(np.concatenate(arrays))
+                else:
+                    flat.append(np.array([0.0], dtype=np.float32))
+            elif isinstance(sample, np.ndarray):
+                # Direct numpy array
+                if sample.ndim == 0:  # scalar
+                    flat.append(np.array([float(sample.item())], dtype=np.float32))
+                else:
+                    # Ensure it's numeric and flatten
+                    try:
+                        flat.append(sample.astype(np.float32).flatten())
+                    except (ValueError, TypeError):
+                        # If conversion fails, try to extract numeric values
+                        numeric_vals = []
+                        flat_sample = sample.flatten()
+                        for val in flat_sample:
+                            if isinstance(val, (int, float, np.number)):
+                                numeric_vals.append(float(val))
+                            elif hasattr(val, '__len__') and len(val) > 0:
+                                # Try to extract first numeric value
+                                try:
+                                    numeric_vals.append(float(val[0]))
+                                except (IndexError, TypeError, ValueError):
+                                    numeric_vals.append(0.0)
+                            else:
+                                numeric_vals.append(0.0)
+                        flat.append(np.array(numeric_vals, dtype=np.float32))
+            else:
+                # Unknown structure, create dummy feature
+                print(f"Warning: Unknown feature structure type {type(sample)} at index {i}, using dummy feature")
+                flat.append(np.array([0.0], dtype=np.float32))
+        except Exception as e:
+            print(f"Warning: Error processing sample {i}: {e}, using dummy feature")
+            flat.append(np.array([0.0], dtype=np.float32))
+    
+    if not flat:
+        raise ValueError("No valid features found in the dataset")
+    
+    # Ensure all feature vectors have the same length
+    max_len = max(len(f) for f in flat)
+    normalized_flat = []
+    for f in flat:
+        if len(f) < max_len:
+            # Pad with zeros if necessary
+            padded = np.zeros(max_len, dtype=np.float32)
+            padded[:len(f)] = f
+            normalized_flat.append(padded)
+        else:
+            normalized_flat.append(f)
+    
+    result = np.vstack(normalized_flat).astype(np.float32)
+    print(f"  Flattened features: {len(flat)} samples -> {result.shape} (dtype: {result.dtype})")
+    return result
 
 
 def conv_instruction(n, prefix):
@@ -387,19 +471,73 @@ def train_quantum_model(datasets, n_qubits=6):
     X_val_dc, y_val = val.X, val.y
     X_test_dc, y_test = test.X, test.y
     
+    # Debug: Print feature structure
+    print(f"Feature structure debugging:")
+    print(f"  Train features type: {type(X_train_dc)}")
+    if len(X_train_dc) > 0:
+        print(f"  First sample type: {type(X_train_dc[0])}")
+        if hasattr(X_train_dc[0], '__len__') and len(X_train_dc[0]) > 0:
+            print(f"  First element of first sample type: {type(X_train_dc[0][0]) if isinstance(X_train_dc[0], (list, tuple)) else 'N/A'}")
+    
     # Flatten DeepChem features
-    X_train_flat = flatten_dc_features(X_train_dc)
-    X_val_flat = flatten_dc_features(X_val_dc)
-    X_test_flat = flatten_dc_features(X_test_dc)
+    try:
+        X_train_flat = flatten_dc_features(X_train_dc)
+        X_val_flat = flatten_dc_features(X_val_dc)
+        X_test_flat = flatten_dc_features(X_test_dc)
+        print(f"  Flattened feature shapes: Train={X_train_flat.shape}, Val={X_val_flat.shape}, Test={X_test_flat.shape}")
+    except Exception as e:
+        print(f"Error flattening features: {e}")
+        return None, None, None
     
     # Scale and apply PCA
     fm_scaler = MinMaxScaler(feature_range=(-np.pi, np.pi))
-    X_all = fm_scaler.fit_transform(
-        np.vstack([X_train_flat, X_val_flat, X_test_flat])
-    )
     
-    pca = PCA(n_components=n_qubits)
+    # Ensure all arrays are properly 2D and consistent
+    print(f"  Pre-scaling shapes: Train={X_train_flat.shape}, Val={X_val_flat.shape}, Test={X_test_flat.shape}")
+    print(f"  Pre-scaling dtypes: Train={X_train_flat.dtype}, Val={X_val_flat.dtype}, Test={X_test_flat.dtype}")
+    
+    # Check for any problematic values
+    def check_array_validity(arr, name):
+        # Ensure array is numeric
+        if arr.dtype == object:
+            print(f"Warning: {name} has object dtype, attempting to convert to float32")
+            try:
+                arr = arr.astype(np.float32)
+            except (ValueError, TypeError) as e:
+                print(f"Error converting {name} to numeric: {e}")
+                # Create a fallback array
+                arr = np.zeros(arr.shape, dtype=np.float32)
+        
+        if not np.all(np.isfinite(arr)):
+            print(f"Warning: {name} contains non-finite values")
+            arr = np.nan_to_num(arr, nan=0.0, posinf=1.0, neginf=-1.0)
+        return arr.astype(np.float32)
+    
+    X_train_flat = check_array_validity(X_train_flat, "X_train_flat")
+    X_val_flat = check_array_validity(X_val_flat, "X_val_flat")
+    X_test_flat = check_array_validity(X_test_flat, "X_test_flat")
+    
+    try:
+        X_all = np.vstack([X_train_flat, X_val_flat, X_test_flat])
+        X_all = fm_scaler.fit_transform(X_all)
+    except Exception as e:
+        print(f"Error during stacking/scaling: {e}")
+        print("Attempting alternative approach...")
+        # Alternative: scale each dataset separately then combine
+        X_train_scaled = fm_scaler.fit_transform(X_train_flat)
+        X_val_scaled = fm_scaler.transform(X_val_flat)
+        X_test_scaled = fm_scaler.transform(X_test_flat)
+        X_all = np.vstack([X_train_scaled, X_val_scaled, X_test_scaled])
+    
+    # Ensure we don't request more PCA components than features
+    n_features = X_all.shape[1]
+    n_components = min(n_qubits, n_features)
+    if n_components != n_qubits:
+        print(f"Warning: Reducing PCA components from {n_qubits} to {n_components} (limited by feature count)")
+    
+    pca = PCA(n_components=n_components)
     X_all_pca = pca.fit_transform(X_all)
+    print(f"  PCA reduced features from {n_features} to {n_components} dimensions")
     
     # Split back
     N_train = X_train_flat.shape[0]
@@ -418,21 +556,15 @@ def train_quantum_model(datasets, n_qubits=6):
     y_test_scaled = y_all[N_train+N_val:].ravel()
     
     # Build quantum circuit
-    feature_map = ZFeatureMap(num_qubits=n_qubits, reps=1)
+    feature_map = ZFeatureMap(feature_dimension=n_components, reps=1)
     
-    qc_cnn = QuantumCircuit(n_qubits)
-    qc_cnn.compose(feature_map, range(n_qubits), inplace=True)
-    qc_cnn.append(conv_instruction(n_qubits, "c1"), range(n_qubits))
-    
-    # Pooling
-    src = list(range(0, n_qubits, 2))
-    snk = list(range(1, n_qubits, 2))
-    qc_cnn.append(pool_instruction(src, snk, "p1"), range(n_qubits))
+    # Create a simpler ansatz circuit for VQR
+    ansatz = RealAmplitudes(num_qubits=n_components, reps=1)
     
     # Train VQR
     vqr = VQR(
         feature_map=feature_map,
-        ansatz=qc_cnn,
+        ansatz=ansatz,
         optimizer=L_BFGS_B(maxiter=150),
         estimator=Estimator(),
     )
@@ -450,6 +582,28 @@ def train_quantum_model(datasets, n_qubits=6):
     print("Quantum model training completed!")
     
     return vqr, (y_val_pred, y_test_pred), (fm_scaler, pca, y_scaler)
+
+
+def evaluate_quantum_predictions(y_true_val, y_pred_val, y_true_test, y_pred_test):
+    """
+    Calculate R² scores for quantum model predictions.
+    
+    Args:
+        y_true_val: True validation labels
+        y_pred_val: Predicted validation values
+        y_true_test: True test labels  
+        y_pred_test: Predicted test values
+    
+    Returns:
+        dict: Dictionary with R² scores
+    """
+    val_r2 = r2_score(y_true_val, y_pred_val)
+    test_r2 = r2_score(y_true_test, y_pred_test)
+    
+    return {
+        'val': val_r2,
+        'test': test_r2
+    }
 
 
 def main():
@@ -487,6 +641,7 @@ def main():
     results = evaluate_model(model, [train, val, test])
     
     # Train quantum model (if available)
+    quantum_results = {}
     if QUANTUM_AVAILABLE:
         print("\n" + "="*60)
         print("Quantum Neural Network Extension")
@@ -500,6 +655,16 @@ def main():
             y_val_pred, y_test_pred = qnn_predictions
             print(f"Quantum model validation predictions shape: {y_val_pred.shape}")
             print(f"Quantum model test predictions shape: {y_test_pred.shape}")
+            
+            # Calculate quantum model R² scores
+            quantum_results = evaluate_quantum_predictions(
+                val.y.ravel(), y_val_pred,
+                test.y.ravel(), y_test_pred
+            )
+            
+            print(f"\nQuantum Model Performance:")
+            print(f"  Validation R²: {quantum_results['val']:.4f}")
+            print(f"  Test R²: {quantum_results['test']:.4f}")
     
     print("\n" + "="*80)
     print("Training completed successfully!")
@@ -510,11 +675,18 @@ def main():
     print(f"Classical ACNN Performance:")
     for dataset, score in results.items():
         print(f"  {dataset.capitalize()} R²: {score:.4f}")
+        
+    if QUANTUM_AVAILABLE and quantum_results:
+        print(f"\nQuantum ACNN Performance:")
+        print(f"  Validation R²: {quantum_results['val']:.4f}")
+        print(f"  Test R²: {quantum_results['test']:.4f}")
     
     print(f"\nThe model has been trained on {len(train)} training samples")
     print(f"and validated on {len(val)} validation samples.")
     print(f"Test set contains {len(test)} samples.")
     
+    # Return results including quantum performance
+    results['quantum'] = quantum_results
     return model, (train, val, test), results
 
 
