@@ -6,12 +6,12 @@ random.seed(42)
 
 # Path to source file
 # source_file = 'proteins.h5'
-source_file = "data/pdbbind2016_core_test.hdf"
+source_file = "pdbbind2016_core_test.hdf"
 
 
 # Load top-level protein group names
 with h5py.File(source_file, 'r') as src:
-    protein_ids = list(src.keys())[:10] # Change 10 to other number
+    protein_ids = list(src.keys())[:150] # Change 10 to other number
 
 # Shuffle and split
 random.shuffle(protein_ids)
@@ -31,4 +31,4 @@ def copy_proteins(protein_list, dst_file):
 
 # Write train and test files
 copy_proteins(train_ids, 'train.hdf')
-copy_proteins(test_ids, 'test.hdf')
+copy_proteins(test_ids, 'val.hdf')
