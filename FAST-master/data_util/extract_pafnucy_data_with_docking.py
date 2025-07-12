@@ -9,11 +9,11 @@
 
 
 import os
-from tfbio.data import Featurizer
+from tf_bio_featurizer import Featurizer
 import numpy as np
 import h5py
 import argparse
-import pybel
+from openbabel import pybel
 import warnings
 #from data_generator.atomfeat_util import read_pdb, rdkit_atom_features, rdkit_atom_coords
 #from data_generator.chem_info import g_atom_vdw_ligand, g_atom_vdw_protein
@@ -22,13 +22,13 @@ from rdkit.Chem.rdmolfiles import MolFromMol2File
 import rdkit
 from rdkit import Chem
 from rdkit.Chem import rdchem
-from pybel import Atom
+# from pybel import Atom
 import pandas as pd
 from tqdm import tqdm
 from glob import glob
 
-ob_log_handler = pybel.ob.OBMessageHandler()
-ob_log_handler.SetOutputLevel(0)
+# ob_log_handler = pybel.ob.OBMessageHandler()
+# ob_log_handler.SetOutputLevel(0)
 
 # TODO: compute rdkit features and store them in the output hdf5 file
 # TODO: instead of making a file for each split, squash into one?
@@ -42,13 +42,15 @@ parser.add_argument("--use-docking", default=False, action="store_true")
 parser.add_argument("--use-exp", default=False, action="store_true")
 parser.add_argument("--output", default="/g/g13/jones289/data/pdbbind_2007_with_docking")
 parser.add_argument("--metadata", default="/g/g13/jones289/data/pdbbind/2007_affinity_data_cleaned.csv")
+
+# python extract_pafnucy_data_with_docking.py --input-pdbbind ~/BindingAffinity/FAST/data/1bzc --use-exp --output ~/BindingAffinity/FAST/data/demo_1bzc --metadata ~/BindingAffinity/FAST/data/affinity_data.csv
 args = parser.parse_args()
 
 
 def parse_element_description(desc_file):
     element_info_dict = {}
     element_info_xml = ET.parse(desc_file)
-    for element in element_info_xml.getiterator():
+    for element in element_info_xml.iter():
         if "comment" in element.attrib.keys():
             continue
         else:
@@ -120,7 +122,10 @@ def main():
     failure_dict = {"name": [], "partition": [], "set": [], "error": []}
 
     for dataset_name, data in tqdm(affinity_data.groupby('set')):
-        print("found {} complexes in {} set".format(len(data), dataset_name))
+    # dataset_name = "pdbbind"
+    # for data in tqdm(affinity_data['pdbid']):
+
+        print(f"found {len(data)} complexes in {dataset_name} set")
 
         if not os.path.exists(args.output):
             os.makedirs(args.output) 
@@ -129,11 +134,10 @@ def main():
 
             for idx, row in tqdm(data.iterrows(), total=data.shape[0]):
 
-                name = row['name']
+                name = row['pdbid']
 
                 affinity = row['-logKd/Ki']
 
-                receptor_path = row['receptor_path']
             
 
                 '''
@@ -168,6 +172,8 @@ def main():
                 ############################### PROCESS THE DOCKING DATA ###############################
                 if args.use_docking:
                     # READ THE DOCKING LIGAND POSES
+                    receptor_path = row['receptor_path']
+
 
                     # pose_path_list = glob("{}/{}/{}_ligand_pose_*.pdb".format(args.input_docking, name, name)) 
                     pose_path_list = glob("{}/{}/{}_ligand_pose_*.mol2".format(args.input_docking, name, name)) 
@@ -276,9 +282,9 @@ def main():
                         crystal_ligand = next(pybel.readfile('mol2', '%s/%s/%s_ligand.mol2' % (args.input_pdbbind, name, name))) 
 
                     # do not add the hydrogens! they were already added in chimera and it would reset the charges
-                    except:
+                    except Exception as pybel_error:
                         error ="no ligand for {} ({} set)".format(name, dataset_name)
-                        warnings.warn(error)
+                        print(pybel_error)
                         failure_dict["name"].append(name), failure_dict["partition"].append("crystal") , failure_dict["set"].append(dataset_name), failure_dict["error"].append(error) 
                         continue
 
