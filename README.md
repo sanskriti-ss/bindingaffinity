@@ -255,7 +255,6 @@ Key trained models and results are available:
 
 - `fixed_binding_model.py` - Best performing traditional ML (R² = 0.9963)
 - `hybrid_cnn_traditional_model.py` - Hybrid CNN+ML approach (R² = 0.9854)
-- `optimized_3d_cnn_model.py` - Memory-optimized 3D CNNs (R² ~0.001)
 - `hybrid_cnn_traditional_results.png` - Hybrid model analysis
 
 ## Technical Details
@@ -314,19 +313,6 @@ config = {
 }
 ```
 
-### Memory Optimizations
-
-For 3D CNN research (when using large grids):
-
-```python
-optimization_config = {
-    'batch_size': 4,              # Memory-optimized batch size
-    'gradient_accumulation': 4,   # Simulate larger batches
-    'mixed_precision': True,      # FP16 training
-    'memory_cleanup': True,       # Aggressive garbage collection
-    'data_streaming': True,       # Load data on-demand
-}
-```
 
 ### Feature Engineering Pipeline
 
