@@ -179,8 +179,6 @@ python fixed_binding_model.py
 # Hybrid CNN + Traditional ML approach
 python hybrid_cnn_traditional_model.py
 
-# Memory-optimized 3D CNN models
-python optimized_3d_cnn_model.py
 
 ```
 
