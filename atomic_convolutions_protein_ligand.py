@@ -17,8 +17,10 @@ ACNN Architecture Overview:
 
 This script includes both classical ACNN training and quantum neural network extensions.
 """
-
+# set environment variable to disable oneDNN optimizations
 import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Suppress TensorFlow warnings
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'  # Disable oneDNN optimizations for reproducibility
 import sys
 import time
 import numpy as np
@@ -387,7 +389,7 @@ def flatten_dc_features(X_dc):
 
 def conv_instruction(n, prefix):
     """
-    Create quantum convolutional instruction.
+    Create an enhanced quantum convolutional instruction with more expressiveness.
     
     Args:
         n: Number of qubits
@@ -396,11 +398,20 @@ def conv_instruction(n, prefix):
     Returns:
         Instruction: Quantum circuit instruction
     """
-    params = ParameterVector(prefix, length=3*n)
+    params = ParameterVector(prefix, length=6*n)  # More parameters for richer circuit
     qc = QuantumCircuit(n, name="Conv")
     idx = 0
-    
-    for q1, q2 in zip(range(0, n, 2), range(1, n, 2)):
+
+    # Layer 1: Parameterized single-qubit rotations on all qubits
+    for q in range(n):
+        qc.rx(params[idx], q)
+        qc.ry(params[idx+1], q)
+        idx += 2
+
+    qc.barrier()
+
+    # Layer 2: Entangle pairs with parameterized two-qubit gates
+    for q1, q2 in zip(range(0, n - 1, 2), range(1, n, 2)):
         sub = QuantumCircuit(2)
         sub.rz(-np.pi/2, 1)
         sub.cx(1, 0)
@@ -408,16 +419,39 @@ def conv_instruction(n, prefix):
         sub.ry(params[idx+1], 1)
         sub.cx(0, 1)
         sub.ry(params[idx+2], 1)
+        sub.rx(params[idx+3], 0)
+        sub.rz(params[idx+4], 1)
         qc.compose(sub, [q1, q2], inplace=True)
-        qc.barrier()
-        idx += 3
-    
+        idx += 5
+
+    qc.barrier()
+
+    # Layer 3: Additional entanglement between neighboring pairs (overlapping pairs)
+    for q1, q2 in zip(range(1, n - 2, 2), range(2, n - 1, 2)):
+        sub = QuantumCircuit(2)
+        sub.rx(params[idx], 0)
+        sub.ry(params[idx+1], 1)
+        sub.cx(0, 1)
+        sub.rz(params[idx+2], 1)
+        sub.cx(1, 0)
+        sub.rz(params[idx+3], 0)
+        qc.compose(sub, [q1, q2], inplace=True)
+        idx += 4
+
+    qc.barrier()
+
+    # Layer 4: Parameterized single-qubit rotations on all qubits again
+    for q in range(n):
+        qc.ry(params[idx], q)
+        qc.rz(params[idx+1], q)
+        idx += 2
+
     return qc.to_instruction()
 
 
 def pool_instruction(srcs, sinks, prefix):
     """
-    Create quantum pooling instruction.
+    Create an enhanced quantum pooling instruction with more expressiveness.
     
     Args:
         srcs: Source qubits
@@ -427,11 +461,22 @@ def pool_instruction(srcs, sinks, prefix):
     Returns:
         Instruction: Quantum circuit instruction
     """
-    params = ParameterVector(prefix, length=3*len(srcs))
     n = len(srcs) + len(sinks)
+    params = ParameterVector(prefix, length=6*len(srcs))  # More parameters for richer circuit
     qc = QuantumCircuit(n, name="Pool")
     idx = 0
-    
+
+    # Layer 1: Parameterized single-qubit rotations on source and sink qubits
+    for s, t in zip(srcs, sinks):
+        qc.rx(params[idx], s)
+        qc.ry(params[idx+1], s)
+        qc.rz(params[idx+2], t)
+        qc.ry(params[idx+3], t)
+        idx += 4
+
+    qc.barrier()
+
+    # Layer 2: Entangling gates with parameters
     for s, t in zip(srcs, sinks):
         sub = QuantumCircuit(2)
         sub.rz(-np.pi/2, 1)
@@ -441,19 +486,29 @@ def pool_instruction(srcs, sinks, prefix):
         sub.cx(0, 1)
         sub.ry(params[idx+2], 1)
         qc.compose(sub, [s, t], inplace=True)
-        qc.barrier()
         idx += 3
-    
+
+    qc.barrier()
+
+    # Layer 3: Parameterized single-qubit rotations again
+    for s, t in zip(srcs, sinks):
+        qc.rx(params[idx], s)
+        qc.rz(params[idx+1], t)
+        idx += 2
+
     return qc.to_instruction()
 
 
-def train_quantum_model(datasets, n_qubits=6):
+def train_quantum_model(datasets, n_qubits=12, feature_map_reps=2, ansatz_reps=2, optimizer_maxiter=300): # Original, 6 qubits, feature_map_reps=1, ansatz_reps=1, optimizer_maxiter=100
     """
-    Train quantum neural network on the datasets.
+    Train quantum neural network on the datasets with improved hyperparameters.
     
     Args:
         datasets: Tuple of (train, val, test) datasets
         n_qubits: Number of qubits to use
+        feature_map_reps: Number of repetitions in feature map
+        ansatz_reps: Number of repetitions in ansatz circuit
+        optimizer_maxiter: Maximum iterations for optimizer
     
     Returns:
         tuple: (vqr_model, predictions, scalers)
@@ -462,7 +517,7 @@ def train_quantum_model(datasets, n_qubits=6):
         print("Quantum ML libraries not available. Skipping quantum training.")
         return None, None, None
     
-    print(f"\nTraining Quantum Neural Network with {n_qubits} qubits...")
+    print(f"\nTraining Quantum Neural Network with {n_qubits} qubits, feature_map_reps={feature_map_reps}, ansatz_reps={ansatz_reps}, optimizer_maxiter={optimizer_maxiter}...")
     
     train, val, test = datasets
     
@@ -522,7 +577,6 @@ def train_quantum_model(datasets, n_qubits=6):
         X_all = fm_scaler.fit_transform(X_all)
     except Exception as e:
         print(f"Error during stacking/scaling: {e}")
-        print("Attempting alternative approach...")
         # Alternative: scale each dataset separately then combine
         X_train_scaled = fm_scaler.fit_transform(X_train_flat)
         X_val_scaled = fm_scaler.transform(X_val_flat)
@@ -555,17 +609,16 @@ def train_quantum_model(datasets, n_qubits=6):
     y_val_scaled = y_all[N_train:N_train+N_val].ravel()
     y_test_scaled = y_all[N_train+N_val:].ravel()
     
-    # Build quantum circuit
-    feature_map = ZFeatureMap(feature_dimension=n_components, reps=1)
+    # Build quantum circuit with increased reps
+    feature_map = ZFeatureMap(feature_dimension=n_components, reps=feature_map_reps)
+    ansatz = RealAmplitudes(num_qubits=n_components, reps=ansatz_reps)
     
-    # Create a simpler ansatz circuit for VQR
-    ansatz = RealAmplitudes(num_qubits=n_components, reps=1)
     
     # Train VQR
     vqr = VQR(
         feature_map=feature_map,
         ansatz=ansatz,
-        optimizer=L_BFGS_B(maxiter=150),
+        optimizer=L_BFGS_B(maxiter=optimizer_maxiter),
         estimator=Estimator(),
     )
     
@@ -621,24 +674,24 @@ def main():
     acf = configure_atomic_conv_featurizer()
     
     # Load data
-    tasks, datasets, transformers = load_pdbbind_data(acf, dataset_size='core')
+    tasks, datasets, transformers = load_pdbbind_data(acf, dataset_size='refined')
     
     # Preprocess data
     train, val, test = preprocess_datasets(datasets)
     
-    # Train classical ACNN
-    model, losses, val_losses = train_atomic_conv_model(
-        train, val, 
-        f1_num_atoms=100, 
-        f2_num_atoms=1000, 
-        max_epochs=50
-    )
+    # # Train classical ACNN
+    # model, losses, val_losses = train_atomic_conv_model(
+    #     train, val, 
+    #     f1_num_atoms=100, 
+    #     f2_num_atoms=1000, 
+    #     max_epochs=50
+    # )
     
-    # Plot training curves
-    plot_training_curves(losses, val_losses, save_path='training_curves.png')
+    # # Plot training curves
+    # plot_training_curves(losses, val_losses, save_path='training_curves.png')
     
-    # Evaluate classical model
-    results = evaluate_model(model, [train, val, test])
+    # # Evaluate classical model
+    # results = evaluate_model(model, [train, val, test])
     
     # Train quantum model (if available)
     quantum_results = {}
@@ -648,7 +701,7 @@ def main():
         print("="*60)
         
         qnn_model, qnn_predictions, qnn_scalers = train_quantum_model(
-            (train, val, test), n_qubits=6
+            (train, val, test), n_qubits=12, feature_map_reps=2, ansatz_reps=2, optimizer_maxiter=300
         )
         
         if qnn_model is not None:
@@ -672,9 +725,9 @@ def main():
     
     # Summary
     print(f"\nFinal Results:")
-    print(f"Classical ACNN Performance:")
-    for dataset, score in results.items():
-        print(f"  {dataset.capitalize()} R²: {score:.4f}")
+    # print(f"Classical ACNN Performance:")
+    # for dataset, score in results.items():
+    #     print(f"  {dataset.capitalize()} R²: {score:.4f}")
         
     if QUANTUM_AVAILABLE and quantum_results:
         print(f"\nQuantum ACNN Performance:")
@@ -686,8 +739,9 @@ def main():
     print(f"Test set contains {len(test)} samples.")
     
     # Return results including quantum performance
+    results = {'quantum': quantum_results}  # Placeholder for quantum results
     results['quantum'] = quantum_results
-    return model, (train, val, test), results
+    return qnn_model, (train, val, test), results
 
 
 if __name__ == "__main__":
