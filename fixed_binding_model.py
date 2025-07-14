@@ -15,6 +15,8 @@ from sklearn.linear_model import Ridge, ElasticNet
 from sklearn.neural_network import MLPRegressor
 from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV
 from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
+
+from scipy import stats
 from sklearn.preprocessing import StandardScaler, RobustScaler
 from sklearn.decomposition import PCA
 from sklearn.feature_selection import SelectKBest, f_regression
@@ -122,9 +124,9 @@ def load_and_parse_csv():
 def load_npy_data():
     """Load and process all NPY data files"""
     data_files = {
-        'ligand_grids': 'processed_ligand_data/ligand_grids.npy',
-        'pocket_grids': 'processed_pocket_data/pocket_grids.npy', 
-        'protein_grids': 'processed_protein_data/protein_grids.npy'
+        'ligand_grids': 'data/processed_ligand_data/ligand_grids.npy',
+        'pocket_grids': 'data/processed_pocket_data/pocket_grids.npy', 
+        'protein_grids': 'data/processed_protein_data/protein_grids.npy'
     }
     
     loaded_data = {}
@@ -347,6 +349,17 @@ def train_optimized_models(X_train, y_train, X_test, y_test):
             # Evaluate
             train_r2 = r2_score(y_train, y_pred_train)
             test_r2 = r2_score(y_test, y_pred_test)
+
+            train_mae = mean_absolute_error(y_train, y_pred_train)
+            test_mae = mean_absolute_error(y_test, y_pred_test)
+
+            train_pearsonr = stats.pearsonr(y_train, y_pred_train)
+            test_pearsonr = stats.pearsonr(y_test, y_pred_test)
+
+            train_spearmanr = stats.spearmanr(y_train, y_pred_train)
+            test_spearmanr = stats.spearmanr(y_test, y_pred_test)
+
+
             train_rmse = np.sqrt(mean_squared_error(y_train, y_pred_train))
             test_rmse = np.sqrt(mean_squared_error(y_test, y_pred_test))
             
@@ -360,6 +373,12 @@ def train_optimized_models(X_train, y_train, X_test, y_test):
                 'test_r2': test_r2,
                 'train_rmse': train_rmse,
                 'test_rmse': test_rmse,
+                'train_mae': train_mae,
+                'test_mae': test_mae,
+                'train_pearsonr': train_pearsonr,
+                'test_pearsonr': test_pearsonr,
+                'train_spearmanr': train_spearmanr,
+                'test_spearmanr': test_spearmanr,
                 'cv_r2_mean': cv_mean,
                 'cv_r2_std': cv_std,
                 'time': time.time() - start_time
@@ -422,6 +441,10 @@ def main():
         print("No models trained successfully!")
         return None, None
     
+    import json
+    with open('fixed_binding_model_results.json', 'w') as f:
+        json.dump(results, f, indent=4)
+    
     # Create ensemble
     print("\\nCreating ensemble...")
     # Weight by CV performance
@@ -468,6 +491,11 @@ def main():
     plt.title('Model Performance Comparison')
     plt.xticks(rotation=45)
     plt.grid(True, alpha=0.3)
+
+    # Add value labels
+    for bar, score in zip(bars, r2_scores):
+        plt.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.01, 
+                f'{score:.3f}', ha='center', va='bottom', fontweight='bold')
     
     # Best vs Ensemble comparison
     top_3_models = sorted(results.keys(), key=lambda x: results[x]['test_r2'], reverse=True)[:3]
