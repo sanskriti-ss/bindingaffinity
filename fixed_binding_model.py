@@ -263,25 +263,6 @@ def align_data_with_csv(npy_data, df_clean):
     # Get corresponding targets
     y = df_clean['final_dG'].values[:n_samples]
     
-    # Also include CSV features as additional features
-    csv_features = []
-    csv_feature_names = []
-    
-    for col in ['resolution', 'Ki_numeric', 'Kd_numeric', 'binding_constant_nM']:
-        if col in df_clean.columns:
-            values = df_clean[col].values[:n_samples]
-            # Fill missing values with median
-            median_val = np.nanmedian(values)
-            values = np.where(np.isnan(values), median_val, values)
-            csv_features.append(values.reshape(-1, 1))
-            csv_feature_names.append(col)
-    
-    if csv_features:
-        csv_X = np.concatenate(csv_features, axis=1)
-        X = np.concatenate([X, csv_X], axis=1)
-        feature_names.extend(csv_feature_names)
-        print(f"After adding CSV features: {X.shape}")
-    
     return X, y, feature_names
 
 
