@@ -43,13 +43,13 @@ from file_util import *
 # program arguments
 parser = argparse.ArgumentParser()
 parser.add_argument("--device-name", default="cuda:0", help="use cpu or cuda:0, cuda:1 ...")
-parser.add_argument("--data-dir", default="/home/kim63/data", help="dataset directory")
+parser.add_argument("--data-dir", default="data", help="dataset directory")
 parser.add_argument("--dataset-type", type=float, default=1, help="ml-hdf version, (1: for fusion, 1.5: for cfusion 2: ml-hdf v2)")
-parser.add_argument("--mlhdf-fn", default="pdbbind2019_crystal_refined_ml.hdf", help="training ml-hdf path")
-parser.add_argument("--csv-fn", default="pdbbind2019_crystal_refined.csv", help="training csv file path")
-parser.add_argument("--vmlhdf-fn", default="", help="validation ml-hdf path")
-parser.add_argument("--vcsv-fn", default="", help="validation csv file path")
-parser.add_argument("--model-path", default="/home/kim63/data/pdbbind2019_crystal_refined_model_20201216.pth", help="model checkpoint file path")
+parser.add_argument("--mlhdf-fn", default="pdbbind2021_demo_train.hdf", help="training ml-hdf path")
+parser.add_argument("--csv-fn", default="pdbbind2019_crystal_refined.csv", help="training csv file name")
+parser.add_argument("--vmlhdf-fn", default="pdbbind2021_demo_val.hdf", help="validation ml-hdf path")
+parser.add_argument("--vcsv-fn", default="", help="validation csv file name")
+parser.add_argument("--model-path", default="data/pdbbind2021_a1_demo_model_20250716.pth", help="model checkpoint file path")
 parser.add_argument("--complex-type", type=int, default=1, help="1: crystal, 2: docking")
 parser.add_argument("--rmsd-weight", action='store_false', default=0, help="whether rmsd-based weighted loss is used or not")
 parser.add_argument("--rmsd-threshold", type=float, default=2, help="rmsd cut-off threshold in case of docking data and/or --rmsd-weight is true")
@@ -194,6 +194,29 @@ def train():
 			scheduler.step()
 
 			print("[%d/%d-%d/%d] training, loss: %.3f, lr: %.7f" % (epoch_ind+1, args.epoch_count, batch_ind+1, batch_count, loss.cpu().data.item(), optimizer.param_groups[0]['lr']))
+			
+			ytrue = y_batch.cpu().float().data.numpy()[:,0]
+			ypred = ypred_batch.cpu().float().data.numpy()[:,0]
+
+			import math
+			from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+			from scipy.stats import pearsonr, spearmanr
+			
+			ytrue_arr = np.array(ytrue)
+			ypred_arr = np.array(ypred)
+			rmse = math.sqrt(mean_squared_error(ytrue_arr, ypred_arr))
+			mae = mean_absolute_error(ytrue_arr, ypred_arr)
+			r2 = r2_score(ytrue_arr, ypred_arr)
+			# pearson, ppval = pearsonr(ytrue_arr, ypred_arr)
+			# spearman, spval = spearmanr(ytrue_arr, ypred_arr)
+			pearson = -10000
+			spearman = -10000
+			mean = np.mean(ypred_arr)
+			std = np.std(ypred_arr)
+
+			print("[%d/%d-%d/%d] training, RMSE: %.3f, MAE: %.3f, R^2 score: %.3f, Pearson: %.3f, Spearman: %.3f, mean/std: %.3f/%.3f" % (epoch_ind+1, args.epoch_count, batch_ind+1, batch_count, rmse, mae, r2, pearson, spearman, mean, std))
+
+
 			if step % args.checkpoint_iter == 0:
 				checkpoint_dict = {
 					"model_state_dict": model_to_save.state_dict(),
@@ -227,9 +250,9 @@ def train():
 					ypred_batch, _ = model(vol_batch[:x_batch.shape[0]])
 
 					if args.rmsd_weight == True:
-						loss = loss_fn(ypred_batch.cpu().float(), y_batch_cpu.float(), w_batch_cpu.float())
+						loss = loss_fn(ypred_batch.cpu().float(), y_batch.float(), w_batch_cpu.float())
 					else:
-						loss = loss_fn(ypred_batch.cpu().float(), y_batch_cpu.float())
+						loss = loss_fn(ypred_batch.cpu().float(), y_batch.float())
 						
 					val_losses.append(loss.cpu().data.item())
 					print("[%d/%d-%d/%d] validation, loss: %.3f" % (epoch_ind+1, args.epoch_count, batch_ind+1, batch_count, loss.cpu().data.item()))
