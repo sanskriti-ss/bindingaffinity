@@ -3,7 +3,8 @@ processed_pocket_data/protein_grids.npy
 processed_ligand_data/ligand_grids.npy
 processed_protein_data/protein_grids.npy
 processed_protein_data/protein_grids_CLEAN.npy
-
+processed_protein_data/protein_grids_backup.npy
+v2013-core
 # Model files (can be large)
 *.pth
 best_*_model.pth

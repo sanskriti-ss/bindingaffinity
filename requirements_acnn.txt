@@ -1,0 +1,38 @@
+# Requirements for Atomic Convolutions Protein-Ligand Interaction Analysis
+# Generated from Jupyter notebook conversion
+# 
+# IMPORTANT: This requires Python 3.9-3.12 (NOT Python 3.13+)
+# TensorFlow and DeepChem do not yet support Python 3.13
+# 
+# NOTE: Use --only-binary=all to avoid compilation issues on Windows
+# pip install --only-binary=all -r requirements_acnn.txt
+
+# Core scientific computing (using pre-compiled wheels)
+numpy>=1.21.0
+matplotlib>=3.5.0,<4.0.0
+scipy>=1.7.0,<2.0.0
+
+# Machine Learning (version constraints for Python 3.9-3.12 compatibility)
+tensorflow>=2.8.0
+scikit-learn>=1.0.0,<2.0.0
+
+# Chemistry and Molecular Modeling (prefer conda-forge for these)
+# Install these with: conda install -c conda-forge rdkit deepchem
+# Or try: pip install --only-binary=all rdkit deepchem
+rdkit>=2022.3.0
+deepchem>=2.6.0
+
+# Additional dependencies that may be needed by DeepChem
+# These often require compilation - use conda if pip fails
+mdtraj>=1.9.0
+pdbfixer>=1.8.0
+openmm>=7.7.0
+
+# Optional: Quantum Machine Learning (for quantum neural network extensions)
+# Uncomment the following lines if you want to use quantum features
+qiskit>=0.39.0,<1.0.0
+qiskit-machine-learning>=0.5.0,<1.0.0
+
+# For Jupyter notebook compatibility (if you want to run the original notebook)
+# jupyter>=1.0.0
+# ipython>=7.0.0
