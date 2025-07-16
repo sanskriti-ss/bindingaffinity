@@ -289,16 +289,14 @@ class PotentialNetParallel(torch.nn.Module):
             data.edge_index = data.edge_index.cuda()
             data.batch = data.batch.cuda()
 
-        # make sure that we have undirected graph
-        
-        # MANVI comment
-        # if not is_undirected(data.edge_index):
-        #     data.edge_index = to_undirected(data.edge_index)
+        # MANVI: new code
         from torch_geometric.data import Batch
         data = Batch.from_data_list(data)
         ## MANVI: END of new code
 
-        
+        # make sure that we have undirected graph
+        if not is_undirected(data.edge_index):
+            data.edge_index = to_undirected(data.edge_index)
 
         # make sure that nodes can propagate messages to themselves
         if not contains_self_loops(data.edge_index):

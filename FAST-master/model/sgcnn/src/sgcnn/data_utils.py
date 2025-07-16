@@ -57,6 +57,7 @@ class PDBBindDataset(Dataset):
 
 
         if self.use_docking:
+            # print("Using docking data")
 
             with h5py.File(data_file, "r") as f:
 
@@ -64,6 +65,8 @@ class PDBBindDataset(Dataset):
                     # if the feature type (pybel or rdkit) not available, skip over it
                     if self.feature_type in list(f[name]):
                         affinity = np.asarray(f[name].attrs["affinity"]).reshape(1, -1)
+                        
+                        # print(f"Docking affinity: {affinity} for {name}")
                         if self.preprocessing_type in f[name][self.feature_type]:
                             if self.dataset_name in list(
                                 f[name][self.feature_type][self.preprocessing_type]
@@ -74,6 +77,7 @@ class PDBBindDataset(Dataset):
                                     self.data_list.append((name, pose, affinity))
 
         else:
+            # print("Using non docking data")
 
             with h5py.File(data_file, "r", driver=self.h5_file_driver) as f:
 
@@ -81,6 +85,7 @@ class PDBBindDataset(Dataset):
                     # if the feature type (pybel or rdkit) not available, skip over it
                     if self.feature_type in list(f[name]):
                         affinity = np.asarray(f[name].attrs["affinity"]).reshape(1, -1)
+                        # print(f"Non docking affinity: {affinity} for {name}")
 
                         self.data_list.append(
                             (name, 0, affinity)
@@ -197,6 +202,7 @@ class PDBBindDataset(Dataset):
 
         else:
             if self.output_info:
+                print("Output info is True")
                 return (pdbid, pose, data)
             else:
                 return data
