@@ -35,7 +35,7 @@ in get_item function
 In SG-CNN, they have f['1bzc'].attrs('affinity'), which is returned as y attr
 
 
-python main_train.py --device-name "cpu" --dataset-type 1 --epoch-count 5 --batch-size 10 --learning-rate 1e-3 --checkpoint-iter 1
+python main_train.py --device-name "cpu" --dataset-type 1 --epoch-count 5 --batch-size 10 --learning-rate 1e-3 --checkpoint-iter 1 --model-path data/pdbbind2021_a2_demo_model_20250716.pth
 
 --data-dir "data" --mlhdf-fn "train.hdf" --vmlhdf-fn "val.hdf"
 
@@ -75,7 +75,7 @@ parser.add_argument("--multi-gpus", default=False, action="store_true", help="wh
 
 ### Testing
 
-python main_eval.py --device-name "cpu" --batch-size 10
+python main_eval.py --device-name "cpu" --batch-size 10 --model-path "data/pdbbind2021_a2_demo_model_20250716.pth"
 
 
 parser = argparse.ArgumentParser()

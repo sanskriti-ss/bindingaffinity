@@ -85,7 +85,7 @@ def eval():
 	gaussian_filter = GaussianFilter(dim=3, channels=19, kernel_size=5, sigma=1, use_cuda=use_cuda)
 
 	# define model
-	model = Model_3DCNN(use_cuda=use_cuda, verbose=0)
+	model = Model_3DCNN(use_cuda=use_cuda, verbose=1)
 	#if use_cuda:
 	#	model = model.cuda()
 	if args.multi_gpus and cuda_count > 1:
@@ -111,7 +111,7 @@ def eval():
 	vol_batch = torch.zeros((batch_size,19,48,48,48)).float().to(device)
 	ytrue_arr = np.zeros((len(dataset),), dtype=np.float32)
 	ypred_arr = np.zeros((len(dataset),), dtype=np.float32)
-	zfeat_arr = np.zeros((len(dataset), 100), dtype=np.float32)
+	zfeat_arr = np.zeros((len(dataset), 10), dtype=np.float32)
 	pred_list = []
 
 	model.eval()
