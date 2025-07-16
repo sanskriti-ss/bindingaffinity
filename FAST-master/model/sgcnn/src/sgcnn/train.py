@@ -254,7 +254,13 @@ def train():
             loss.backward()
 
             y_true = y.cpu().data.numpy()
+            print(f"MANVI: y_true shape: {y_true.shape}")
+            print(f"MANVI: y_true: {y_true}")
+
             y_pred = y_.cpu().data.numpy()
+
+            print(f"MANVI: y_pred shape: {y_true.shape}")
+            print(f"MANVI: y_pred: {y_true}")
 
             r2 = r2_score(y_true=y_true, y_pred=y_pred)
             mae = mean_absolute_error(y_true=y_true, y_pred=y_pred)
@@ -268,16 +274,18 @@ def train():
             # threshold = base_model.covalent_neighbor_threshold.t.cpu().data.item()
 
             tqdm.write(
-                "epoch: {}\tloss:{:0.4f}\tr2: {:0.4f}\t pearsonr: {:0.4f}\tspearmanr: {:0.4f}\tmae: {:0.4f}\tpred stdev: {:0.4f}"
-                "\t pred mean: {:0.4f} \tcovalent_threshold: {:0.4f} \tnon covalent threshold: {:0.4f}".format(
+                "epoch: {}\tloss:{:0.4f}\tr2: {:0.4f}\t pearsonr: {:0.4f}\tspearmanr: {:0.4f}\tmae: {:0.4f}\t train mean/stdev: {:0.4f},{:0.4f}"
+                "\t pred mean/std: {:0.4f}/{:0.4f} \tcovalent_threshold: {:0.4f} \tnon covalent threshold: {:0.4f}".format(
                     epoch,
                     loss.cpu().data.numpy(),
                     r2,
                     float(pearsonr[0]),
                     float(spearmanr[0]),
                     float(mae),
-                    np.std(y_pred),
+                    np.mean(y_true),
+                    np.std(y_true),
                     np.mean(y_pred),
+                    np.std(y_pred),
                     base_model.covalent_neighbor_threshold.t.cpu().data.item(),
                     base_model.non_covalent_neighbor_threshold.t.cpu().data.item(),
                 )
