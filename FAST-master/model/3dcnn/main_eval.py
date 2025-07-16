@@ -34,10 +34,10 @@ from file_util import *
 # program arguments
 parser = argparse.ArgumentParser()
 parser.add_argument("--device-name", default="cuda:0", help="use cpu or cuda:0, cuda:1 ...")
-parser.add_argument("--data-dir", default="/home/kim63/data", help="dataset directory")
+parser.add_argument("--data-dir", default="data", help="dataset directory")
 parser.add_argument("--dataset-type", type=float, default=1, help="1: ml-hdf, 2: ml-hdf v2")
 parser.add_argument("--csv-fn", default="", help="csv file name")
-parser.add_argument("--mlhdf-fn", default="pdbbind2019_crystal_core_ml.hdf", help="ml-hdf name")
+parser.add_argument("--mlhdf-fn", default="pdbbind2021_test.hdf", help="ml-hdf name")
 parser.add_argument("--model-path", default="data/pdbbind2021_a1_demo_model_20250716.pth", help="model checkpoint file path")
 parser.add_argument("--complex-type", type=int, default=1, help="1: crystal, 2: docking")
 parser.add_argument("--rmsd-threshold", type=float, default=2, help="rmsd cut-off threshold in case of docking data and/or --rmsd-weight is true")

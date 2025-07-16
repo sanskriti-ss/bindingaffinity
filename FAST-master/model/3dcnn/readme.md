@@ -72,6 +72,28 @@ parser.add_argument("--verbose", type=int, default=0, help="print all input/outp
 parser.add_argument("--multi-gpus", default=False, action="store_true", help="whether to use multi-gpus")
 
 
+
+### Testing
+
+python main_eval.py --device-name "cpu" --batch-size 10
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--device-name", default="cuda:0", help="use cpu or cuda:0, cuda:1 ...")
+parser.add_argument("--data-dir", default="/home/kim63/data", help="dataset directory")
+parser.add_argument("--dataset-type", type=float, default=1, help="1: ml-hdf, 2: ml-hdf v2")
+parser.add_argument("--csv-fn", default="", help="csv file name")
+parser.add_argument("--mlhdf-fn", default="pdbbind2019_crystal_core_ml.hdf", help="ml-hdf name")
+parser.add_argument("--model-path", default="data/pdbbind2021_a1_demo_model_20250716.pth", help="model checkpoint file path")
+parser.add_argument("--complex-type", type=int, default=1, help="1: crystal, 2: docking")
+parser.add_argument("--rmsd-threshold", type=float, default=2, help="rmsd cut-off threshold in case of docking data and/or --rmsd-weight is true")
+parser.add_argument("--batch-size", type=int, default=50, help="mini-batch size")
+parser.add_argument("--multi-gpus", default=False, action="store_true", help="whether to use multi-gpus")
+parser.add_argument("--save-pred", default=True, action="store_true", help="whether to save prediction results in csv")
+parser.add_argument("--save-feat", default=True, action="store_true", help="whether to save fully connected features in npy")
+args = parser.parse_args()
+
+
 ##### 3D-CNN tensorflow version (used in the paper)
 
 To train or test 3D-CNN, run `model/3dcnn_tf/main_3dcnn_pdbbind.py`. 
