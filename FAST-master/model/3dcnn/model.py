@@ -62,10 +62,11 @@ class Model_3DCNN(nn.Module):
 		self.conv_block3 = self.__conv_layer_set__(self.num_filters[1], self.num_filters[2], 5, 2, 2)
 		self.max_pool3 = nn.MaxPool3d(2)
 
-		self.fc1 = nn.Linear(2048, 100)
+		fc_len = 10 # change from 100 to 10
+		self.fc1 = nn.Linear(2048, fc_len) 
 		torch.nn.init.normal_(self.fc1.weight, 0, 1)
-		self.fc1_bn = nn.BatchNorm1d(num_features=100, affine=True, momentum=0.1).train()
-		self.fc2 = nn.Linear(100, 1)
+		self.fc1_bn = nn.BatchNorm1d(num_features=fc_len, affine=True, momentum=0.1).train()
+		self.fc2 = nn.Linear(fc_len, 1)
 		torch.nn.init.normal_(self.fc2.weight, 0, 1)
 		self.relu = nn.ReLU()
 		#self.drop=nn.Dropout(p=0.15)

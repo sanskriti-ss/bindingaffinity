@@ -171,6 +171,7 @@ def train():
 			else:
 				x_batch_cpu, y_batch_cpu = batch
 			x_batch, y_batch = x_batch_cpu.to(device), y_batch_cpu.to(device)
+			print(f"x_batch shape: {x_batch.shape}, y_batch shape: {y_batch.shape}")
 			
 			# voxelize into 3d volume
 			for i in range(x_batch.shape[0]):
@@ -209,8 +210,8 @@ def train():
 			r2 = r2_score(ytrue_arr, ypred_arr)
 			# pearson, ppval = pearsonr(ytrue_arr, ypred_arr)
 			# spearman, spval = spearmanr(ytrue_arr, ypred_arr)
-			pearson = -10000
-			spearman = -10000
+			pearson = float('nan')
+			spearman = float('nan')
 			mean = np.mean(ypred_arr)
 			std = np.std(ypred_arr)
 
