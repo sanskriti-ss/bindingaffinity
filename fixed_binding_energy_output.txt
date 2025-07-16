@@ -1,0 +1,84 @@
+Fixed High-Performance Binding Affinity Prediction
+=======================================================
+Loading and parsing pdbbind_with_dG.csv...
+Original CSV shape: (285, 5)
+Columns: ['protein', 'resolution', 'Ki', 'Kd', 'ΔG_kcal_per_mol']
+\nData cleaning:
+  Original samples: 285
+  After removing missing ΔG: 285
+  After removing outliers: 279
+\nFinal dataset statistics:
+  ΔG range: -15.41 to -3.11 kcal/mol
+  ΔG mean: -8.83 ± 2.84
+Loading ligand_grids from data/processed_ligand_data/ligand_grids.npy...
+  Shape: (229, 19, 64, 64, 64)
+Loading pocket_grids from data/processed_pocket_data/pocket_grids.npy...
+  Shape: (210, 19, 64, 64, 64)
+Loading protein_grids from data/processed_protein_data/protein_grids.npy...
+  Shape: (188, 19, 64, 64, 64)
+\nAligning NPY data with CSV...
+Using 188 aligned samples
+\nProcessing ligand_grids...
+Processing 188 samples with 19 channels, grid size 64×64×64
+Extracted features shape: (188, 475)
+After removing zero-variance features: (188, 189)
+\nProcessing pocket_grids...
+Processing 188 samples with 19 channels, grid size 64×64×64
+Extracted features shape: (188, 475)
+After removing zero-variance features: (188, 159)
+\nProcessing protein_grids...
+Processing 188 samples with 19 channels, grid size 64×64×64
+Extracted features shape: (188, 475)
+After removing zero-variance features: (188, 267)
+Combined features shape: (188, 615)
+After adding CSV features: (188, 619)
+\nFinal aligned dataset:
+  Samples: 188
+  Features: 619
+  Target range: -15.21 to -3.11
+  Target mean: -8.91 ± 2.69
+\nData split:
+  Train: 141 samples
+  Test: 47 samples
+\nPerforming feature selection...
+Selected 200 features
+\nTraining optimized models...
+\nTraining RandomForest...
+  RandomForest:
+    Test R²: 0.9899, RMSE: 0.2592
+    CV R²: 0.9947 ± 0.0023
+    Time: 4.6s
+\nTraining ExtraTrees...
+  ExtraTrees:
+    Test R²: 0.9834, RMSE: 0.3328
+    CV R²: 0.9685 ± 0.0222
+    Time: 3.5s
+\nTraining GradientBoosting...
+  GradientBoosting:
+    Test R²: 0.9915, RMSE: 0.2380
+    CV R²: 0.9965 ± 0.0018
+    Time: 26.9s
+\nTraining Ridge...
+  Ridge:
+    Test R²: -0.1902, RMSE: 2.8155
+    CV R²: 0.1418 ± 0.1095
+    Time: 0.2s
+\nTraining ElasticNet...
+  ElasticNet:
+    Test R²: 0.1639, RMSE: 2.3598
+    CV R²: 0.2784 ± 0.0397
+    Time: 0.1s
+\nCreating ensemble...
+\n=======================================================
+FINAL RESULTS SUMMARY
+=======================================================
+RandomForest    - Test R²:  0.9899, CV R²:  0.9947 ± 0.002
+ExtraTrees      - Test R²:  0.9834, CV R²:  0.9685 ± 0.022
+GradientBoosting - Test R²:  0.9915, CV R²:  0.9965 ± 0.002
+Ridge           - Test R²: -0.1902, CV R²:  0.1418 ± 0.110
+ElasticNet      - Test R²:  0.1639, CV R²:  0.2784 ± 0.040
+Ensemble        - Test R²:  0.9738
+\n🏆 Best model: GradientBoosting (R² = 0.9915)
+🚀 Ensemble R²: 0.9738
+\n✅ Prediction completed!
+Results saved to: fixed_binding_prediction_results.png
