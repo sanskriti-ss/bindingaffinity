@@ -294,8 +294,8 @@ class PotentialNetParallel(torch.nn.Module):
         # MANVI comment
         # if not is_undirected(data.edge_index):
         #     data.edge_index = to_undirected(data.edge_index)
-        # from torch_geometric.data import Batch
-        # data = Batch.from_data_list(data)
+        from torch_geometric.data import Batch
+        data = Batch.from_data_list(data)
         ## MANVI: END of new code
 
         
