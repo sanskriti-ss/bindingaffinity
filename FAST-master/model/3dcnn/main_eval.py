@@ -111,7 +111,8 @@ def eval():
 	vol_batch = torch.zeros((batch_size,19,48,48,48)).float().to(device)
 	ytrue_arr = np.zeros((len(dataset),), dtype=np.float32)
 	ypred_arr = np.zeros((len(dataset),), dtype=np.float32)
-	zfeat_arr = np.zeros((len(dataset), 10), dtype=np.float32)
+	# zfeat_arr = np.zeros((len(dataset), 10), dtype=np.float32)
+	z_feat_dict = dict()
 	pred_list = []
 
 	model.eval()
@@ -119,7 +120,7 @@ def eval():
 		for bind, batch in enumerate(dataloader):
 		
 			# transfer to GPU
-			x_batch_cpu, y_batch_cpu = batch
+			pdb_id_batch, x_batch_cpu, y_batch_cpu = batch
 			x_batch, y_batch = x_batch_cpu.to(device), y_batch_cpu.to(device)
 			
 			# voxelize into 3d volume
@@ -137,13 +138,17 @@ def eval():
 			zfeat = zfeat_batch.cpu().float().data.numpy()
 			ytrue_arr[bind*batch_size:bind*batch_size+bsize] = ytrue
 			ypred_arr[bind*batch_size:bind*batch_size+bsize] = ypred
-			zfeat_arr[bind*batch_size:bind*batch_size+bsize] = zfeat
+			# zfeat_arr[bind*batch_size:bind*batch_size+bsize] = zfeat
 
 			if args.save_pred:
 				for i in range(bsize):
-					pred_list.append([bind + i, ytrue[i], ypred[i]])
+					pred_list.append([pdb_id_batch[i], ytrue[i], ypred[i]])
 
-			print("[%d/%d] evaluating" % (bind+1, batch_count))
+			if args.save_feat:
+				for i in range(bsize):
+					z_feat_dict[pdb_id_batch[i]] = zfeat
+
+			print("[%d/%d] evaluating:" % (bind+1, batch_count))
 			#ytrue_str = np.array_repr(ytrue).replace('\n', '')
 			#ypred_str = np.array_repr(ypred).replace('\n', '')
 			#print(ytrue_str)
@@ -163,10 +168,14 @@ def eval():
 		csv_fpath = "%s_%s_pred.csv" % (args.model_path[:-4], args.mlhdf_fn[:-4])
 		df = pd.DataFrame(pred_list, columns=["cid", "label", "pred"])
 		df.to_csv(csv_fpath, index=False)
+		print("Predictions saved to %s" % csv_fpath)
 		
 	if args.save_feat:
-		npy_fpath = "%s_%s_feat.npy" % (args.model_path[:-4], args.mlhdf_fn[:-4])
-		np.save(npy_fpath, zfeat_arr)
+		# npy_fpath = "%s_%s_feat.npy" % (args.model_path[:-4], args.mlhdf_fn[:-4])
+		# np.save(npy_fpath, zfeat_arr)
+		npz_fpath = "%s_%s_feat.npz" % (args.model_path[:-4], args.mlhdf_fn[:-4])
+		np.savez(npz_fpath, **z_feat_dict)
+		print("Features saved to %s" % npz_fpath)
 
 
 def main():

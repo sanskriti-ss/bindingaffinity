@@ -15,6 +15,8 @@ import torch
 import numpy as np
 
 from torch.utils.data import Dataset
+from torch_geometric.data import Data
+
 
 
 # Note: if csv_path exists, the following columns should be included:
@@ -96,7 +98,7 @@ class Dataset_MLHDF(Dataset):
 		if self.rmsd_weight == True:
 			data_w = 0.5 + self.rmsd_thres - rmsd
 			w = torch.tensor(np.expand_dims(data_w, axis=0))
-			return x, y, w
+			return (pdbid, x, y, w)
 		else:
-			return x, y
+			return (pdbid,x, y)
 
