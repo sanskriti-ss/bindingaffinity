@@ -130,6 +130,7 @@ def train():
 
 	# define model
 	model = Model_3DCNN(use_cuda=use_cuda, verbose=args.verbose)
+	model._init_normal_(dataset.labels)  # initialize mean and std for normalization
 	#if use_cuda:
 	#	model = model.cuda()
 	if args.multi_gpus and cuda_count > 1:

@@ -67,8 +67,16 @@ class Dataset_MLHDF(Dataset):
             else:
                 print("not supported!")
 
+        self.labels = self._get_labels()
+
     def close(self):
         self.mlhdf.close()
+
+    def _get_labels(self):
+        labels = []
+        for _, _, _, affinity in self.data_info_list:
+            labels.append(affinity)
+        return np.array(labels, dtype=np.float32)
 
     def __len__(self):
         count = len(self.data_info_list)

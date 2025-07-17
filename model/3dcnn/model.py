@@ -43,7 +43,7 @@ def strip_prefix_if_present(state_dict, prefix):
 class Model_3DCNN(nn.Module):
 
 	# num_filters=[64,128,256] or [96,128,128]
-	def __init__(self, feat_dim=19, output_dim=1, num_filters=[64,128,256], use_cuda=True, verbose=0):
+	def __init__(self, feat_dim=19, output_dim=1, num_filters=[64,128,256], use_cuda=True, verbose=0, dropout_rate=0.15):
 		super(Model_3DCNN, self).__init__()
         
 		self.feat_dim = feat_dim
@@ -51,8 +51,9 @@ class Model_3DCNN(nn.Module):
 		self.num_filters = num_filters
 		self.use_cuda = use_cuda
 		self.verbose = verbose
+		self.dropout_rate = dropout_rate
 
-		self.input_bn = nn.BatchNorm3d(num_features=self.feat_dim, affine=True, momentum=0.1).train()
+		self.input_bn = nn.BatchNorm3d(num_features=self.feat_dim, affine=True, momentum=0.1)
 
 		self.conv_block1 = self.__conv_layer_set__(self.feat_dim, self.num_filters[0], 7, 2, 3)
 		self.res_block1 = self.__conv_layer_set__(self.num_filters[0], self.num_filters[0], 7, 1, 3)
@@ -63,14 +64,22 @@ class Model_3DCNN(nn.Module):
 
 		self.conv_block3 = self.__conv_layer_set__(self.num_filters[1], self.num_filters[2], 5, 2, 2)
 		self.max_pool3 = nn.MaxPool3d(2)
-
+		
+		# Add dropout layers
+		self.dropout_conv = nn.Dropout3d(p=self.dropout_rate)  # For convolutional layers
+		self.dropout_fc = nn.Dropout(p=self.dropout_rate)      # For fully connected layers
+	
 		self.fc1 = nn.Linear(2048, 100)
 		torch.nn.init.normal_(self.fc1.weight, 0, 1)
-		self.fc1_bn = nn.BatchNorm1d(num_features=100, affine=True, momentum=0.1).train()
+		self.fc1_bn = nn.BatchNorm1d(num_features=100, affine=True, momentum=0.1)
 		self.fc2 = nn.Linear(100, 1)
 		torch.nn.init.normal_(self.fc2.weight, 0, 1)
-		self.relu = nn.ReLU()
 		#self.drop=nn.Dropout(p=0.15)
+		self.fin_norm = nn.BatchNorm1d(num_features=1, affine=False, momentum=0.1)
+
+	def _init_normal_(self, labels):
+		self.y_mean = labels.mean()
+		self.y_std = labels.std()
 
 	def __conv_layer_set__(self, in_c, out_c, k_size, stride, padding):
 		conv_layer = nn.Sequential(
@@ -115,7 +124,7 @@ class Model_3DCNN(nn.Module):
 		if self.verbose != 0:
 			print(conv3_h.shape)
 
-		pool3_h = conv3_h
+		pool3_h = self.dropout_conv(conv3_h)
 		#pool3_h = self.max_pool3(conv3_h)
 		#if self.verbose != 0:
 		#	print(pool3_h.shape)
@@ -125,13 +134,19 @@ class Model_3DCNN(nn.Module):
 			print(flatten_h.shape)
 
 		fc1_z = self.fc1(flatten_h)
-		fc1_y = self.relu(fc1_z)
-		fc1_h = self.fc1_bn(fc1_y) if fc1_y.shape[0]>1 else fc1_y  #batchnorm train require more than 1 batch
+
+		fc1_h = self.fc1_bn(fc1_z) #batchnorm train require more than 1 batch
 		if self.verbose != 0:
 			print(fc1_h.shape)
 
-		fc2_z = self.fc2(fc1_h)
+		fc1_d = self.dropout_fc(fc1_h)
+
+		fc2_z = self.fc2(fc1_d)
 		if self.verbose != 0:
 			print(fc2_z.shape)
 
-		return fc2_z, fc1_z
+		fc2_n = self.fin_norm(fc2_z)
+
+		out = self.y_mean + self.y_std * fc2_n if hasattr(self, 'y_mean') else fc2_z
+
+		return out, fc1_z
