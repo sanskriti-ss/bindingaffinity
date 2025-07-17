@@ -52,6 +52,8 @@ class Model_3DCNN(nn.Module):
 		self.use_cuda = use_cuda
 		self.verbose = verbose
 
+		self.input_bn = nn.BatchNorm3d(num_features=self.feat_dim, affine=True, momentum=0.1).train()
+
 		self.conv_block1 = self.__conv_layer_set__(self.feat_dim, self.num_filters[0], 7, 2, 3)
 		self.res_block1 = self.__conv_layer_set__(self.num_filters[0], self.num_filters[0], 7, 1, 3)
 		self.res_block2 = self.__conv_layer_set__(self.num_filters[0], self.num_filters[0], 7, 1, 3)
@@ -80,7 +82,8 @@ class Model_3DCNN(nn.Module):
 	def forward(self, x):
 		if x.dim() == 1:
 			x = x.unsqueeze(-1)
-		conv1_h = self.conv_block1(x)
+		x_normed = self.input_bn(x)
+		conv1_h = self.conv_block1(x_normed)
 		if self.verbose != 0:
 			print(conv1_h.shape)
 

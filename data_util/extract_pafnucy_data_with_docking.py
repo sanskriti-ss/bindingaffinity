@@ -124,9 +124,9 @@ def featurize_pybel_complex(ligand_mol, pocket_mol, name, dataset_name):
             obatom = atom.OBAtom
             x, y, z = atom.coords
             coords.append([x, y, z])
-            
-            # Initialize 19-dimensional feature vector
-            features = np.zeros(19)
+
+            # Initialize 22-dimensional feature vector
+            features = np.zeros(22)
             
             # 0-8: One-hot element encoding
             atomic_num = obatom.GetAtomicNum()
@@ -152,10 +152,15 @@ def featurize_pybel_complex(ligand_mol, pocket_mol, name, dataset_name):
             
             # 9: Hybridization (1=sp, 2=sp2, 3=sp3, 0=other)
             hyb = obatom.GetHyb()
-            if hyb in [1, 2, 3]:
-                features[9] = hyb
+            
+            if hyb == 1:
+                features[9] = 1
+            elif hyb == 2:
+                features[10] = 1
+            elif hyb == 3:
+                features[11] = 1
             else:
-                features[9] = 0
+                features[12] = 1
             
             # 10: Heavy-atom bonds (bonds to atoms with Z > 1)
             heavy_bonds = 0
@@ -170,36 +175,36 @@ def featurize_pybel_complex(ligand_mol, pocket_mol, name, dataset_name):
                     if nbr_atomic_num not in [1, 6]:
                         hetero_bonds += 1
             
-            features[10] = heavy_bonds
-            features[11] = hetero_bonds
+            features[13] = heavy_bonds
+            features[14] = hetero_bonds
             
             # 12-16: One-hot structural features
             # 12: Hydrophobic (carbon atoms)
             if atomic_num == 6:
-                features[12] = 1
+                features[15] = 1
             
             # 13: Aromatic
             if obatom.IsAromatic():
-                features[13] = 1
+                features[16] = 1
             
             # 14: Acceptor
             if obatom.IsHbondAcceptor():
-                features[14] = 1
+                features[17] = 1
             
             # 15: Donor
             if obatom.IsHbondDonor():
-                features[15] = 1
+                features[18] = 1
             
             # 16: Ring
             if obatom.IsInRing():
-                features[16] = 1
+                features[19] = 1
             
             # 17: Partial charge
-            features[17] = atom.partialcharge
+            features[20] = atom.partialcharge
             
             # 18: Molecule type (-1 for protein, +1 for ligand)
-            features[18] = mol_type
-            
+            features[21] = mol_type
+
             feats.append(features)
         
         return np.array(coords, dtype=float), np.array(feats, dtype=float)
