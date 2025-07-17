@@ -20,7 +20,7 @@ path=$@
 # gnu parallel
 
 
-tmp_file=$$_tmp.mol2
+tmp_file=tmp/$$_tmp.mol2
 
 echo "my tmp file is ${tmp_file}"
 
@@ -30,7 +30,7 @@ for pdbfile in $path; do
         mol2file=${pdbfile%pdb}mol2
 
         # NOTICED THAT SOME INPUTS seem to never finish chimera step
-        echo -e "open $pdbfile \n addh \n addcharge \n write format mol2 0 $$_tmp.mol2 \n stop" | chimera --nogui 
+        echo -e "open $pdbfile \n addh \n addcharge \n save ${tmp_file} format mol2 \n exit" | chimerax --nogui 
         # Do not use TIP3P atom types, pybel cannot read them
         sed 's/H\.t3p/H    /' ${tmp_file} | sed 's/O\.t3p/O\.3  /' > $mol2file
 

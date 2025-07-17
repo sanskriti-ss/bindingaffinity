@@ -172,11 +172,15 @@ def train():
 				x_batch_cpu, y_batch_cpu = batch
 			x_batch, y_batch = x_batch_cpu.to(device), y_batch_cpu.to(device)
 			
-			# voxelize into 3d volume
-			for i in range(x_batch.shape[0]):
-				xyz, feat = x_batch[i,:,:3], x_batch[i,:,3:]
-				vol_batch[i,:,:,:,:] = voxelizer(xyz, feat)
-			vol_batch = gaussian_filter(vol_batch)
+			# Check if data is already 3D (from 3D CNN HDF) or needs voxelization
+			if len(x_batch.shape) == 5:  # Already 3D: [batch, channels, depth, height, width]
+				vol_batch = gaussian_filter(x_batch)
+			else:  # Point cloud data that needs voxelization
+				vol_batch = torch.zeros((args.batch_size,19,48,48,48)).float().to(device)
+				for i in range(x_batch.shape[0]):
+					xyz, feat = x_batch[i,:,:3], x_batch[i,:,3:]
+					vol_batch[i,:,:,:,:] = voxelizer(xyz, feat)
+				vol_batch = gaussian_filter(vol_batch)
 			
 			# forward training
 			ypred_batch, _ = model(vol_batch[:x_batch.shape[0]])
@@ -219,10 +223,15 @@ def train():
 						x_batch_cpu, y_batch_cpu = batch
 					x_batch, y_batch = x_batch_cpu.to(device), y_batch_cpu.to(device)
 					
-					for i in range(x_batch.shape[0]):
-						xyz, feat = x_batch[i,:,:3], x_batch[i,:,3:]
-						vol_batch[i,:,:,:,:] = voxelizer(xyz, feat)
-					vol_batch = gaussian_filter(vol_batch)
+					# Check if data is already 3D or needs voxelization
+					if len(x_batch.shape) == 5:  # Already 3D
+						vol_batch = gaussian_filter(x_batch)
+					else:  # Point cloud data that needs voxelization
+						vol_batch = torch.zeros((args.batch_size,19,48,48,48)).float().to(device)
+						for i in range(x_batch.shape[0]):
+							xyz, feat = x_batch[i,:,:3], x_batch[i,:,3:]
+							vol_batch[i,:,:,:,:] = voxelizer(xyz, feat)
+						vol_batch = gaussian_filter(vol_batch)
 					
 					ypred_batch, _ = model(vol_batch[:x_batch.shape[0]])
 

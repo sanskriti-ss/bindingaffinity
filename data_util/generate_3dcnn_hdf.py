@@ -23,10 +23,10 @@ import scipy.ndimage
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--main-dir", default="../data", help="main dataset directory")
+parser.add_argument("--main-dir", default="data", help="main dataset directory")
 parser.add_argument("--use-external", default=True, help="whether external test file is used or not")
-parser.add_argument("--input-file", default="", help="input test HDF filename")
-parser.add_argument("--output-file", default="", help="output test HDF filename")
+parser.add_argument("--input-file", default="refined.hdf", help="input test HDF filename")
+parser.add_argument("--output-file", default="refined_3d_out.hdf", help="output test HDF filename")
 args = parser.parse_args()
 
 
@@ -42,7 +42,7 @@ g_feat_type_ind = 1
 
 g_feat_pdbbind_type_list = ['crystal', 'docking'] # for display
 g_feat_pdbbind_type_list2 = ['pdbbind', 'docking'] # for reading hdf
-g_feat_pdbbind_type_ind = 1
+g_feat_pdbbind_type_ind = 0
 
 g_feat_data_str = 'data'
 
@@ -298,13 +298,16 @@ for input_hdf, output_hdf, output_prefix, split in zip(input_hdfs, output_hdfs, 
 
         feat_tool_list = input_hdf[lig_id]
         if not feat_tool_str in feat_tool_list:
+            print("skipped because ___feat_tool_str not in feat_tool_list___")
             continue
         feat_type_list = feat_tool_list[feat_tool_str]
         if not feat_type_str in feat_type_list:
+            print("skipped because ___feat_type_str not in feat_type_list___")
             continue
         
         feat_pdbbind_list = feat_type_list[feat_type_str]
         if not feat_pdbbind_str in feat_pdbbind_list:
+            print("skipped because ___feat_pdbbind_str not in feat_pdbbind_list___")
             continue
             
         print("processing %s" % lig_id)
@@ -313,6 +316,7 @@ for input_hdf, output_hdf, output_prefix, split in zip(input_hdfs, output_hdfs, 
             feat_data_0 = feat_pdbbind_list[feat_pdbbind_str]
             for n in range(1,11):  # assuming pose1 to pose10
                 if not str(n) in feat_data_0:
+                    print("skipped because ___str(n) not in feat_data_0___")
                     continue
 
                 feat_data = feat_data_0[str(n)]

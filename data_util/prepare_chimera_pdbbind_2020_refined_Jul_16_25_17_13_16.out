@@ -1,0 +1,9 @@
+Seq	Host	Starttime	JobRuntime	Send	Receive	Exitval	Signal	Command
+1	:	1752711219.525	     6.355	0	2463	0	0	./prepare_complexes_chimera.sh /home/karen/Projects/pdbbind/PDBbind_v2020_refined/refined-set/5mkr/5mkr_pocket.pdb
+2	:	1752711222.028	     6.577	0	2774	0	0	./prepare_complexes_chimera.sh /home/karen/Projects/pdbbind/PDBbind_v2020_refined/refined-set/3cfn/3cfn_pocket.pdb
+3	:	1752711224.534	     4.875	0	2805	0	0	./prepare_complexes_chimera.sh /home/karen/Projects/pdbbind/PDBbind_v2020_refined/refined-set/5nyh/5nyh_pocket.pdb
+4	:	1752711227.036	     4.440	0	2570	0	0	./prepare_complexes_chimera.sh /home/karen/Projects/pdbbind/PDBbind_v2020_refined/refined-set/1mrn/1mrn_pocket.pdb
+5	:	1752711229.536	     3.729	0	2543	0	0	./prepare_complexes_chimera.sh /home/karen/Projects/pdbbind/PDBbind_v2020_refined/refined-set/5m28/5m28_pocket.pdb
+6	:	1752711232.037	     3.470	0	2435	0	0	./prepare_complexes_chimera.sh /home/karen/Projects/pdbbind/PDBbind_v2020_refined/refined-set/6d1g/6d1g_pocket.pdb
+7	:	1752711234.537	     3.427	0	2596	0	0	./prepare_complexes_chimera.sh /home/karen/Projects/pdbbind/PDBbind_v2020_refined/refined-set/2qdt/2qdt_pocket.pdb
+8	:	1752711237.038	     3.730	0	2539	0	0	./prepare_complexes_chimera.sh /home/karen/Projects/pdbbind/PDBbind_v2020_refined/refined-set/4dld/4dld_pocket.pdb

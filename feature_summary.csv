@@ -1,0 +1,4 @@
+Complex,Affinity,Total_Atoms,Ligand_Atoms,Protein_Atoms,C_atoms,N_atoms,O_atoms,Aromatic_atoms,Acceptor_atoms,Donor_atoms,Avg_partial_charge
+966c,7.64,416,27,389,253.0,64.0,95.0,93.0,103.0,93.0,-0.15214872
+8cpa,9.15,498,32,466,310.0,75.0,111.0,91.0,124.0,106.0,-0.14937672
+8a3h,4.06,437,25,412,246.0,66.0,125.0,75.0,146.0,121.0,-0.16591145
