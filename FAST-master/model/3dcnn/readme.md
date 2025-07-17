@@ -75,7 +75,7 @@ parser.add_argument("--multi-gpus", default=False, action="store_true", help="wh
 
 ### Testing
 
-python main_eval.py --device-name "cpu" --batch-size 10 --model-path "data/pdbbind2021_a2_demo_model_20250716.pth"
+python main_eval.py --device-name "cpu" --batch-size 10 --model-path "data/pdbbind2021_demo_model_20250716_a2.pth"
 
 
 parser = argparse.ArgumentParser()
