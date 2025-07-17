@@ -17,19 +17,24 @@ import h5py
 parser = argparse.ArgumentParser()
 parser.add_argument("--input-hdf", default='eval_sgcnn.hdf')
 parser.add_argument("--output-npy", default='eval_sgcnn_feat.npy')
+parser.add_argument("--output-npz", default='eval_sgcnn_feat.npz')
 args = parser.parse_args()
 
 
 input_hdf_path = args.input_hdf
 output_npy_path = args.output_npy
+output_npz_path = args.output_npz
 
 #input_hdf_path = '/Users/kim63/Desktop/temp/fusion_test/eval_sgcnn.hdf'
 #output_npy_path = '/Users/kim63/Desktop/temp/fusion_test/eval_sgcnn_feat.npy'
 
 
 
-feat_list = []
-pred_list = []
+# feat_list = []
+# pred_list = []
+
+feat_dict = dict()
+pred_dict = dict()
 
 input_hdf = h5py.File(input_hdf_path, 'r')
 for com_id in input_hdf.keys():
@@ -41,13 +46,17 @@ for com_id in input_hdf.keys():
 		input_pose = input_com[str(pose_id)]
 		feat = input_pose['hidden_features'][:].ravel()
 		feat = feat[-6:] # For Fc6, for FC-12 in FAST its 28:40
-		feat_list.append(feat)
+		# feat_list.append(feat)
+		feat_dict[com_id] = feat
+		
 		pred = input_pose.attrs['y_pred'].ravel()
-		pred_list.append(pred)
+		# pred_list.append(pred)
+		pred_dict[com_id] = pred
 
 
-np.save(output_npy_path, np.array(feat_list))
-np.save(output_npy_path[:-8] + 'pred.npy', np.array(pred_list))
+# np.save(output_npy_path, np.array(feat_list))
+# np.save(output_npy_path[:-8] + 'pred.npy', np.array(pred_list))
 input_hdf.close()
 
-
+np.savez(output_npz_path, **feat_dict)
+np.savez(output_npz_path[:-8] + 'pred.npz', **pred_dict)
