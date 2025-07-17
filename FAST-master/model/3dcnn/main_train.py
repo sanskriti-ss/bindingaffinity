@@ -167,9 +167,9 @@ def train():
 
 			# transfer to GPU
 			if args.rmsd_weight == True:
-				x_batch_cpu, y_batch_cpu, w_batch_cpu = batch
+				pdb_id_batch, x_batch_cpu, y_batch_cpu, w_batch_cpu = batch
 			else:
-				x_batch_cpu, y_batch_cpu = batch
+				pdb_id_batch, x_batch_cpu, y_batch_cpu = batch
 			x_batch, y_batch = x_batch_cpu.to(device), y_batch_cpu.to(device)
 			print(f"x_batch shape: {x_batch.shape}, y_batch shape: {y_batch.shape}")
 			
