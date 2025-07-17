@@ -27,6 +27,15 @@ from img_util import GaussianFilter, Voxelizer3D
 from file_util import *
 
 
+def calculate_r2(y_true, y_pred):
+    """Calculate R² (coefficient of determination)"""
+    ss_res = np.sum((y_true - y_pred) ** 2)
+    ss_tot = np.sum((y_true - np.mean(y_true)) ** 2)
+    r2 = 1 - (ss_res / ss_tot)
+    return r2
+
+
+
 
 # seed all random number generators and set cudnn settings for deterministic: https://github.com/rusty1s/pytorch_geometric/issues/217
 #random.seed(0)
@@ -214,6 +223,8 @@ def train():
 		
 		if val_dataset:
 			val_losses = []
+			val_predictions = []
+			val_targets = []
 			model.eval()
 			with torch.no_grad():
 				for batch_ind, batch in enumerate(val_dataloader):
@@ -241,9 +252,25 @@ def train():
 						loss = loss_fn(ypred_batch.cpu().float(), y_batch_cpu.float())
 						
 					val_losses.append(loss.cpu().data.item())
-					print("[%d/%d-%d/%d] validation, loss: %.3f" % (epoch_ind+1, args.epoch_count, batch_ind+1, batch_count, loss.cpu().data.item()))
+					
+					# Collect predictions and targets for R² calculation
+					val_predictions.extend(ypred_batch.cpu().numpy().flatten())
+					val_targets.extend(y_batch_cpu.numpy().flatten())
+					
+					print("[%d/%d-%d/%d] validation, loss: %.3f" % (epoch_ind+1, args.epoch_count, batch_ind+1, len(val_dataloader), loss.cpu().data.item()))
 
-				print("[%d/%d] validation, epoch loss: %.3f" % (epoch_ind+1, args.epoch_count, np.mean(val_losses)))
+				# Calculate R² score
+				val_predictions = np.array(val_predictions)
+				val_targets = np.array(val_targets)
+				r2_score = calculate_r2(val_targets, val_predictions)
+				
+				# Calculate additional metrics
+				mae = np.mean(np.abs(val_targets - val_predictions))
+				rmse = np.sqrt(np.mean((val_targets - val_predictions) ** 2))
+				
+				print("[%d/%d] validation, epoch loss: %.3f, R²: %.3f, MAE: %.3f, RMSE: %.3f" % (
+					epoch_ind+1, args.epoch_count, np.mean(val_losses), r2_score, mae, rmse))
+
 
 	# close dataset
 	dataset.close()
