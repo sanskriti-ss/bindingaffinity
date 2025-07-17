@@ -146,7 +146,7 @@ def eval():
 
 			if args.save_feat:
 				for i in range(bsize):
-					z_feat_dict[pdb_id_batch[i]] = zfeat
+					z_feat_dict[pdb_id_batch[i]] = zfeat[i]
 
 			print("[%d/%d] evaluating:" % (bind+1, batch_count))
 			#ytrue_str = np.array_repr(ytrue).replace('\n', '')
