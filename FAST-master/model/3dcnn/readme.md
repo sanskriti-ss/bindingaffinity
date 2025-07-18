@@ -9,8 +9,10 @@ Predicting accurate protein-ligand binding affinity is important in drug discove
 ### Prerequisites
 
 ~~- Tensorflow 1.14 or higher~~
-- [PyTorch 1.4 or higher](https://pytorch.org)
+- [PyTorch 1.4 or higher](https://pytorch.org), different cmd for cuda
 - [PyTorch Geometric Feature)](https://github.com/rusty1s/pytorch_geometric)
+- scikit-learn
+- h5py
 - [rdkit](rdkit.org) (optional)
 - [pybel](https://github.com/pybel/pybel)  (optional)
 - [pdbfixer](https://github.com/openmm/pdbfixer)  (optional)
@@ -35,7 +37,11 @@ in get_item function
 In SG-CNN, they have f['1bzc'].attrs('affinity'), which is returned as y attr
 
 
-python main_train.py --device-name "cpu" --dataset-type 1 --epoch-count 5 --batch-size 10 --learning-rate 1e-3 --checkpoint-iter 1 --model-path data/pdbbind2021_a2_demo_model_20250716.pth
+python main_train.py --device-name "cuda:0" --dataset-type 1 --epoch-count 2 --batch-size 10 --learning-rate 1e-3 --checkpoint-iter 1 --checkpoint-dir checkpoint-test
+
+python main_train.py --device-name "cuda:0" --dataset-type 1 --epoch-count 2 --batch-size 10 --learning-rate 1e-3 --checkpoint-iter 1 --model-path data/pdbbind2021_demo_model_20250718_a1.pth
+
+
 
 --data-dir "data" --mlhdf-fn "train.hdf" --vmlhdf-fn "val.hdf"
 
@@ -75,7 +81,7 @@ parser.add_argument("--multi-gpus", default=False, action="store_true", help="wh
 
 ### Testing
 
-python main_eval.py --device-name "cpu" --batch-size 10 --model-path "data/pdbbind2021_demo_model_20250716_a2.pth"
+python main_eval.py --device-name "cuda:0" --batch-size 10 --model-path "data/pdbbind2021_demo_model_20250718_a1.pth"
 
 
 parser = argparse.ArgumentParser()
@@ -94,14 +100,6 @@ parser.add_argument("--save-feat", default=True, action="store_true", help="whet
 args = parser.parse_args()
 
 
-##### 3D-CNN tensorflow version (used in the paper)
-
-To train or test 3D-CNN, run `model/3dcnn_tf/main_3dcnn_pdbbind.py`. 
-Here is an example comand to test a pre-trained 3D-CNN model:
-
-```
-python main_3dcnn_pdbbind.py --main-dir "pdbbind_3dcnn" --model-subdir "pdbbind2016_refined" --run-mode 5 --external-hdftype 3 --external-testhdf "eval_set.hdf" --external-featprefix "eval_3dcnn" --external-dir "pdbbind_2019"
-```
 
 ##### 3D-CNN pytorch version (new version)
 
@@ -116,20 +114,4 @@ example evaluation:
 `python main_eval.py  --data-dir /a/b/c  --mlhdf-fn data_ml.hdf  --model-path d/e/model_3dcnn_01.pth --complex-type 2 --save-pred --save-feat`
 
 Note that `model/3dcnn/data_reader.py` is a default data reader that reads our ML-HDF format described above. Please use your own data_reader to read your own format.
-
-
-
-
-#### Pre-trained weights (checkpoint files)
-
-We trained all of the networks above on [pdbbind 2016 datasets](http://www.pdbbind.org.cn). Particularly, we used general and refined datasets for training and validation, and evaluated the model on the core set (see sample_data/core_test.hdf). 
-
-The checkpoint files for the models are made available under the Creative Commons BY 4.0 license. See the license section below for the terms of the license. The files can be found here: `ftp://gdo-bioinformatics.ucllnl.org/fast/pdbbind2016_model_checkpoints/`. 
-
-Note that the new 3dcnn checkpoint for pytorch (model_checkpoint_3dcnn.tgz) was trained on pdbbind 2019 refined dataset.  
-
-
-
-
-
 

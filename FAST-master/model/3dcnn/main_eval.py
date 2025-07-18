@@ -85,7 +85,7 @@ def eval():
 	gaussian_filter = GaussianFilter(dim=3, channels=19, kernel_size=5, sigma=1, use_cuda=use_cuda)
 
 	# define model
-	model = Model_3DCNN(use_cuda=use_cuda, verbose=1)
+	model = Model_3DCNN(use_cuda=use_cuda, verbose=0)
 	#if use_cuda:
 	#	model = model.cuda()
 	if args.multi_gpus and cuda_count > 1:
@@ -101,7 +101,7 @@ def eval():
 	if not valid_file(args.model_path):
 		print("checkpoint not found! %s" % args.model_path)
 		return
-	checkpoint = torch.load(args.model_path, map_location=device)
+	checkpoint = torch.load(args.model_path, map_location=device, weights_only=False)
 	#checkpoint = torch.load(args.model_path)
 	model_state_dict = checkpoint.pop("model_state_dict")
 	strip_prefix_if_present(model_state_dict, "module.")
