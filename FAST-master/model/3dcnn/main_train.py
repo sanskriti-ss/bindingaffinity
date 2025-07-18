@@ -170,7 +170,6 @@ def train():
     
     best_checkpoint_dict = None
     best_checkpoint_epoch = 0
-    best_checkpoint_step = 0
     best_checkpoint_r2 = -9e9
 
     for epoch_ind in range(epoch_start, args.epoch_count):
@@ -241,11 +240,14 @@ def train():
                 optimizer, train_metrics)
             
             if checkpoint_dict["validate_dict"]["r2"] > best_checkpoint_r2:
-                best_checkpoint_step = step
                 best_checkpoint_epoch = epoch_ind
                 best_checkpoint_r2 = checkpoint_dict["validate_dict"]["r2"]
                 best_checkpoint_dict = checkpoint_dict
 
+        
+    if best_checkpoint_dict is not None:
+        print("best checkpoint epoch: %d, r2: %.4f" % (best_checkpoint_epoch, best_checkpoint_r2))
+        torch.save(best_checkpoint_dict, args.checkpoint_dir + "/best_checkpoint.pth")
 
     # close dataset
     dataset.close()
@@ -269,16 +271,16 @@ def compute_metrics(ytrue_arr, ypred_arr, loss):
         spearman, spval = float('nan'), float('nan')
 
     return {
-        "loss": loss,
-        "rmse": rmse,
-        "r2": r2,
-        "pearson": pearson,
-        "spearman": spearman,
-        "mae": mae,
-        "label_mean": np.mean(ytrue_arr),
-        "label_stdev": np.std(ytrue_arr),
-        "pred_mean": np.mean(ypred_arr),
-        "pred_stdev": np.std(ypred_arr),
+        "loss": float(loss),
+        "rmse": float(rmse),
+        "r2": float(r2),
+        "pearson": float(pearson),
+        "spearman": float(spearman),
+        "mae": float(mae),
+        "label_mean": float(np.mean(ytrue_arr)),
+        "label_stdev": float(np.std(ytrue_arr)),
+        "pred_mean": float(np.mean(ypred_arr)),
+        "pred_stdev": float(np.std(ypred_arr)),
     }
 
 def validate(model, val_dataloader, epoch_ind):

@@ -1,0 +1,87 @@
+(fetch-research-env) PS C:\Users\user\Documents\bindingaffinity\FAST-master\model\3dcnn> python main_train.py --device-name "cuda:0" --dataset-type 1 --epoch-count 2 --batch-size 10 --checkpoint-iter 1 --checkpoint-dir checkpoint-test2
+Use cuda: True, count: 1, device: cuda:0
+C:\Users\user\miniconda3\Lib\site-packages\torch\functional.py:554: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\native\TensorShape.cpp:4316.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+TRAIN:x_batch shape: torch.Size([10, 2000, 22]), y_batch shape: torch.Size([10, 1])
+C:\Users\user\Documents\bindingaffinity\FAST-master\model\3dcnn\img_util.py:123: UserWarning: The torch.cuda.*DtypeTensor constructors are no longer recommended. It's best to use methods such as torch.tensor(data, dtype=*, device='cuda') to create tensors. (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\tensor\python_tensor.cpp:80.)
+  vol_data = torch.cuda.FloatTensor(self.vol_dim, self.vol_dim, self.vol_dim, self.feat_dim).fill_(0)
+[1/2-1/12] training, loss: 65.996, lr: 0.0007000
+C:\Users\user\miniconda3\Lib\site-packages\torch\autograd\graph.py:824: UserWarning: Attempting to run cuBLAS, but there was no current CUDA context! Attempting to set the primary context... (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\cuda\CublasHandlePool.cpp:181.)
+  return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+TRAIN:x_batch shape: torch.Size([10, 2000, 22]), y_batch shape: torch.Size([10, 1])
+[1/2-2/12] training, loss: 49.046, lr: 0.0007000
+TRAIN:x_batch shape: torch.Size([10, 2000, 22]), y_batch shape: torch.Size([10, 1])
+[1/2-3/12] training, loss: 49.796, lr: 0.0007000
+TRAIN:x_batch shape: torch.Size([10, 2000, 22]), y_batch shape: torch.Size([10, 1])
+[1/2-4/12] training, loss: 28.607, lr: 0.0007000
+TRAIN:x_batch shape: torch.Size([10, 2000, 22]), y_batch shape: torch.Size([10, 1])
+[1/2-5/12] training, loss: 46.825, lr: 0.0007000
+TRAIN:x_batch shape: torch.Size([10, 2000, 22]), y_batch shape: torch.Size([10, 1])
+[1/2-6/12] training, loss: 33.145, lr: 0.0007000
+TRAIN:x_batch shape: torch.Size([10, 2000, 22]), y_batch shape: torch.Size([10, 1])
+[1/2-7/12] training, loss: 51.241, lr: 0.0007000
+TRAIN:x_batch shape: torch.Size([10, 2000, 22]), y_batch shape: torch.Size([10, 1])
+[1/2-8/12] training, loss: 41.622, lr: 0.0007000
+TRAIN:x_batch shape: torch.Size([10, 2000, 22]), y_batch shape: torch.Size([10, 1])
+[1/2-9/12] training, loss: 48.514, lr: 0.0007000
+TRAIN:x_batch shape: torch.Size([10, 2000, 22]), y_batch shape: torch.Size([10, 1])
+[1/2-10/12] training, loss: 36.929, lr: 0.0007000
+TRAIN:x_batch shape: torch.Size([10, 2000, 22]), y_batch shape: torch.Size([10, 1])
+[1/2-11/12] training, loss: 32.205, lr: 0.0007000
+TRAIN:x_batch shape: torch.Size([10, 2000, 22]), y_batch shape: torch.Size([10, 1])
+[1/2-12/12] training, loss: 25.244, lr: 0.0007000
+[1/2] training, epoch loss: 42.431
+Compute metrics shape debug: true/pred (120,) / (120,)
+After Training:         loss:25.2437
+ Metrics: {'loss': 25.243663787841797, 'rmse': 6.513891195239445, 'r2': -9.171706199645996, 'pearson': 0.33362364768981934, 'spearman': 0.3860090808591091, 'mae': 6.189077377319336, 'label_mean': 6.6003336906433105, 'label_stdev': 2.0424132347106934, 'pred_mean': 0.41125643253326416, 'pred_stdev': 1.3286627531051636}    
+VAL: x_batch shape: torch.Size([10, 2000, 22]), y_batch shape: torch.Size([10, 1])
+[1/2-1/3] validation, loss: 9.261
+VAL: x_batch shape: torch.Size([10, 2000, 22]), y_batch shape: torch.Size([10, 1])
+[1/2-2/3] validation, loss: 22.525
+VAL: x_batch shape: torch.Size([10, 2000, 22]), y_batch shape: torch.Size([10, 1])
+[1/2-3/3] validation, loss: 11.645
+Len y_true_arr: 30
+Len y_pred_arr: 30
+Compute metrics shape debug: true/pred (30,) / (30,)
+[1/2-3/3] Validation:   loss:11.6452
+ Metrics: {'loss': 11.645219802856445, 'rmse': 3.804888898152312, 'r2': -2.736429214477539, 'pearson': 0.6050671935081482, 'spearman': 0.5586206896551724, 'mae': 3.467120409011841, 'label_mean': 6.4063334465026855, 'label_stdev': 1.9684011936187744, 'pred_mean': 2.9392130374908447, 'pred_stdev': 1.2040767669677734}      
+TRAIN:x_batch shape: torch.Size([10, 2000, 22]), y_batch shape: torch.Size([10, 1])
+[2/2-1/12] training, loss: 44.421, lr: 0.0007000
+TRAIN:x_batch shape: torch.Size([10, 2000, 22]), y_batch shape: torch.Size([10, 1])
+[2/2-2/12] training, loss: 37.374, lr: 0.0007000
+TRAIN:x_batch shape: torch.Size([10, 2000, 22]), y_batch shape: torch.Size([10, 1])
+[2/2-3/12] training, loss: 42.560, lr: 0.0007000
+TRAIN:x_batch shape: torch.Size([10, 2000, 22]), y_batch shape: torch.Size([10, 1])
+[2/2-4/12] training, loss: 37.724, lr: 0.0007000
+TRAIN:x_batch shape: torch.Size([10, 2000, 22]), y_batch shape: torch.Size([10, 1])
+[2/2-5/12] training, loss: 38.917, lr: 0.0007000
+TRAIN:x_batch shape: torch.Size([10, 2000, 22]), y_batch shape: torch.Size([10, 1])
+[2/2-6/12] training, loss: 48.962, lr: 0.0007000
+TRAIN:x_batch shape: torch.Size([10, 2000, 22]), y_batch shape: torch.Size([10, 1])
+[2/2-7/12] training, loss: 39.667, lr: 0.0007000
+TRAIN:x_batch shape: torch.Size([10, 2000, 22]), y_batch shape: torch.Size([10, 1])
+[2/2-8/12] training, loss: 31.103, lr: 0.0007000
+TRAIN:x_batch shape: torch.Size([10, 2000, 22]), y_batch shape: torch.Size([10, 1])
+[2/2-9/12] training, loss: 30.024, lr: 0.0007000
+TRAIN:x_batch shape: torch.Size([10, 2000, 22]), y_batch shape: torch.Size([10, 1])
+[2/2-10/12] training, loss: 38.965, lr: 0.0007000
+TRAIN:x_batch shape: torch.Size([10, 2000, 22]), y_batch shape: torch.Size([10, 1])
+[2/2-11/12] training, loss: 38.838, lr: 0.0007000
+TRAIN:x_batch shape: torch.Size([10, 2000, 22]), y_batch shape: torch.Size([10, 1])
+[2/2-12/12] training, loss: 30.091, lr: 0.0007000
+[2/2] training, epoch loss: 38.220
+Compute metrics shape debug: true/pred (120,) / (120,)
+After Training:         loss:30.0910
+ Metrics: {'loss': 30.090984344482422, 'rmse': 6.18226787645047, 'r2': -8.162382125854492, 'pearson': 0.6592854857444763, 'spearman': 0.6715675978282267, 'mae': 5.979066371917725, 'label_mean': 6.6003336906433105, 'label_stdev': 2.0424132347106934, 'pred_mean': 0.621266782283783, 'pred_stdev': 1.010528326034546}
+VAL: x_batch shape: torch.Size([10, 2000, 22]), y_batch shape: torch.Size([10, 1])
+[2/2-1/3] validation, loss: 27.991
+VAL: x_batch shape: torch.Size([10, 2000, 22]), y_batch shape: torch.Size([10, 1])
+[2/2-2/3] validation, loss: 54.632
+VAL: x_batch shape: torch.Size([10, 2000, 22]), y_batch shape: torch.Size([10, 1])
+[2/2-3/3] validation, loss: 35.931
+Len y_true_arr: 30
+Len y_pred_arr: 30
+Compute metrics shape debug: true/pred (30,) / (30,)
+[2/2-3/3] Validation:   loss:35.9307
+ Metrics: {'loss': 35.9306755065918, 'rmse': 6.286309325552111, 'r2': -9.199156761169434, 'pearson': 0.28709518909454346, 'spearman': 0.2462736373748609, 'mae': 5.963647842407227, 'label_mean': 6.4063334465026855, 'label_stdev': 1.9684011936187744, 'pred_mean': 0.4426848292350769, 'pred_stdev': 1.1954662799835205}       
+best checkpoint epoch: 0, r2: -2.7364
