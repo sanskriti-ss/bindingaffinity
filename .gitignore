@@ -3,3 +3,4 @@ data/*
 data/splits/*
 /models/*
 /model/3dcnn/wandb/*
+model/sgcnn/src/sgcnn/wandb/*
