@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "/home/karen/Projects/FAST/model/3dcnn/main_train.py", line 348, in <module>
+    main()
+  File "/home/karen/Projects/FAST/model/3dcnn/main_train.py", line 345, in main
+    train()
+  File "/home/karen/Projects/FAST/model/3dcnn/main_train.py", line 127, in train
+    dataset = Dataset_MLHDF(os.path.join(args.data_dir, args.mlhdf_fn), args.dataset_type, os.path.join(args.data_dir, args.csv_fn), is_crystal=is_crystal, rmsd_weight=args.rmsd_weight, rmsd_thres=args.rmsd_threshold)
+  File "/home/karen/Projects/FAST/model/3dcnn/data_reader.py", line 36, in __init__
+    self.mlhdf = h5py.File(self.mlhdf_path, 'r')
+  File "/root/miniconda3/envs/fetchai/lib/python3.10/site-packages/h5py/_hl/files.py", line 564, in __init__
+    fid = make_fid(name, mode, userblock_size, fapl, fcpl, swmr=swmr)
+  File "/root/miniconda3/envs/fetchai/lib/python3.10/site-packages/h5py/_hl/files.py", line 238, in make_fid
+    fid = h5f.open(name, flags, fapl=fapl)
+  File "h5py/_objects.pyx", line 56, in h5py._objects.with_phil.wrapper
+  File "h5py/_objects.pyx", line 57, in h5py._objects.with_phil.wrapper
+  File "h5py/h5f.pyx", line 102, in h5py.h5f.open
+FileNotFoundError: [Errno 2] Unable to synchronously open file (unable to open file: name = '/home/karen/Projects/FAST/data/splits/refined_3d_train.hdf', errno = 2, error message = 'No such file or directory', flags = 0, o_flags = 0)

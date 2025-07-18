@@ -1,0 +1,62 @@
+{
+  "os":  "Linux-6.11.0-26-generic-x86_64-with-glibc2.39",
+  "python":  "CPython 3.10.9",
+  "startedAt":  "2025-07-18T04:47:25.082980Z",
+  "args":  [
+    "--device-name",
+    "cuda:0",
+    "--data-dir",
+    "/home/karen/Projects/FAST/data/splits",
+    "--dataset-type",
+    "1",
+    "--mlhdf-fn",
+    "refined_3d_train.hdf",
+    "--csv-fn",
+    "refined_3d_train.csv",
+    "--vmlhdf-fn",
+    "refined_3d_val.hdf",
+    "--vcsv-fn",
+    "refined_3d_val.csv",
+    "--model-path",
+    "/home/karen/Projects/FAST/models/refined_3dcnn_model.pth",
+    "--complex-type",
+    "1",
+    "--epoch-count",
+    "50",
+    "--batch-size",
+    "16",
+    "--learning-rate",
+    "0.0007",
+    "--decay-rate",
+    "0.95",
+    "--decay-iter",
+    "100",
+    "--checkpoint-iter",
+    "50",
+    "--verbose",
+    "1"
+  ],
+  "program":  "/home/karen/Projects/FAST/model/3dcnn/main_train.py",
+  "codePath":  "model/3dcnn/main_train.py",
+  "codePathLocal":  "main_train.py",
+  "git":  {
+    "remote":  "https://github.com/sanskriti-ss/bindingaffinity.git",
+    "commit":  "20370311e8590cd0a95581463d6d9efda8d85b6a"
+  },
+  "email":  "karen.mossoyan@gmail.com",
+  "root":  "/home/karen/Projects/FAST/model/3dcnn",
+  "host":  "Bartholomew",
+  "executable":  "/root/miniconda3/envs/fetchai/bin/python",
+  "cpu_count":  2,
+  "cpu_count_logical":  4,
+  "disk":  {
+    "/":  {
+      "total":  "982240026624",
+      "used":  "209487794176"
+    }
+  },
+  "memory":  {
+    "total":  "33545449472"
+  },
+  "writerId":  "qflqa4ne3wf5shhqcfu9i2xia7f018mt"
+}

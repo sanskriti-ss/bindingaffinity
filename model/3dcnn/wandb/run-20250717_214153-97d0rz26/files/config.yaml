@@ -1,0 +1,93 @@
+_wandb:
+    value:
+        cli_version: 0.21.0
+        e:
+            x2kkq3xist08u9rs3pzoc8kwxo5ub36p:
+                args:
+                    - --device-name
+                    - cuda:0
+                    - --data-dir
+                    - /home/karen/Projects/FAST/data/splits
+                    - --dataset-type
+                    - "1"
+                    - --mlhdf-fn
+                    - refined_3d_train.hdf
+                    - --csv-fn
+                    - refined_3d_train.csv
+                    - --vmlhdf-fn
+                    - refined_3d_val.hdf
+                    - --vcsv-fn
+                    - refined_3d_val.csv
+                    - --model-path
+                    - /home/karen/Projects/FAST/models/refined_3dcnn_model.pth
+                    - --complex-type
+                    - "1"
+                    - --epoch-count
+                    - "50"
+                    - --batch-size
+                    - "16"
+                    - --learning-rate
+                    - "0.0007"
+                    - --decay-rate
+                    - "0.95"
+                    - --decay-iter
+                    - "100"
+                    - --checkpoint-iter
+                    - "50"
+                    - --verbose
+                    - "1"
+                codePath: model/3dcnn/main_train.py
+                codePathLocal: main_train.py
+                cpu_count: 2
+                cpu_count_logical: 4
+                disk:
+                    /:
+                        total: "982240026624"
+                        used: "209487335424"
+                email: karen.mossoyan@gmail.com
+                executable: /root/miniconda3/envs/fetchai/bin/python
+                git:
+                    commit: 20370311e8590cd0a95581463d6d9efda8d85b6a
+                    remote: https://github.com/sanskriti-ss/bindingaffinity.git
+                host: Bartholomew
+                memory:
+                    total: "33545449472"
+                os: Linux-6.11.0-26-generic-x86_64-with-glibc2.39
+                program: /home/karen/Projects/FAST/model/3dcnn/main_train.py
+                python: CPython 3.10.9
+                root: /home/karen/Projects/FAST/model/3dcnn
+                startedAt: "2025-07-18T04:41:53.631615Z"
+                writerId: x2kkq3xist08u9rs3pzoc8kwxo5ub36p
+        m: []
+        python_version: 3.10.9
+        t:
+            "1":
+                - 1
+                - 5
+                - 53
+            "2":
+                - 1
+                - 5
+                - 53
+            "3":
+                - 16
+            "4": 3.10.9
+            "5": 0.21.0
+            "12": 0.21.0
+            "13": linux-x86_64
+batch_size:
+    value: 16
+complex_type:
+    value: 1
+dataset:
+    value: refined_3d_train.hdf
+decay_iter:
+    value: 100
+decay_rate:
+    value: 0.95
+epochs:
+    value: 50
+learning_rate:
+    value: 0.0007
+rmsd_weight:
+    value: 0

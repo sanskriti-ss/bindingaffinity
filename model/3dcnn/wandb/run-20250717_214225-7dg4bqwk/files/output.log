@@ -1,0 +1,16 @@
+/root/miniconda3/envs/fetchai/lib/python3.10/site-packages/torch/functional.py:554: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /pytorch/aten/src/ATen/native/TensorShape.cpp:4314.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+Traceback (most recent call last):
+  File "/home/karen/Projects/FAST/model/3dcnn/main_train.py", line 348, in <module>
+    main()
+  File "/home/karen/Projects/FAST/model/3dcnn/main_train.py", line 345, in main
+    train()
+  File "/home/karen/Projects/FAST/model/3dcnn/main_train.py", line 208, in train
+    vol_batch = gaussian_filter(x_batch)
+  File "/root/miniconda3/envs/fetchai/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/root/miniconda3/envs/fetchai/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/karen/Projects/FAST/model/3dcnn/img_util.py", line 204, in forward
+    return self.conv(input, weight=self.weight, groups=self.groups, padding=self.padding)
+RuntimeError: Given groups=19, weight of size [19, 1, 11, 11, 11], expected input[16, 22, 48, 48, 48] to have 19 channels, but got 22 channels instead

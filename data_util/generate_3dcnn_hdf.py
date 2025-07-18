@@ -64,7 +64,7 @@ g_3D_atom_radius = 1
 g_3D_atom_radii = False
 g_3D_sigma = 1
 if g_feat_tool_ind == 0:
-    g_3D_dim = [g_3D_size_dim, g_3D_size_dim, g_3D_size_dim, 19]
+    g_3D_dim = [g_3D_size_dim, g_3D_size_dim, g_3D_size_dim, 22]
 else:
     g_3D_dim = [g_3D_size_dim, g_3D_size_dim, g_3D_size_dim, 75]
 

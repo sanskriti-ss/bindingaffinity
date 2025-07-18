@@ -16,6 +16,7 @@ import random
 import numpy as np
 import torch
 import torch.nn as nn
+import wandb
 
 from torch.nn.parallel import DataParallel, DistributedDataParallel
 from torch.optim import Adam, RMSprop, lr_scheduler
@@ -25,6 +26,8 @@ from model import Model_3DCNN, strip_prefix_if_present
 from data_reader import Dataset_MLHDF
 from img_util import GaussianFilter, Voxelizer3D
 from file_util import *
+import wandb
+from sklearn.metrics import r2_score as sklearn_r2_score
 
 
 def calculate_r2(y_true, y_pred):
@@ -96,7 +99,25 @@ class WeightedMSELoss(nn.Module):
 def worker_init_fn(worker_id):
 	np.random.seed(int(0))
 
+wandb_api_key = os.environ.get("WANDB_API_KEY")
+
 def train():
+    # Initialize wandb
+	if wandb_api_key:
+		wandb.login(key=wandb_api_key)
+	wandb.init(
+		project="binding-affinity",
+		config={
+			"learning_rate": args.learning_rate,
+			"batch_size": args.batch_size,
+			"epochs": args.epoch_count,
+			"decay_rate": args.decay_rate,
+			"decay_iter": args.decay_iter,
+			"dataset": args.mlhdf_fn,
+			"complex_type": args.complex_type,
+			"rmsd_weight": args.rmsd_weight
+		}
+	)
 
 	# load dataset
 	if args.complex_type == 1:
@@ -126,10 +147,10 @@ def train():
 
 	# define voxelizer, gaussian_filter
 	voxelizer = Voxelizer3D(use_cuda=use_cuda, verbose=args.verbose)
-	gaussian_filter = GaussianFilter(dim=3, channels=19, kernel_size=11, sigma=1, use_cuda=use_cuda)
+	gaussian_filter = GaussianFilter(dim=3, channels=22, kernel_size=11, sigma=1, use_cuda=use_cuda)
 
 	# define model
-	model = Model_3DCNN(use_cuda=use_cuda, verbose=args.verbose)
+	model = Model_3DCNN(use_cuda=use_cuda, verbose=args.verbose, feat_dim=22)
 	model._init_normal_(dataset.labels)  # initialize mean and std for normalization
 	#if use_cuda:
 	#	model = model.cuda()
@@ -173,6 +194,8 @@ def train():
 		vol_batch = torch.zeros((args.batch_size,19,48,48,48)).float().to(device)
 		losses = []
 		model.train()
+		train_predictions = []
+		train_targets = []
 		for batch_ind, batch in enumerate(dataloader):
 
 			# transfer to GPU
@@ -202,12 +225,25 @@ def train():
 				loss = loss_fn(ypred_batch.cpu().float(), y_batch_cpu.float())
 				
 			losses.append(loss.cpu().data.item())
+			
+			# Collect training predictions and targets for R² calculation
+			train_predictions.extend(ypred_batch.cpu().detach().numpy().flatten())
+			train_targets.extend(y_batch_cpu.numpy().flatten())
+			
 			optimizer.zero_grad()
 			loss.backward()
 			optimizer.step()
 			scheduler.step()
 
+			# Log batch metrics
+			wandb.log({
+				"batch_loss": loss.cpu().data.item(),
+				"learning_rate": optimizer.param_groups[0]['lr'],
+				"step": step
+			})
+
 			print("[%d/%d-%d/%d] training, loss: %.3f, lr: %.7f" % (epoch_ind+1, args.epoch_count, batch_ind+1, batch_count, loss.cpu().data.item(), optimizer.param_groups[0]['lr']))
+			
 			if step % args.checkpoint_iter == 0:
 				checkpoint_dict = {
 					"model_state_dict": model_to_save.state_dict(),
@@ -220,7 +256,25 @@ def train():
 				print("checkpoint saved: %s" % args.model_path)
 			step += 1
 
-		print("[%d/%d] training, epoch loss: %.3f" % (epoch_ind+1, args.epoch_count, np.mean(losses)))
+		# Calculate training epoch metrics
+		train_epoch_loss = np.mean(losses)
+		train_predictions = np.array(train_predictions)
+		train_targets = np.array(train_targets)
+		train_r2 = calculate_r2(train_targets, train_predictions)
+		train_mae = np.mean(np.abs(train_targets - train_predictions))
+		train_rmse = np.sqrt(np.mean((train_targets - train_predictions) ** 2))
+
+		print("[%d/%d] training, epoch loss: %.3f, R²: %.3f, MAE: %.3f, RMSE: %.3f" % (
+			epoch_ind+1, args.epoch_count, train_epoch_loss, train_r2, train_mae, train_rmse))
+		
+		# Log training metrics
+		epoch_metrics = {
+			"epoch": epoch_ind + 1,
+			"train_loss": train_epoch_loss,
+			"train_r2": train_r2,
+			"train_mae": train_mae,
+			"train_rmse": train_rmse
+		}
 		
 		if val_dataset:
 			val_losses = []
@@ -260,22 +314,33 @@ def train():
 					
 					print("[%d/%d-%d/%d] validation, loss: %.3f" % (epoch_ind+1, args.epoch_count, batch_ind+1, len(val_dataloader), loss.cpu().data.item()))
 
-				# Calculate R² score
+				# Calculate validation metrics
+				val_epoch_loss = np.mean(val_losses)
 				val_predictions = np.array(val_predictions)
 				val_targets = np.array(val_targets)
-				r2_score = calculate_r2(val_targets, val_predictions)
-				
-				# Calculate additional metrics
-				mae = np.mean(np.abs(val_targets - val_predictions))
-				rmse = np.sqrt(np.mean((val_targets - val_predictions) ** 2))
+				val_r2 = calculate_r2(val_targets, val_predictions)
+				val_mae = np.mean(np.abs(val_targets - val_predictions))
+				val_rmse = np.sqrt(np.mean((val_targets - val_predictions) ** 2))
 				
 				print("[%d/%d] validation, epoch loss: %.3f, R²: %.3f, MAE: %.3f, RMSE: %.3f" % (
-					epoch_ind+1, args.epoch_count, np.mean(val_losses), r2_score, mae, rmse))
+					epoch_ind+1, args.epoch_count, val_epoch_loss, val_r2, val_mae, val_rmse))
 
+				# Add validation metrics
+				epoch_metrics.update({
+					"val_loss": val_epoch_loss,
+					"val_r2": val_r2,
+					"val_mae": val_mae,
+					"val_rmse": val_rmse
+				})
 
-	# close dataset
+        # Log all epoch metrics
+		wandb.log(epoch_metrics)
+
+    # close dataset
 	dataset.close()
-	val_dataset.close()
+	if val_dataset:
+		val_dataset.close()
+	wandb.finish()
 
 
 def main():
