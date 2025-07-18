@@ -24,6 +24,9 @@ from torch.utils.data import Dataset, DataLoader, Subset
 from model import Model_3DCNN, strip_prefix_if_present
 from data_reader import Dataset_MLHDF
 from img_util import GaussianFilter, Voxelizer3D
+
+from tqdm import tqdm
+
 from file_util import *
 
 
@@ -46,7 +49,7 @@ parser.add_argument("--device-name", default="cuda:0", help="use cpu or cuda:0, 
 parser.add_argument("--data-dir", default="data", help="dataset directory")
 parser.add_argument("--dataset-type", type=float, default=1, help="ml-hdf version, (1: for fusion, 1.5: for cfusion 2: ml-hdf v2)")
 parser.add_argument("--mlhdf-fn", default="pdbbind2021_demo_train.hdf", help="training ml-hdf path")
-parser.add_argument("--csv-fn", default="pdbbind2019_crystal_refined.csv", help="training csv file name")
+parser.add_argument("--csv-fn", default="", help="training csv file name")
 parser.add_argument("--vmlhdf-fn", default="pdbbind2021_demo_val.hdf", help="validation ml-hdf path")
 parser.add_argument("--vcsv-fn", default="", help="validation csv file name")
 parser.add_argument("--model-path", default="data/pdbbind2021_a1_demo_model_20250716.pth", help="model checkpoint file path")
@@ -65,14 +68,14 @@ args = parser.parse_args()
 
 
 # set CUDA for PyTorch
-use_cuda = torch.cuda.is_available()
+use_cuda = torch.cuda.is_available() and args.device_name != "cpu"
 cuda_count = torch.cuda.device_count()
 if use_cuda:
 	device = torch.device(args.device_name)
 	torch.cuda.set_device(int(args.device_name.split(':')[1]))
 else:
 	device = torch.device("cpu")
-print(use_cuda, cuda_count, device)
+print(f"Use cuda: {use_cuda}, count: {cuda_count}, device: {device}") 
 
 
 
@@ -208,14 +211,32 @@ def train():
 			rmse = math.sqrt(mean_squared_error(ytrue_arr, ypred_arr))
 			mae = mean_absolute_error(ytrue_arr, ypred_arr)
 			r2 = r2_score(ytrue_arr, ypred_arr)
-			# pearson, ppval = pearsonr(ytrue_arr, ypred_arr)
-			# spearman, spval = spearmanr(ytrue_arr, ypred_arr)
-			pearson = float('nan')
-			spearman = float('nan')
-			mean = np.mean(ypred_arr)
-			std = np.std(ypred_arr)
+			
+			try:
+				pearson, ppval = pearsonr(ytrue_arr, ypred_arr)
+			except:
+				pearson, ppval = float('nan'), float('nan')
 
-			print("[%d/%d-%d/%d] training, RMSE: %.3f, MAE: %.3f, R^2 score: %.3f, Pearson: %.3f, Spearman: %.3f, mean/std: %.3f/%.3f" % (epoch_ind+1, args.epoch_count, batch_ind+1, batch_count, rmse, mae, r2, pearson, spearman, mean, std))
+			try:
+				spearman, spval = spearmanr(ytrue_arr, ypred_arr)
+			except:
+				spearman, spval = float('nan'), float('nan')
+
+			tqdm.write(
+                "[{}/{}-{}/{}] Training: \tloss:{:0.4f}\tr2: {:0.4f}\t pearsonr: {:0.4f}\tspearmanr: {:0.4f}\tmae: {:0.4f}\t"
+				"train mean/stdev: {:0.4f},{:0.4f}, pred mean/std: {:0.4f}/{:0.4f}".format(
+                    epoch_ind+1, args.epoch_count, batch_ind+1, batch_count,
+                    loss.cpu().data.numpy(),
+                    r2,
+                    pearson,
+                    spearman,
+                    float(mae),
+                    np.mean(ytrue_arr),
+                    np.std(ytrue_arr),
+                    np.mean(ypred_arr),
+                    np.std(ypred_arr),
+                )
+            )
 
 
 			if step % args.checkpoint_iter == 0:
@@ -238,9 +259,9 @@ def train():
 			with torch.no_grad():
 				for batch_ind, batch in enumerate(val_dataloader):
 					if args.rmsd_weight == True:
-						x_batch_cpu, y_batch_cpu, w_batch_cpu = batch
+						_, x_batch_cpu, y_batch_cpu, w_batch_cpu = batch
 					else:
-						x_batch_cpu, y_batch_cpu = batch
+						_, x_batch_cpu, y_batch_cpu = batch
 					x_batch, y_batch = x_batch_cpu.to(device), y_batch_cpu.to(device)
 					
 					for i in range(x_batch.shape[0]):
@@ -251,11 +272,11 @@ def train():
 					ypred_batch, _ = model(vol_batch[:x_batch.shape[0]])
 
 					if args.rmsd_weight == True:
-						loss = loss_fn(ypred_batch.cpu().float(), y_batch.float(), w_batch_cpu.float())
+						loss = loss_fn(ypred_batch.float(), y_batch.float(), w_batch_cpu.float())
 					else:
-						loss = loss_fn(ypred_batch.cpu().float(), y_batch.float())
+						loss = loss_fn(ypred_batch.float(), y_batch.float())
 						
-					val_losses.append(loss.cpu().data.item())
+					val_losses.append(loss.data.item())
 					print("[%d/%d-%d/%d] validation, loss: %.3f" % (epoch_ind+1, args.epoch_count, batch_ind+1, batch_count, loss.cpu().data.item()))
 
 				print("[%d/%d] validation, epoch loss: %.3f" % (epoch_ind+1, args.epoch_count, np.mean(val_losses)))
