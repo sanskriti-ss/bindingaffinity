@@ -1,4 +1,8 @@
+aiohappyeyeballs==2.6.1
+aiohttp==3.12.14
+aiosignal==1.4.0
 annotated-types==0.7.0
+async-timeout==5.0.1
 attrs==25.3.0
 bel-resources==0.0.3
 bioregistry==0.12.23
@@ -13,7 +17,10 @@ dnspython==2.7.0
 email_validator==2.2.0
 filelock==3.18.0
 fonttools==4.59.0
+frozenlist==1.7.0
 fsspec==2025.7.0
+gitdb==4.0.12
+GitPython==3.1.44
 greenlet==3.2.3
 h5py==3.14.0
 humanize==4.12.3
@@ -28,6 +35,7 @@ matplotlib==3.10.3
 more-click==0.1.2
 more-itertools==10.7.0
 mpmath==1.3.0
+multidict==6.6.3
 multisplitby==0.0.1
 networkx==3.4.2
 numpy==2.2.6
@@ -49,6 +57,10 @@ packaging==25.0
 pandas==2.3.1
 pathlib==1.0.1
 pillow==11.3.0
+platformdirs==4.3.8
+propcache==0.3.2
+protobuf==6.31.1
+psutil==7.0.0
 psycopg2-binary==2.9.10
 pybel==0.15.5
 pydantic==2.11.7
@@ -58,6 +70,7 @@ pystow==0.7.1
 python-dateutil==2.9.0.post0
 PyTrie==0.4.0
 pytz==2025.2
+PyYAML==6.0.2
 ratelimit==2.2.1
 rdkit==2025.3.3
 referencing==0.36.2
@@ -67,13 +80,18 @@ rpds-py==0.26.0
 scikit-learn==1.7.0
 scipy==1.15.3
 seaborn==0.13.2
+sentry-sdk==2.33.0
 six==1.17.0
+smmap==5.0.2
 sortedcontainers==2.4.0
 SQLAlchemy==2.0.41
 sympy==1.14.0
 tabulate==0.9.0
 threadpoolctl==3.6.0
 torch==2.7.1
+torch-geometric==2.6.1
+torch_scatter==2.1.2
+torch_sparse==0.6.18
 torchaudio==2.7.1
 torchvision==0.22.1
 tqdm==4.67.1
@@ -83,3 +101,5 @@ typing-inspection==0.4.1
 typing_extensions==4.14.1
 tzdata==2025.2
 urllib3==2.5.0
+wandb==0.21.0
+yarl==1.20.1
