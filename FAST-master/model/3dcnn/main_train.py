@@ -29,6 +29,10 @@ from tqdm import tqdm
 
 from file_util import *
 
+import math
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+from scipy.stats import pearsonr, spearmanr
+
 
 
 # seed all random number generators and set cudnn settings for deterministic: https://github.com/rusty1s/pytorch_geometric/issues/217
@@ -61,7 +65,8 @@ parser.add_argument("--batch-size", type=int, default=50, help="mini-batch size"
 parser.add_argument("--learning-rate", type=float, default=0.0007, help="initial learning rate")
 parser.add_argument("--decay-rate", type=float, default=0.95, help="learning rate decay")
 parser.add_argument("--decay-iter", type=int, default=100, help="learning rate decay")
-parser.add_argument("--checkpoint-iter", type=int, default=50, help="checkpoint save rate")
+parser.add_argument("--checkpoint-dir", default="checkpoint/", help="checkpoint save directory")
+parser.add_argument("--checkpoint-iter", type=int, default=10000, help="number of epochs per checkpoint")
 parser.add_argument("--verbose", type=int, default=0, help="print all input/output shapes or not")
 parser.add_argument("--multi-gpus", default=False, action="store_true", help="whether to use multi-gpus")
 args = parser.parse_args()
@@ -71,223 +76,322 @@ args = parser.parse_args()
 use_cuda = torch.cuda.is_available() and args.device_name != "cpu"
 cuda_count = torch.cuda.device_count()
 if use_cuda:
-	device = torch.device(args.device_name)
-	torch.cuda.set_device(int(args.device_name.split(':')[1]))
+    device = torch.device(args.device_name)
+    torch.cuda.set_device(int(args.device_name.split(':')[1]))
 else:
-	device = torch.device("cpu")
+    device = torch.device("cpu")
 print(f"Use cuda: {use_cuda}, count: {cuda_count}, device: {device}") 
 
 
 
 class WeightedMSELoss(nn.Module):
-	def __init__(self):
-		super(WeightedMSELoss, self).__init__()
+    def __init__(self):
+        super(WeightedMSELoss, self).__init__()
 
-	def forward(self, y_pred, y_true, weight):
-		return (weight * (y_pred - y_true) ** 2).mean()
+    def forward(self, y_pred, y_true, weight):
+        return (weight * (y_pred - y_true) ** 2).mean()
 
 
 def worker_init_fn(worker_id):
-	np.random.seed(int(0))
+    np.random.seed(int(0))
 
 def train():
 
-	# load dataset
-	if args.complex_type == 1:
-		is_crystal = True
-	else:
-		is_crystal = False
-	dataset = Dataset_MLHDF(os.path.join(args.data_dir, args.mlhdf_fn), args.dataset_type, os.path.join(args.data_dir, args.csv_fn), is_crystal=is_crystal, rmsd_weight=args.rmsd_weight, rmsd_thres=args.rmsd_threshold)
+    # load dataset
+    if args.complex_type == 1:
+        is_crystal = True
+    else:
+        is_crystal = False
+    dataset = Dataset_MLHDF(os.path.join(args.data_dir, args.mlhdf_fn), args.dataset_type, os.path.join(args.data_dir, args.csv_fn), is_crystal=is_crystal, rmsd_weight=args.rmsd_weight, rmsd_thres=args.rmsd_threshold)
 
-	# if validation set is available
-	val_dataset = None
-	if len(args.vmlhdf_fn) > 0:
-		val_dataset = Dataset_MLHDF(os.path.join(args.data_dir, args.vmlhdf_fn), args.dataset_type, os.path.join(args.data_dir, args.vcsv_fn), is_crystal=is_crystal, rmsd_weight=args.rmsd_weight, rmsd_thres=args.rmsd_threshold)
+    # if validation set is available
+    val_dataset = None
+    if len(args.vmlhdf_fn) > 0:
+        val_dataset = Dataset_MLHDF(os.path.join(args.data_dir, args.vmlhdf_fn), args.dataset_type, os.path.join(args.data_dir, args.vcsv_fn), is_crystal=is_crystal, rmsd_weight=args.rmsd_weight, rmsd_thres=args.rmsd_threshold)
 
-	# check multi-gpus
-	num_workers = 0
-	if args.multi_gpus and cuda_count > 1:
-		num_workers = cuda_count
+    # check multi-gpus
+    num_workers = 0
+    if args.multi_gpus and cuda_count > 1:
+        num_workers = cuda_count
 
-	# initialize data loader
-	batch_count = len(dataset) // args.batch_size
-	dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True, num_workers=num_workers, worker_init_fn=None)
-	
-	# if validation set is available
-	val_dataloader = None
-	if val_dataset:
-		val_dataloader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=num_workers, worker_init_fn=None)
+    # initialize data loader
+    batch_count = len(dataset) // args.batch_size
+    dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True, num_workers=num_workers, worker_init_fn=None)
+    
+    # if validation set is available
+    val_dataloader = None
+    if val_dataset:
+        val_dataloader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=num_workers, worker_init_fn=None)
 
-	# define voxelizer, gaussian_filter
-	voxelizer = Voxelizer3D(use_cuda=use_cuda, verbose=args.verbose)
-	gaussian_filter = GaussianFilter(dim=3, channels=19, kernel_size=11, sigma=1, use_cuda=use_cuda)
+    # define voxelizer, gaussian_filter
+    voxelizer = Voxelizer3D(use_cuda=use_cuda, verbose=args.verbose)
+    gaussian_filter = GaussianFilter(dim=3, channels=19, kernel_size=11, sigma=1, use_cuda=use_cuda)
 
-	# define model
-	model = Model_3DCNN(use_cuda=use_cuda, verbose=args.verbose)
-	#if use_cuda:
-	#	model = model.cuda()
-	if args.multi_gpus and cuda_count > 1:
-		model = nn.DataParallel(model)
-	model.to(device)
-	
-	if isinstance(model, (DistributedDataParallel, DataParallel)):
-		model_to_save = model.module
-	else:
-		model_to_save = model
+    # define model
+    model = Model_3DCNN(use_cuda=use_cuda, verbose=args.verbose)
+    #if use_cuda:
+    #	model = model.cuda()
+    if args.multi_gpus and cuda_count > 1:
+        model = nn.DataParallel(model)
+    model.to(device)
+    
+    if isinstance(model, (DistributedDataParallel, DataParallel)):
+        model_to_save = model.module
+    else:
+        model_to_save = model
 
-	# set loss, optimizer, decay, other parameters
-	if args.rmsd_weight == True:
-		loss_fn = WeightedMSELoss().float()
-	else:
-		loss_fn = nn.MSELoss().float()
-	#optimizer = Adam(model.parameters(), lr=args.learning_rate, betas=(0.9, 0.999), eps=1e-08)
-	optimizer = RMSprop(model.parameters(), lr=args.learning_rate)
-	scheduler = lr_scheduler.StepLR(optimizer, step_size=args.decay_iter, gamma=args.decay_rate)
+    # set loss, optimizer, decay, other parameters
+    if args.rmsd_weight == True:
+        loss_fn = WeightedMSELoss().float()
+    else:
+        loss_fn = nn.MSELoss().float()
+    #optimizer = Adam(model.parameters(), lr=args.learning_rate, betas=(0.9, 0.999), eps=1e-08)
+    optimizer = RMSprop(model.parameters(), lr=args.learning_rate)
+    scheduler = lr_scheduler.StepLR(optimizer, step_size=args.decay_iter, gamma=args.decay_rate)
 
-	# load model
-	epoch_start = 0
-	if valid_file(args.model_path):
-		checkpoint = torch.load(args.model_path, map_location=device)
-		#checkpoint = torch.load(args.model_path)
-		model_state_dict = checkpoint.pop("model_state_dict")
-		strip_prefix_if_present(model_state_dict, "module.")
-		model_to_save.load_state_dict(model_state_dict, strict=False)
-		optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
-		epoch_start = checkpoint["epoch"]
-		loss = checkpoint["loss"]
-		print("checkpoint loaded: %s" % args.model_path)
+    # load model
+    epoch_start = 0
+    if valid_file(args.model_path):
+        checkpoint = torch.load(args.model_path, map_location=device)
+        #checkpoint = torch.load(args.model_path)
+        model_state_dict = checkpoint.pop("model_state_dict")
+        strip_prefix_if_present(model_state_dict, "module.")
+        model_to_save.load_state_dict(model_state_dict, strict=False)
+        optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+        epoch_start = checkpoint["epoch"]
+        loss = checkpoint["loss"]
+        print("checkpoint loaded: %s" % args.model_path)
 
-	if not os.path.exists(os.path.dirname(args.model_path)):
-		os.makedirs(os.path.dirname(args.model_path))
-	output_dir = os.path.dirname(args.model_path)
+    if not os.path.exists(os.path.dirname(args.model_path)):
+        os.makedirs(os.path.dirname(args.model_path))
+    output_dir = os.path.dirname(args.model_path)
 
-	step = 0
-	for epoch_ind in range(epoch_start, args.epoch_count):
-		vol_batch = torch.zeros((args.batch_size,19,48,48,48)).float().to(device)
-		losses = []
-		model.train()
-		for batch_ind, batch in enumerate(dataloader):
+    step = 0
+    
+    best_checkpoint_dict = None
+    best_checkpoint_epoch = 0
+    best_checkpoint_step = 0
+    best_checkpoint_r2 = -9e9
 
-			# transfer to GPU
-			if args.rmsd_weight == True:
-				pdb_id_batch, x_batch_cpu, y_batch_cpu, w_batch_cpu = batch
-			else:
-				pdb_id_batch, x_batch_cpu, y_batch_cpu = batch
-			x_batch, y_batch = x_batch_cpu.to(device), y_batch_cpu.to(device)
-			print(f"x_batch shape: {x_batch.shape}, y_batch shape: {y_batch.shape}")
-			
-			# voxelize into 3d volume
-			for i in range(x_batch.shape[0]):
-				xyz, feat = x_batch[i,:,:3], x_batch[i,:,3:]
-				vol_batch[i,:,:,:,:] = voxelizer(xyz, feat)
-			vol_batch = gaussian_filter(vol_batch)
-			
-			# forward training
-			ypred_batch, _ = model(vol_batch[:x_batch.shape[0]])
+    for epoch_ind in range(epoch_start, args.epoch_count):
+        vol_batch = torch.zeros((args.batch_size,19,48,48,48)).float().to(device)
+        losses = []
+        model.train()
 
-			# compute loss
-			if args.rmsd_weight == True:
-				loss = loss_fn(ypred_batch.cpu().float(), y_batch_cpu.float(), w_batch_cpu.float())
-			else:
-				loss = loss_fn(ypred_batch.cpu().float(), y_batch_cpu.float())
-				
-			losses.append(loss.cpu().data.item())
-			optimizer.zero_grad()
-			loss.backward()
-			optimizer.step()
-			scheduler.step()
+        
 
-			print("[%d/%d-%d/%d] training, loss: %.3f, lr: %.7f" % (epoch_ind+1, args.epoch_count, batch_ind+1, batch_count, loss.cpu().data.item(), optimizer.param_groups[0]['lr']))
-			
-			ytrue = y_batch.cpu().float().data.numpy()[:,0]
-			ypred = ypred_batch.cpu().float().data.numpy()[:,0]
+        y_true_arr = np.zeros((len(dataset),), dtype=np.float32)
+        y_pred_arr = np.zeros((len(dataset),), dtype=np.float32)
 
-			import math
-			from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
-			from scipy.stats import pearsonr, spearmanr
-			
-			ytrue_arr = np.array(ytrue)
-			ypred_arr = np.array(ypred)
-			rmse = math.sqrt(mean_squared_error(ytrue_arr, ypred_arr))
-			mae = mean_absolute_error(ytrue_arr, ypred_arr)
-			r2 = r2_score(ytrue_arr, ypred_arr)
-			
-			try:
-				pearson, ppval = pearsonr(ytrue_arr, ypred_arr)
-			except:
-				pearson, ppval = float('nan'), float('nan')
+        for batch_ind, batch in enumerate(dataloader):
+            # transfer to GPU
+            if args.rmsd_weight == True:
+                pdb_id_batch, x_batch_cpu, y_batch_cpu, w_batch_cpu = batch
+            else:
+                pdb_id_batch, x_batch_cpu, y_batch_cpu = batch
+            x_batch, y_batch = x_batch_cpu.to(device), y_batch_cpu.to(device)
+            print(f"TRAIN:x_batch shape: {x_batch.shape}, y_batch shape: {y_batch.shape}")
+            
+            # voxelize into 3d volume
+            bsize = x_batch.shape[0]
+            for i in range(x_batch.shape[0]):
+                xyz, feat = x_batch[i,:,:3], x_batch[i,:,3:]
+                vol_batch[i,:,:,:,:] = voxelizer(xyz, feat)
+            vol_batch = gaussian_filter(vol_batch)
+            
+            # forward training
+            ypred_batch, _ = model(vol_batch[:x_batch.shape[0]])
 
-			try:
-				spearman, spval = spearmanr(ytrue_arr, ypred_arr)
-			except:
-				spearman, spval = float('nan'), float('nan')
+            # compute loss
+            if args.rmsd_weight == True:
+                loss = loss_fn(ypred_batch.cpu().float(), y_batch_cpu.float(), w_batch_cpu.float())
+            else:
+                loss = loss_fn(ypred_batch.cpu().float(), y_batch_cpu.float())
+                
+            print("[%d/%d-%d/%d] training, loss: %.3f, lr: %.7f" % (epoch_ind+1, args.epoch_count, batch_ind+1, batch_count, loss.cpu().data.item(), optimizer.param_groups[0]['lr']))
+            
+            ytrue = y_batch.detach().cpu().float().numpy()[:,0]
+            ypred = ypred_batch.detach().cpu().float().numpy()[:,0]
+            y_true_arr[batch_ind*args.batch_size : batch_ind*args.batch_size+bsize] = ytrue
+            y_pred_arr[batch_ind*args.batch_size : batch_ind*args.batch_size+bsize] = ypred
+            
+            step += 1
 
-			tqdm.write(
-                "[{}/{}-{}/{}] Training: \tloss:{:0.4f}\tr2: {:0.4f}\t pearsonr: {:0.4f}\tspearmanr: {:0.4f}\tmae: {:0.4f}\t"
-				"train mean/stdev: {:0.4f},{:0.4f}, pred mean/std: {:0.4f}/{:0.4f}".format(
-                    epoch_ind+1, args.epoch_count, batch_ind+1, batch_count,
-                    loss.cpu().data.numpy(),
-                    r2,
-                    pearson,
-                    spearman,
-                    float(mae),
-                    np.mean(ytrue_arr),
-                    np.std(ytrue_arr),
-                    np.mean(ypred_arr),
-                    np.std(ypred_arr),
+            losses.append(loss.cpu().data.item())
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            scheduler.step()
+
+        print("[%d/%d] training, epoch loss: %.3f" % (epoch_ind+1, args.epoch_count, np.mean(losses)))
+
+        if (epoch_ind+1) % args.checkpoint_iter == 0:
+            train_metrics = compute_metrics(y_true_arr, y_pred_arr, float(loss))
+        
+            tqdm.write(
+                "After Training: \tloss:{:0.4f}\n Metrics: {}"
+                .format(
+                    loss.cpu().data.numpy(), train_metrics
                 )
             )
+            
+            checkpoint_dict = checkpoint_model(model, val_dataloader,
+                args.checkpoint_dir
+                    + "/model-epoch-{}.pth".format(epoch_ind),
+                optimizer, train_metrics)
+            
+            if checkpoint_dict["validate_dict"]["r2"] > best_checkpoint_r2:
+                best_checkpoint_step = step
+                best_checkpoint_epoch = epoch_ind
+                best_checkpoint_r2 = checkpoint_dict["validate_dict"]["r2"]
+                best_checkpoint_dict = checkpoint_dict
 
 
-			if step % args.checkpoint_iter == 0:
-				checkpoint_dict = {
-					"model_state_dict": model_to_save.state_dict(),
-					"optimizer_state_dict": optimizer.state_dict(),
-					"loss": loss,
-					"step": step,
-					"epoch": epoch_ind
-				}
-				torch.save(checkpoint_dict, args.model_path)
-				print("checkpoint saved: %s" % args.model_path)
-			step += 1
+    # close dataset
+    dataset.close()
+    val_dataset.close()
 
-		print("[%d/%d] training, epoch loss: %.3f" % (epoch_ind+1, args.epoch_count, np.mean(losses)))
-		
-		if val_dataset:
-			val_losses = []
-			model.eval()
-			with torch.no_grad():
-				for batch_ind, batch in enumerate(val_dataloader):
-					if args.rmsd_weight == True:
-						_, x_batch_cpu, y_batch_cpu, w_batch_cpu = batch
-					else:
-						_, x_batch_cpu, y_batch_cpu = batch
-					x_batch, y_batch = x_batch_cpu.to(device), y_batch_cpu.to(device)
-					
-					for i in range(x_batch.shape[0]):
-						xyz, feat = x_batch[i,:,:3], x_batch[i,:,3:]
-						vol_batch[i,:,:,:,:] = voxelizer(xyz, feat)
-					vol_batch = gaussian_filter(vol_batch)
-					
-					ypred_batch, _ = model(vol_batch[:x_batch.shape[0]])
 
-					if args.rmsd_weight == True:
-						loss = loss_fn(ypred_batch.float(), y_batch.float(), w_batch_cpu.float())
-					else:
-						loss = loss_fn(ypred_batch.float(), y_batch.float())
-						
-					val_losses.append(loss.data.item())
-					print("[%d/%d-%d/%d] validation, loss: %.3f" % (epoch_ind+1, args.epoch_count, batch_ind+1, batch_count, loss.cpu().data.item()))
+def compute_metrics(ytrue_arr, ypred_arr, loss):
+    print("Compute metrics shape debug: true/pred", ytrue_arr.shape, "/", ypred_arr.shape)
+    rmse = math.sqrt(mean_squared_error(ytrue_arr, ypred_arr))
+    mae = mean_absolute_error(ytrue_arr, ypred_arr)
+    r2 = r2_score(ytrue_arr, ypred_arr)
+    
+    try:
+        pearson, ppval = pearsonr(ytrue_arr, ypred_arr)
+    except:
+        pearson, ppval = float('nan'), float('nan')
 
-				print("[%d/%d] validation, epoch loss: %.3f" % (epoch_ind+1, args.epoch_count, np.mean(val_losses)))
+    try:
+        spearman, spval = spearmanr(ytrue_arr, ypred_arr)
+    except:
+        spearman, spval = float('nan'), float('nan')
 
-	# close dataset
-	dataset.close()
-	val_dataset.close()
+    return {
+        "loss": loss,
+        "rmse": rmse,
+        "r2": r2,
+        "pearson": pearson,
+        "spearman": spearman,
+        "mae": mae,
+        "label_mean": np.mean(ytrue_arr),
+        "label_stdev": np.std(ytrue_arr),
+        "pred_mean": np.mean(ypred_arr),
+        "pred_stdev": np.std(ypred_arr),
+    }
+
+def validate(model, val_dataloader, epoch_ind):
+
+    model.eval()
+
+    y_true_arr = []
+    y_pred_arr = []
+    pdbid_list = []
+    pose_list = []
+
+    val_batch_count = len(val_dataloader.dataset) // args.batch_size
+
+    y_true_arr = np.zeros((len(val_dataloader.dataset),), dtype=np.float32)
+    y_pred_arr = np.zeros((len(val_dataloader.dataset),), dtype=np.float32)
+
+
+    for batch_ind,batch in enumerate(val_dataloader):
+        # transfer to GPU
+        if args.rmsd_weight == True:
+            pdb_id_batch, x_batch_cpu, y_batch_cpu, w_batch_cpu = batch
+        else:
+            pdb_id_batch, x_batch_cpu, y_batch_cpu = batch
+        
+        x_batch, y_batch = x_batch_cpu.to(device), y_batch_cpu.to(device)
+        print(f"VAL: x_batch shape: {x_batch.shape}, y_batch shape: {y_batch.shape}")
+
+        voxelizer = Voxelizer3D(use_cuda=use_cuda, verbose=args.verbose)
+        gaussian_filter = GaussianFilter(dim=3, channels=19, kernel_size=11, sigma=1, use_cuda=use_cuda)
+        
+        vol_batch = torch.zeros((args.batch_size,19,48,48,48)).float().to(device)
+        # voxelize into 3d volume
+        for i in range(x_batch.shape[0]):
+            xyz, feat = x_batch[i,:,:3], x_batch[i,:,3:]
+            vol_batch[i,:,:,:,:] = voxelizer(xyz, feat)
+        vol_batch = gaussian_filter(vol_batch)
+        
+        # forward training
+        bsize = x_batch.shape[0]
+        ypred_batch, _ = model(vol_batch[:x_batch.shape[0]])
+
+        if args.rmsd_weight == True:
+            loss_fn = WeightedMSELoss().float()
+            loss = loss_fn(ypred_batch.cpu().float(), y_batch_cpu.float(), w_batch_cpu.float())
+            # loss = float('nan') # TODO: fix WeightMSELoss
+        else:
+            loss_fn = nn.MSELoss().float()
+            loss = loss_fn(ypred_batch.cpu().float(), y_batch_cpu.float())
+
+        print("[%d/%d-%d/%d] validation, loss: %.3f" % (epoch_ind+1, args.epoch_count, batch_ind+1, val_batch_count, loss.cpu().data.item()))
+        
+        ytrue = y_batch.detach().cpu().float().numpy()[:,0]
+        ypred = ypred_batch.detach().cpu().float().numpy()[:,0]
+
+        y_true_arr[batch_ind*args.batch_size:batch_ind*args.batch_size+bsize] = ytrue
+        y_pred_arr[batch_ind*args.batch_size:batch_ind*args.batch_size+bsize] = ypred
+
+
+
+
+    print(f"Len y_true_arr: {len(y_true_arr)}")
+    print(f"Len y_pred_arr: {len(y_pred_arr)}")
+
+    
+    val_metrics = compute_metrics(y_true_arr, y_pred_arr, float(loss))
+            
+    tqdm.write(
+        "[{}/{}-{}/{}] Validation: \tloss:{:0.4f}\n Metrics: {}"
+        .format(
+            epoch_ind+1, args.epoch_count, batch_ind+1, val_batch_count,
+            loss.cpu().data.numpy(),
+            val_metrics
+        )
+    )
+
+    model.train() # restore to train mode
+    return val_metrics
+
+
+        
+def checkpoint_model(model, dataloader, checkpoint_path, optimizer, train_dict):
+    import os
+    if not os.path.exists(os.path.dirname(checkpoint_path)):
+        os.makedirs(os.path.dirname(checkpoint_path))
+    
+    import re
+    # Extract the filename from the path
+    filename = os.path.basename(checkpoint_path)
+    if match := re.match(r"model-epoch-(\d+)\.pth", filename):
+        epoch_ind = int(match.group(1))
+
+    validate_dict = validate(model, dataloader, epoch_ind)
+    model.train()
+
+    checkpoint_dict = {
+        "model_state_dict": model.state_dict(),
+        "optimizer_state_dict": optimizer.state_dict(),
+        "args": vars(args),
+        "train_dict": train_dict,
+        "validate_dict": validate_dict,
+    }
+
+    torch.save(checkpoint_dict, checkpoint_path)
+
+    # return the computed metrics so it can be used to update the training loop
+    return checkpoint_dict
+
+
+
 
 
 def main():
-	train()
+    train()
 
 if __name__ == "__main__":
-	main()
+    main()
