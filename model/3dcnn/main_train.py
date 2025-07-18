@@ -173,6 +173,8 @@ def train():
 	scheduler = lr_scheduler.StepLR(optimizer, step_size=args.decay_iter, gamma=args.decay_rate)
 
 	# load model
+	best_loss = 1e10
+	best_model_path = args.model_path.replace('.pth', '_best_val.pth')
 	epoch_start = 0
 	if valid_file(args.model_path):
 		checkpoint = torch.load(args.model_path, map_location=device)
@@ -183,6 +185,11 @@ def train():
 		optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
 		epoch_start = checkpoint["epoch"]
 		loss = checkpoint["loss"]
+		        
+		# Load best validation loss if available
+		if "best_val_loss" in checkpoint:
+			best_val_loss = checkpoint["best_val_loss"]
+
 		print("checkpoint loaded: %s" % args.model_path)
 
 	if not os.path.exists(os.path.dirname(args.model_path)):
@@ -250,7 +257,8 @@ def train():
 					"optimizer_state_dict": optimizer.state_dict(),
 					"loss": loss,
 					"step": step,
-					"epoch": epoch_ind
+					"epoch": epoch_ind,
+					"best_val_loss": best_val_loss
 				}
 				torch.save(checkpoint_dict, args.model_path)
 				print("checkpoint saved: %s" % args.model_path)
@@ -332,6 +340,33 @@ def train():
 					"val_mae": val_mae,
 					"val_rmse": val_rmse
 				})
+
+				# Best validation loss checkpointing
+				if val_epoch_loss < best_val_loss:
+					best_val_loss = val_epoch_loss
+					best_checkpoint_dict = {
+						"model_state_dict": model_to_save.state_dict(),
+						"optimizer_state_dict": optimizer.state_dict(),
+						"loss": train_epoch_loss,
+						"val_loss": val_epoch_loss,
+						"step": step,
+						"epoch": epoch_ind,
+						"best_val_loss": best_val_loss,
+						"train_r2": train_r2,
+						"val_r2": val_r2,
+						"train_mae": train_mae,
+						"val_mae": val_mae,
+						"train_rmse": train_rmse,
+						"val_rmse": val_rmse
+					}
+					torch.save(best_checkpoint_dict, best_model_path)
+					print("*** NEW BEST MODEL *** validation loss: %.3f, saved to: %s" % (val_epoch_loss, best_model_path))
+					
+					# Log best model info to wandb
+					wandb.log({
+						"best_val_loss": best_val_loss,
+						"best_model_epoch": epoch_ind + 1
+					})
 
         # Log all epoch metrics
 		wandb.log(epoch_metrics)
