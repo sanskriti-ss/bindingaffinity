@@ -12,7 +12,8 @@ import torch
 from torch import Tensor
 from torch.nn import Parameter as Param
 from torch_geometric.nn.conv import MessagePassing
-from torch_geometric.utils import softmax, scatter_
+from torch_geometric.utils import softmax
+from torch_scatter import scatter as scatter_
 #from torch_geometric.utils import softmax
 #from torch_scatter import scatter as scatter_
 from torch_geometric.nn.inits import uniform, reset
@@ -69,6 +70,8 @@ class GatedGraphConv(MessagePassing):
     def forward(self, x, edge_index, edge_attr):
         """"""
         h = x if x.dim() == 2 else x.unsqueeze(-1)
+        ##print(h.shape)
+        ##print(self.out_channels)
         assert h.size(1) <= self.out_channels
 
         # if input size is < out_channels, pad input with 0s to equal the sizes

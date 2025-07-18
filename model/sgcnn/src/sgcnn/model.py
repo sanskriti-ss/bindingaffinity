@@ -47,12 +47,9 @@ from torch_geometric.utils import (
     add_self_loops,
 )
 
-#from torch_scatter import scatter as scatter_
-from torch_geometric.utils import scatter_
-
 from torch_geometric.nn import DataParallel as GeometricDataParallel
 from torch_geometric.data import Batch
-from .ggcnn import GatedGraphConv, PotentialNetAttention
+from ggcnn import GatedGraphConv, PotentialNetAttention
 from torch.nn import init
 
 
@@ -75,7 +72,7 @@ def filter_adj(row, col, edge_attr, mask):
 class PotentialNetPropagation(torch.nn.Module):
     def __init__(
         self,
-        feat_size=19,
+        feat_size=22,
         gather_width=64,
         k=2,
         neighbor_threshold=None,

@@ -1,0 +1,104 @@
+_wandb:
+    value:
+        cli_version: 0.21.0
+        e:
+            1fs7j01e4os7vkvwvnyuj915uzq7st11:
+                args:
+                    - --preprocessing-type
+                    - processed
+                    - --feature-type
+                    - pybel
+                    - --dataset-name
+                    - pdbbind
+                    - --train-data
+                    - /home/karen/Projects/FAST/data/refined_splits/refined_train.hdf
+                    - --val-data
+                    - /home/karen/Projects/FAST/data/refined_splits/refined_val.hdf
+                    - --epochs
+                    - "100"
+                    - --batch-size
+                    - "32"
+                    - --lr
+                    - "1e-3"
+                    - --checkpoint
+                    - "True"
+                    - --checkpoint-dir
+                    - ./checkpoints
+                    - --checkpoint-iter
+                    - "100"
+                    - --num-workers
+                    - "4"
+                codePath: model/sgcnn/src/sgcnn/train.py
+                codePathLocal: train.py
+                cpu_count: 2
+                cpu_count_logical: 4
+                disk:
+                    /:
+                        total: "982240026624"
+                        used: "209712353280"
+                email: karen.mossoyan@gmail.com
+                executable: /root/miniconda3/envs/fetchai/bin/python
+                git:
+                    commit: e8b3b85550563487c62b9eb5e6ef2d65c0400ad7
+                    remote: https://github.com/sanskriti-ss/bindingaffinity.git
+                host: Bartholomew
+                memory:
+                    total: "33545449472"
+                os: Linux-6.11.0-26-generic-x86_64-with-glibc2.39
+                program: /home/karen/Projects/FAST/model/sgcnn/src/sgcnn/train.py
+                python: CPython 3.10.9
+                root: /home/karen/Projects/FAST/model/sgcnn/src/sgcnn
+                startedAt: "2025-07-18T22:04:48.817269Z"
+                writerId: 1fs7j01e4os7vkvwvnyuj915uzq7st11
+        m: []
+        python_version: 3.10.9
+        t:
+            "1":
+                - 1
+                - 5
+                - 53
+                - 77
+            "2":
+                - 1
+                - 5
+                - 53
+                - 77
+            "3":
+                - 13
+                - 16
+            "4": 3.10.9
+            "5": 0.21.0
+            "12": 0.21.0
+            "13": linux-x86_64
+batch_size:
+    value: 32
+checkpoint_iter:
+    value: 100
+covalent_gather_width:
+    value: 128
+covalent_k:
+    value: 1
+covalent_threshold:
+    value: 1.5
+dataset_name:
+    value: pdbbind
+epochs:
+    value: 100
+feature_type:
+    value: pybel
+learning_rate:
+    value: 0.001
+model:
+    value: SGCNN
+non_covalent_gather_width:
+    value: 128
+non_covalent_k:
+    value: 1
+non_covalent_threshold:
+    value: 7.5
+num_workers:
+    value: 4
+preprocessing_type:
+    value: processed
+use_docking:
+    value: false

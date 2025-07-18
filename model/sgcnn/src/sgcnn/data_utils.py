@@ -81,8 +81,8 @@ class PDBBindDataset(Dataset):
         
         # Then try pdbbind sublevel
         pdbbind_path = f"{name}/{self.feature_type}/{self.preprocessing_type}/{self.dataset_name}"
-        if pdbbind_path in f and "affinity" in f[pdbind_path].attrs:
-            return np.asarray(f[pdbind_path].attrs["affinity"]).reshape(1, -1)
+        if pdbbind_path in f and "affinity" in f[pdbbind_path].attrs:
+            return np.asarray(f[pdbbind_path].attrs["affinity"]).reshape(1, -1)
         
         print(f"Warning: No affinity found for {name}")
         return None
@@ -132,7 +132,7 @@ class PDBBindDataset(Dataset):
 
             if self.feature_type == "pybel":
                 coords = data[:, 0:3]
-                node_feats = np.concatenate([vdw_radii, data[:, 3:22]], axis=1)
+                node_feats = np.concatenate([vdw_radii, data[:, 3:]], axis=1)
             else:
                 raise NotImplementedError
 

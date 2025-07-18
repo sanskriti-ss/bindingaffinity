@@ -7,7 +7,6 @@
 # Spatial Graph Convolutional Network training script
 ################################################################################
 
-
 import os
 import itertools
 from glob import glob
@@ -32,8 +31,7 @@ from data_utils import PDBBindDataset
 from model import PotentialNetParallel, GraphThreshold
 from sklearn.preprocessing import StandardScaler
 from torch.utils.data import ConcatDataset, SubsetRandomSampler
-
-
+import wandb
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -72,11 +70,7 @@ parser.add_argument(
 )
 parser.add_argument(
     "--dataset-name", type=str, required=True
-)  # NOTE: this should probably just consist of a set of choices
-
-
-
-
+)
 parser.add_argument("--covalent-gather-width", type=int, default=128)
 parser.add_argument("--non-covalent-gather-width", type=int, default=128)
 parser.add_argument("--covalent-k", type=int, default=1)
@@ -86,32 +80,70 @@ parser.add_argument("--non-covalent-threshold", type=float, default=7.5)
 parser.add_argument("--train-data", type=str, required=True, nargs="+")
 parser.add_argument("--val-data", type=str, required=True, nargs="+")
 parser.add_argument("--use-docking", default=False, action="store_true")
+
+# Add wandb arguments
+parser.add_argument("--wandb-project", default="binding-affinity", help="wandb project name")
+parser.add_argument("--wandb-run-name", default="", help="wandb run name (auto-generated if empty)")
+parser.add_argument("--disable-wandb", action="store_true", help="disable wandb logging")
+
 args = parser.parse_args()
 
-# seed all random number generators and set cudnn settings for deterministic: https://github.com/rusty1s/pytorch_geometric/issues/217
+# seed all random number generators and set cudnn settings for deterministic
 random.seed(0)
 np.random.seed(0)
 torch.manual_seed(0)
 torch.cuda.manual_seed(0)
 torch.cuda.manual_seed_all(0)
 torch.backends.cudnn.deterministic = True
-torch.backends.cudnn.benchmark = False  # NOTE: https://discuss.pytorch.org/t/what-does-torch-backends-cudnn-benchmark-do/5936
+torch.backends.cudnn.benchmark = False
 os.environ["PYTHONHASHSEED"] = "0"
-
 
 def worker_init_fn(worker_id):
     np.random.seed(int(0))
 
-
 def collate_fn_none_filter(batch):
     return [x for x in batch if x is not None]
 
+# Get wandb API key
+wandb_api_key = os.environ.get("WANDB_API_KEY")
 
 def train():
+    # Initialize wandb
+    if not args.disable_wandb:
+        if wandb_api_key:
+            wandb.login(key=wandb_api_key)
+        
+        # Generate run name if not provided
+        run_name = args.wandb_run_name
+        if not run_name:
+            run_name = f"sgcnn-{args.feature_type}-lr{args.lr}-bs{args.batch_size}-{args.dataset_name}"
+        
+        wandb.init(
+            project=args.wandb_project,
+            name=run_name,
+            config={
+                "model": "SGCNN",
+                "learning_rate": args.lr,
+                "batch_size": args.batch_size,
+                "epochs": args.epochs,
+                "feature_type": args.feature_type,
+                "preprocessing_type": args.preprocessing_type,
+                "dataset_name": args.dataset_name,
+                "covalent_gather_width": args.covalent_gather_width,
+                "non_covalent_gather_width": args.non_covalent_gather_width,
+                "covalent_k": args.covalent_k,
+                "non_covalent_k": args.non_covalent_k,
+                "covalent_threshold": args.covalent_threshold,
+                "non_covalent_threshold": args.non_covalent_threshold,
+                "use_docking": args.use_docking,
+                "num_workers": args.num_workers,
+                "checkpoint_iter": args.checkpoint_iter
+            }
+        )
 
     # set the input channel dims based on featurization type
     if args.feature_type == "pybel":
-        feature_size = 20
+        feature_size = 22 + 1 # 22 features from pybel + 1 for the van der waals
     else:
         feature_size = 75
 
@@ -152,7 +184,7 @@ def train():
         shuffle=False,
         worker_init_fn=worker_init_fn,
         drop_last=True,
-    )  # just to keep batch sizes even, since shuffling is used
+    )
 
     val_dataloader = DataListLoader(
         val_dataset,
@@ -164,9 +196,23 @@ def train():
 
     tqdm.write("{} complexes in training dataset".format(len(train_dataset)))
     tqdm.write("{} complexes in validation dataset".format(len(val_dataset)))
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    model = GeometricDataParallel(
-        PotentialNetParallel(
+    if torch.cuda.is_available():
+        model = GeometricDataParallel(
+            PotentialNetParallel(
+                in_channels=feature_size,
+                out_channels=1,
+                covalent_gather_width=args.covalent_gather_width,
+                non_covalent_gather_width=args.non_covalent_gather_width,
+                covalent_k=args.covalent_k,
+                non_covalent_k=args.non_covalent_k,
+                covalent_neighbor_threshold=args.covalent_threshold,
+                non_covalent_neighbor_threshold=args.non_covalent_threshold,
+            )
+        ).float()
+    else:
+        model = PotentialNetParallel(
             in_channels=feature_size,
             out_channels=1,
             covalent_gather_width=args.covalent_gather_width,
@@ -175,11 +221,10 @@ def train():
             non_covalent_k=args.non_covalent_k,
             covalent_neighbor_threshold=args.covalent_threshold,
             non_covalent_neighbor_threshold=args.non_covalent_threshold,
-        )
-    ).float()
+        ).float()
 
     model.train()
-    model.to(0)
+    model.to(device)
     tqdm.write(str(model))
     tqdm.write(
         "{} trainable parameters.".format(
@@ -190,6 +235,15 @@ def train():
         "{} total parameters.".format(sum(p.numel() for p in model.parameters()))
     )
 
+    # Log model info to wandb
+    if not args.disable_wandb:
+        wandb.log({
+            "trainable_parameters": sum(p.numel() for p in model.parameters() if p.requires_grad),
+            "total_parameters": sum(p.numel() for p in model.parameters()),
+            "train_dataset_size": len(train_dataset),
+            "val_dataset_size": len(val_dataset)
+        })
+
     criterion = nn.MSELoss().float()
     optimizer = Adam(model.parameters(), lr=args.lr)
 
@@ -198,8 +252,12 @@ def train():
     best_checkpoint_step = 0
     best_checkpoint_r2 = -9e9
     step = 0
+    
     for epoch in range(args.epochs):
         losses = []
+        epoch_y_true = []
+        epoch_y_pred = []
+        
         for batch in tqdm(train_dataloader):
             batch = [x for x in batch if x is not None]
             if len(batch) < 1:
@@ -207,22 +265,59 @@ def train():
                 continue
             optimizer.zero_grad()
 
-            data = [x[2] for x in batch]
-            y_ = model(data)
+            # Create a proper batch from the list of data objects
+            data_list = [x[2] for x in batch]
+            batched_data = Batch.from_data_list(data_list)
+            
+            # Move to device if using GPU
+            if torch.cuda.is_available():
+                batched_data = batched_data.to(device)
+            
+            y_ = model(batched_data)
             y = torch.cat([x[2].y for x in batch])
 
-            loss = criterion(y.float(), y_.cpu().float())
+            # Move y to device if using GPU
+            if torch.cuda.is_available():
+                y = y.to(device)
+
+            loss = criterion(y.float(), y_.float())
             losses.append(loss.cpu().data.item())
             loss.backward()
 
             y_true = y.cpu().data.numpy()
             y_pred = y_.cpu().data.numpy()
 
+            # Collect for epoch-level metrics
+            epoch_y_true.extend(y_true.flatten())
+            epoch_y_pred.extend(y_pred.flatten())
+
             r2 = r2_score(y_true=y_true, y_pred=y_pred)
             mae = mean_absolute_error(y_true=y_true, y_pred=y_pred)
 
             pearsonr = stats.pearsonr(y_true.reshape(-1), y_pred.reshape(-1))
             spearmanr = stats.spearmanr(y_true.reshape(-1), y_pred.reshape(-1))
+
+            # Fix threshold access for CPU/GPU compatibility
+            if torch.cuda.is_available():
+                cov_thresh = model.module.covalent_neighbor_threshold.t.cpu().data.item()
+                non_cov_thresh = model.module.non_covalent_neighbor_threshold.t.cpu().data.item()
+            else:
+                cov_thresh = model.covalent_neighbor_threshold.t.cpu().data.item()
+                non_cov_thresh = model.non_covalent_neighbor_threshold.t.cpu().data.item()
+
+            # Log batch metrics to wandb
+            if not args.disable_wandb:
+                wandb.log({
+                    "batch_loss": loss.cpu().data.item(),
+                    "batch_r2": r2,
+                    "batch_mae": mae,
+                    "batch_pearsonr": float(pearsonr[0]),
+                    "batch_spearmanr": float(spearmanr[0]),
+                    "covalent_threshold": cov_thresh,
+                    "non_covalent_threshold": non_cov_thresh,
+                    "step": step,
+                    "epoch": epoch
+                })
 
             tqdm.write(
                 "epoch: {}\tloss:{:0.4f}\tr2: {:0.4f}\t pearsonr: {:0.4f}\tspearmanr: {:0.4f}\tmae: {:0.4f}\tpred stdev: {:0.4f}"
@@ -235,8 +330,8 @@ def train():
                     float(mae),
                     np.std(y_pred),
                     np.mean(y_pred),
-                    model.module.covalent_neighbor_threshold.t.cpu().data.item(),
-                    model.module.non_covalent_neighbor_threshold.t.cpu().data.item(),
+                    cov_thresh,
+                    non_cov_thresh,
                 )
             )
 
@@ -255,10 +350,41 @@ def train():
                         best_checkpoint_epoch = epoch
                         best_checkpoint_r2 = checkpoint_dict["validate_dict"]["r2"]
                         best_checkpoint_dict = checkpoint_dict
+                        
+                        # Log best model update to wandb
+                        if not args.disable_wandb:
+                            wandb.log({
+                                "best_val_r2": best_checkpoint_r2,
+                                "best_model_epoch": epoch,
+                                "best_model_step": step
+                            })
 
             optimizer.step()
             step += 1
 
+        # Calculate epoch-level training metrics
+        epoch_y_true = np.array(epoch_y_true)
+        epoch_y_pred = np.array(epoch_y_pred)
+        train_epoch_loss = np.mean(losses)
+        train_r2 = r2_score(epoch_y_true, epoch_y_pred)
+        train_mae = mean_absolute_error(epoch_y_true, epoch_y_pred)
+        train_rmse = np.sqrt(mean_squared_error(epoch_y_true, epoch_y_pred))
+        train_pearsonr = stats.pearsonr(epoch_y_true, epoch_y_pred)
+        train_spearmanr = stats.spearmanr(epoch_y_true, epoch_y_pred)
+
+        epoch_metrics = {
+            "epoch": epoch + 1,
+            "train_epoch_loss": train_epoch_loss,
+            "train_epoch_r2": train_r2,
+            "train_epoch_mae": train_mae,
+            "train_epoch_rmse": train_rmse,
+            "train_epoch_pearsonr": float(train_pearsonr[0]),
+            "train_epoch_spearmanr": float(train_spearmanr[0])
+        }
+
+        print(f"[{epoch+1}/{args.epochs}] training epoch - loss: {train_epoch_loss:.4f}, R²: {train_r2:.4f}, MAE: {train_mae:.4f}, RMSE: {train_rmse:.4f}")
+
+        # End of epoch checkpoint and validation
         if args.checkpoint:
             checkpoint_dict = checkpoint_model(
                 model,
@@ -267,14 +393,37 @@ def train():
                 step,
                 args.checkpoint_dir + "/model-epoch-{}-step-{}.pth".format(epoch, step),
             )
+            
+            val_metrics = checkpoint_dict["validate_dict"]
+            epoch_metrics.update({
+                "val_epoch_loss": val_metrics["mse"],  # MSE is the loss
+                "val_epoch_r2": val_metrics["r2"],
+                "val_epoch_mae": val_metrics["mae"],
+                "val_epoch_rmse": np.sqrt(val_metrics["mse"]),
+                "val_epoch_pearsonr": float(val_metrics["pearsonr"][0]),
+                "val_epoch_spearmanr": float(val_metrics["spearmanr"][0])
+            })
+            
             if checkpoint_dict["validate_dict"]["r2"] > best_checkpoint_r2:
                 best_checkpoint_step = step
                 best_checkpoint_epoch = epoch
                 best_checkpoint_r2 = checkpoint_dict["validate_dict"]["r2"]
                 best_checkpoint_dict = checkpoint_dict
+                
+                # Log best model update to wandb
+                if not args.disable_wandb:
+                    wandb.log({
+                        "best_val_r2": best_checkpoint_r2,
+                        "best_model_epoch": epoch,
+                        "best_model_step": step
+                    })
+
+        # Log epoch metrics to wandb
+        if not args.disable_wandb:
+            wandb.log(epoch_metrics)
 
     if args.checkpoint:
-        # once broken out of the loop, save last model
+        # Save final model
         checkpoint_dict = checkpoint_model(
             model,
             val_dataloader,
@@ -289,18 +438,31 @@ def train():
             best_checkpoint_r2 = checkpoint_dict["validate_dict"]["r2"]
             best_checkpoint_dict = checkpoint_dict
 
-    if args.checkpoint:
+        # Save best checkpoint
         torch.save(best_checkpoint_dict, args.checkpoint_dir + "/best_checkpoint.pth")
+        
+        # Log final summary to wandb
+        if not args.disable_wandb:
+            wandb.log({
+                "final_best_val_r2": best_checkpoint_r2,
+                "final_best_epoch": best_checkpoint_epoch,
+                "final_best_step": best_checkpoint_step,
+                "training_completed": True
+            })
+
     print(
         "best training checkpoint epoch {}/step {} with r2: {}".format(
             best_checkpoint_epoch, best_checkpoint_step, best_checkpoint_r2
         )
     )
-
+    
+    # Finish wandb run
+    if not args.disable_wandb:
+        wandb.finish()
 
 def validate(model, val_dataloader):
-
     model.eval()
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     y_true = []
     y_pred = []
@@ -308,8 +470,18 @@ def validate(model, val_dataloader):
     pose_list = []
 
     for batch in tqdm(val_dataloader):
-        data = [x[2] for x in batch if x is not None]
-        y_ = model(data)
+        batch = [x for x in batch if x is not None]
+        if len(batch) < 1:
+            continue
+            
+        # Batch the data properly
+        data_list = [x[2] for x in batch]
+        batched_data = Batch.from_data_list(data_list)
+        
+        if torch.cuda.is_available():
+            batched_data = batched_data.to(device)
+            
+        y_ = model(batched_data)
         y = torch.cat([x[2].y for x in batch])
 
         pdbid_list.extend([x[0] for x in batch])
@@ -346,7 +518,6 @@ def validate(model, val_dataloader):
         "pose": pose_list,
     }
 
-
 def checkpoint_model(model, dataloader, epoch, step, output_path):
     if not os.path.exists(os.path.dirname(output_path)):
         os.makedirs(os.path.dirname(output_path))
@@ -362,14 +533,10 @@ def checkpoint_model(model, dataloader, epoch, step, output_path):
     }
 
     torch.save(checkpoint_dict, output_path)
-
-    # return the computed metrics so it can be used to update the training loop
     return checkpoint_dict
-
 
 def main():
     train()
-
 
 if __name__ == "__main__":
     main()

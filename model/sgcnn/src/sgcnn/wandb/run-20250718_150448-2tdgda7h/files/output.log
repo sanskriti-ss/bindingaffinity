@@ -1,0 +1,123 @@
+found 1 datasets in input train-data
+/root/miniconda3/envs/fetchai/lib/python3.10/site-packages/torch_geometric/deprecation.py:26: UserWarning: 'data.DataListLoader' is deprecated, use 'loader.DataListLoader' instead
+  warnings.warn(out)
+4131 complexes in training dataset
+516 complexes in validation dataset
+PotentialNetParallel(
+  (covalent_neighbor_threshold): GraphThreshold()
+  (non_covalent_neighbor_threshold): GraphThreshold()
+  (covalent_propagation): PotentialNetPropagation(
+    (neighbor_threshold): GraphThreshold()
+    (edge_network_nn): Sequential(
+      (0): Linear(in_features=1, out_features=11, bias=True)
+      (1): Softsign()
+      (2): Linear(in_features=11, out_features=23, bias=True)
+      (3): Softsign()
+    )
+    (edge_network): NNConv(23, 23, aggr=add, nn=Sequential(
+      (0): Linear(in_features=1, out_features=11, bias=True)
+      (1): Softsign()
+      (2): Linear(in_features=11, out_features=23, bias=True)
+      (3): Softsign()
+    ))
+    (gate): GatedGraphConv(23, num_layers=1)
+    (attention): PotentialNetAttention(
+      (net_i): Sequential(
+        (0): Linear(in_features=46, out_features=23, bias=True)
+        (1): Softsign()
+        (2): Linear(in_features=23, out_features=128, bias=True)
+        (3): Softsign()
+      )
+      (net_j): Sequential(
+        (0): Linear(in_features=23, out_features=128, bias=True)
+        (1): Softsign()
+      )
+    )
+  )
+  (non_covalent_propagation): PotentialNetPropagation(
+    (neighbor_threshold): GraphThreshold()
+    (edge_network_nn): Sequential(
+      (0): Linear(in_features=1, out_features=64, bias=True)
+      (1): Softsign()
+      (2): Linear(in_features=64, out_features=128, bias=True)
+      (3): Softsign()
+    )
+    (edge_network): NNConv(128, 128, aggr=add, nn=Sequential(
+      (0): Linear(in_features=1, out_features=64, bias=True)
+      (1): Softsign()
+      (2): Linear(in_features=64, out_features=128, bias=True)
+      (3): Softsign()
+    ))
+    (gate): GatedGraphConv(128, num_layers=1)
+    (attention): PotentialNetAttention(
+      (net_i): Sequential(
+        (0): Linear(in_features=256, out_features=128, bias=True)
+        (1): Softsign()
+        (2): Linear(in_features=128, out_features=128, bias=True)
+        (3): Softsign()
+      )
+      (net_j): Sequential(
+        (0): Linear(in_features=128, out_features=128, bias=True)
+        (1): Softsign()
+      )
+    )
+  )
+  (output): PotentialNetFullyConnected(
+    (output): Sequential(
+      (0): Linear(in_features=128, out_features=85, bias=True)
+      (1): ReLU()
+      (2): Linear(in_features=85, out_features=64, bias=True)
+      (3): ReLU()
+      (4): Linear(in_features=64, out_features=1, bias=True)
+    )
+  )
+)
+234788 trainable parameters.
+234788 total parameters.
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 16/16 [00:33<00:00,  2.08s/it]
+epoch: 0	loss:36.7245	r2: -14.2905	 pearsonr: -0.4335	spearmanr: -0.5051	mae: 5.8582	pred stdev: 0.0028	 pred mean: 0.1080 	covalent_threshold: 1.5000 	non covalent threshold: 7.5000
+ 19%|█████████████████████▌                                                                                              | 24/129 [01:51<08:08,  4.65s/it]
+r2: -10.960665702819824	mae: 6.341847896575928	mse: 43.89312744140625	pearsonr: PearsonRResult(statistic=np.float32(-0.43716845), pvalue=np.float64(2.5985344369033864e-25))	 spearmanr: SignificanceResult(statistic=np.float64(-0.4431255210708011), pvalue=np.float64(4.882844617991992e-26))
+epoch: 0	loss:54.1779	r2: -17.7173	 pearsonr: -0.3995	spearmanr: -0.4124	mae: 7.1608	pred stdev: 0.0045	 pred mean: 0.1451 	covalent_threshold: 1.5000 	non covalent threshold: 7.5000
+epoch: 0	loss:50.3964	r2: -8.2524	 pearsonr: 0.7026	spearmanr: 0.7716	mae: 6.7063	pred stdev: 0.0075	 pred mean: 0.1725 	covalent_threshold: 1.5000 	non covalent threshold: 7.5000
+epoch: 0	loss:48.5328	r2: -8.4751	 pearsonr: 0.6257	spearmanr: 0.6686	mae: 6.5914	pred stdev: 0.0127	 pred mean: 0.2042 	covalent_threshold: 1.5000 	non covalent threshold: 7.5000
+epoch: 0	loss:43.7513	r2: -9.0623	 pearsonr: 0.5524	spearmanr: 0.5435	mae: 6.2804	pred stdev: 0.0178	 pred mean: 0.2336 	covalent_threshold: 1.5000 	non covalent threshold: 7.5000
+epoch: 0	loss:55.0020	r2: -19.2637	 pearsonr: 0.0828	spearmanr: 0.1884	mae: 7.2317	pred stdev: 0.0406	 pred mean: 0.2827 	covalent_threshold: 1.5000 	non covalent threshold: 7.5000
+epoch: 0	loss:43.7790	r2: -12.7392	 pearsonr: 0.4653	spearmanr: 0.5314	mae: 6.3745	pred stdev: 0.0253	 pred mean: 0.2980 	covalent_threshold: 1.5000 	non covalent threshold: 7.5000
+epoch: 0	loss:51.5569	r2: -7.6779	 pearsonr: 0.6507	spearmanr: 0.7265	mae: 6.7623	pred stdev: 0.0361	 pred mean: 0.3427 	covalent_threshold: 1.5000 	non covalent threshold: 7.5000
+epoch: 0	loss:51.6597	r2: -14.3659	 pearsonr: 0.4067	spearmanr: 0.4507	mae: 6.9549	pred stdev: 0.0507	 pred mean: 0.3951 	covalent_threshold: 1.5000 	non covalent threshold: 7.5000
+epoch: 0	loss:39.3894	r2: -14.3355	 pearsonr: 0.2652	spearmanr: 0.4421	mae: 6.0708	pred stdev: 0.0424	 pred mean: 0.4276 	covalent_threshold: 1.5000 	non covalent threshold: 7.5000
+epoch: 0	loss:36.5023	r2: -7.6116	 pearsonr: 0.3464	spearmanr: 0.3449	mae: 5.6867	pred stdev: 0.0550	 pred mean: 0.4858 	covalent_threshold: 1.5000 	non covalent threshold: 7.5000
+epoch: 0	loss:47.6863	r2: -8.5658	 pearsonr: 0.3124	spearmanr: 0.3471	mae: 6.5425	pred stdev: 0.0787	 pred mean: 0.5847 	covalent_threshold: 1.5000 	non covalent threshold: 7.5000
+epoch: 0	loss:39.1900	r2: -9.7550	 pearsonr: 0.5673	spearmanr: 0.5707	mae: 5.9757	pred stdev: 0.0782	 pred mean: 0.6511 	covalent_threshold: 1.5000 	non covalent threshold: 7.5000
+epoch: 0	loss:32.5739	r2: -12.4102	 pearsonr: 0.4130	spearmanr: 0.1850	mae: 5.5012	pred stdev: 0.0992	 pred mean: 0.6973 	covalent_threshold: 1.5000 	non covalent threshold: 7.5000
+epoch: 0	loss:31.9228	r2: -7.2414	 pearsonr: 0.3883	spearmanr: 0.5219	mae: 5.3111	pred stdev: 0.1123	 pred mean: 0.8235 	covalent_threshold: 1.5000 	non covalent threshold: 7.5000
+epoch: 0	loss:36.4051	r2: -8.6746	 pearsonr: 0.4209	spearmanr: 0.3219	mae: 5.7275	pred stdev: 0.1066	 pred mean: 0.9378 	covalent_threshold: 1.5000 	non covalent threshold: 7.5000
+epoch: 0	loss:40.0425	r2: -11.1375	 pearsonr: 0.7225	spearmanr: 0.7278	mae: 6.1000	pred stdev: 0.1917	 pred mean: 1.0700 	covalent_threshold: 1.5000 	non covalent threshold: 7.5000
+epoch: 0	loss:29.7836	r2: -10.9539	 pearsonr: 0.3127	spearmanr: 0.3046	mae: 5.2369	pred stdev: 0.1614	 pred mean: 1.1309 	covalent_threshold: 1.5000 	non covalent threshold: 7.5000
+epoch: 0	loss:25.1184	r2: -8.6032	 pearsonr: 0.1042	spearmanr: 0.1902	mae: 4.7464	pred stdev: 0.2205	 pred mean: 1.2861 	covalent_threshold: 1.5000 	non covalent threshold: 7.5000
+epoch: 0	loss:31.5567	r2: -9.0151	 pearsonr: 0.4033	spearmanr: 0.4144	mae: 5.3603	pred stdev: 0.2849	 pred mean: 1.6254 	covalent_threshold: 1.5000 	non covalent threshold: 7.5000
+epoch: 0	loss:28.5968	r2: -9.3812	 pearsonr: 0.1019	spearmanr: 0.2693	mae: 5.0854	pred stdev: 0.2685	 pred mean: 1.7562 	covalent_threshold: 1.5000 	non covalent threshold: 7.5000
+epoch: 0	loss:20.8445	r2: -4.8183	 pearsonr: 0.3337	spearmanr: 0.2740	mae: 4.1929	pred stdev: 0.3484	 pred mean: 1.9989 	covalent_threshold: 1.5000 	non covalent threshold: 7.5000
+epoch: 0	loss:20.1809	r2: -5.2190	 pearsonr: 0.7247	spearmanr: 0.7520	mae: 4.2068	pred stdev: 0.3345	 pred mean: 2.1232 	covalent_threshold: 1.5000 	non covalent threshold: 7.5000
+epoch: 0	loss:17.4486	r2: -5.3447	 pearsonr: 0.3186	spearmanr: 0.3905	mae: 3.8663	pred stdev: 0.3580	 pred mean: 2.4155 	covalent_threshold: 1.5000 	non covalent threshold: 7.5000
+Traceback (most recent call last):
+  File "/home/karen/Projects/FAST/model/sgcnn/src/sgcnn/train.py", line 542, in <module>
+    main()
+  File "/home/karen/Projects/FAST/model/sgcnn/src/sgcnn/train.py", line 539, in main
+    train()
+  File "/home/karen/Projects/FAST/model/sgcnn/src/sgcnn/train.py", line 276, in train
+    y_ = model(batched_data)
+  File "/root/miniconda3/envs/fetchai/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/root/miniconda3/envs/fetchai/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/karen/Projects/FAST/model/sgcnn/src/sgcnn/model.py", line 288, in forward
+    ) = self.non_covalent_neighbor_threshold(data.edge_index, data.edge_attr)
+  File "/root/miniconda3/envs/fetchai/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/root/miniconda3/envs/fetchai/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/karen/Projects/FAST/model/sgcnn/src/sgcnn/model.py", line 169, in forward
+    edge_index = torch.stack(
+KeyboardInterrupt

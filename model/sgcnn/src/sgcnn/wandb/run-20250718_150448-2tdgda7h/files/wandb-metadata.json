@@ -1,0 +1,54 @@
+{
+  "os":  "Linux-6.11.0-26-generic-x86_64-with-glibc2.39",
+  "python":  "CPython 3.10.9",
+  "startedAt":  "2025-07-18T22:04:48.817269Z",
+  "args":  [
+    "--preprocessing-type",
+    "processed",
+    "--feature-type",
+    "pybel",
+    "--dataset-name",
+    "pdbbind",
+    "--train-data",
+    "/home/karen/Projects/FAST/data/refined_splits/refined_train.hdf",
+    "--val-data",
+    "/home/karen/Projects/FAST/data/refined_splits/refined_val.hdf",
+    "--epochs",
+    "100",
+    "--batch-size",
+    "32",
+    "--lr",
+    "1e-3",
+    "--checkpoint",
+    "True",
+    "--checkpoint-dir",
+    "./checkpoints",
+    "--checkpoint-iter",
+    "100",
+    "--num-workers",
+    "4"
+  ],
+  "program":  "/home/karen/Projects/FAST/model/sgcnn/src/sgcnn/train.py",
+  "codePath":  "model/sgcnn/src/sgcnn/train.py",
+  "codePathLocal":  "train.py",
+  "git":  {
+    "remote":  "https://github.com/sanskriti-ss/bindingaffinity.git",
+    "commit":  "e8b3b85550563487c62b9eb5e6ef2d65c0400ad7"
+  },
+  "email":  "karen.mossoyan@gmail.com",
+  "root":  "/home/karen/Projects/FAST/model/sgcnn/src/sgcnn",
+  "host":  "Bartholomew",
+  "executable":  "/root/miniconda3/envs/fetchai/bin/python",
+  "cpu_count":  2,
+  "cpu_count_logical":  4,
+  "disk":  {
+    "/":  {
+      "total":  "982240026624",
+      "used":  "209712353280"
+    }
+  },
+  "memory":  {
+    "total":  "33545449472"
+  },
+  "writerId":  "1fs7j01e4os7vkvwvnyuj915uzq7st11"
+}
