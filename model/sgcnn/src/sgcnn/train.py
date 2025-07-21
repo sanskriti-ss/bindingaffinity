@@ -24,8 +24,6 @@ from scipy import stats
 from torch.utils.data import Dataset, DataLoader, Subset
 from tqdm import tqdm
 from torch_geometric.data import Data, Batch
-from torch_geometric.data import DataLoader as GeometricDataLoader
-from torch_geometric.nn import DataParallel as GeometricDataParallel
 from torch_geometric.data import DataListLoader
 from data_utils import PDBBindDataset
 from model import PotentialNetParallel, GraphThreshold
@@ -198,30 +196,16 @@ def train():
     tqdm.write("{} complexes in validation dataset".format(len(val_dataset)))
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    if torch.cuda.is_available():
-        model = GeometricDataParallel(
-            PotentialNetParallel(
-                in_channels=feature_size,
-                out_channels=1,
-                covalent_gather_width=args.covalent_gather_width,
-                non_covalent_gather_width=args.non_covalent_gather_width,
-                covalent_k=args.covalent_k,
-                non_covalent_k=args.non_covalent_k,
-                covalent_neighbor_threshold=args.covalent_threshold,
-                non_covalent_neighbor_threshold=args.non_covalent_threshold,
-            )
-        ).float()
-    else:
-        model = PotentialNetParallel(
-            in_channels=feature_size,
-            out_channels=1,
-            covalent_gather_width=args.covalent_gather_width,
-            non_covalent_gather_width=args.non_covalent_gather_width,
-            covalent_k=args.covalent_k,
-            non_covalent_k=args.non_covalent_k,
-            covalent_neighbor_threshold=args.covalent_threshold,
-            non_covalent_neighbor_threshold=args.non_covalent_threshold,
-        ).float()
+    model = PotentialNetParallel(
+        in_channels=feature_size,
+        out_channels=1,
+        covalent_gather_width=args.covalent_gather_width,
+        non_covalent_gather_width=args.non_covalent_gather_width,
+        covalent_k=args.covalent_k,
+        non_covalent_k=args.non_covalent_k,
+        covalent_neighbor_threshold=args.covalent_threshold,
+        non_covalent_neighbor_threshold=args.non_covalent_threshold,
+    ).float()
 
     model.train()
     model.to(device)
@@ -297,13 +281,8 @@ def train():
             pearsonr = stats.pearsonr(y_true.reshape(-1), y_pred.reshape(-1))
             spearmanr = stats.spearmanr(y_true.reshape(-1), y_pred.reshape(-1))
 
-            # Fix threshold access for CPU/GPU compatibility
-            if torch.cuda.is_available():
-                cov_thresh = model.module.covalent_neighbor_threshold.t.cpu().data.item()
-                non_cov_thresh = model.module.non_covalent_neighbor_threshold.t.cpu().data.item()
-            else:
-                cov_thresh = model.covalent_neighbor_threshold.t.cpu().data.item()
-                non_cov_thresh = model.non_covalent_neighbor_threshold.t.cpu().data.item()
+            cov_thresh = model.covalent_neighbor_threshold.t.cpu().data.item()
+            non_cov_thresh = model.non_covalent_neighbor_threshold.t.cpu().data.item()
 
             # Log batch metrics to wandb
             if not args.disable_wandb:

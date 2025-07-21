@@ -128,6 +128,6 @@ class Dataset_MLHDF(Dataset):
         if self.rmsd_weight == True:
             data_w = 0.5 + self.rmsd_thres - rmsd
             w = torch.tensor(np.expand_dims(data_w, axis=0), dtype=torch.float32)
-            return x, y, w
+            return x, y, w, pdbid
         else:
-            return x, y
+            return x, y, pdbid

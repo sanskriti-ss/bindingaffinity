@@ -53,6 +53,7 @@ nvidia-cusparselt-cu12==0.6.3
 nvidia-nccl-cu12==2.26.2
 nvidia-nvjitlink-cu12==12.6.85
 nvidia-nvtx-cu12==12.6.77
+openbabel-wheel
 packaging==25.0
 pandas==2.3.1
 pathlib==1.0.1

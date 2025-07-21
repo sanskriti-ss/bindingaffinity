@@ -43,7 +43,7 @@ def strip_prefix_if_present(state_dict, prefix):
 class Model_3DCNN(nn.Module):
 
 	# num_filters=[64,128,256] or [96,128,128]
-	def __init__(self, feat_dim=19, output_dim=1, num_filters=[64,128,256], use_cuda=True, verbose=0, dropout_rate=0.15):
+	def __init__(self, feat_dim=19, output_dim=1, num_filters=[64,128,256], use_cuda=True, verbose=0, dropout_rate=0.15, quantum=False):
 		super(Model_3DCNN, self).__init__()
         
 		self.feat_dim = feat_dim
@@ -52,6 +52,7 @@ class Model_3DCNN(nn.Module):
 		self.use_cuda = use_cuda
 		self.verbose = verbose
 		self.dropout_rate = dropout_rate
+		self.quantum = quantum
 
 		self.input_bn = nn.BatchNorm3d(num_features=self.feat_dim, affine=True, momentum=0.1)
 
@@ -72,8 +73,14 @@ class Model_3DCNN(nn.Module):
 		self.fc1 = nn.Linear(2048, 100)
 		torch.nn.init.normal_(self.fc1.weight, 0, 1)
 		self.fc1_bn = nn.BatchNorm1d(num_features=100, affine=True, momentum=0.1)
-		self.fc2 = nn.Linear(100, 1)
+
+		self.quantum_intermediate = nn.Linear(100, 10) if self.quantum else nn.Identity()
+		if self.quantum:
+			torch.nn.init.normal_(self.quantum_intermediate.weight, 0, 1)
+
+		self.fc2 = nn.Linear(10 if self.quantum else 100, self.output_dim)
 		torch.nn.init.normal_(self.fc2.weight, 0, 1)
+
 		#self.drop=nn.Dropout(p=0.15)
 		self.fin_norm = nn.BatchNorm1d(num_features=1, affine=False, momentum=0.1)
 
@@ -141,7 +148,9 @@ class Model_3DCNN(nn.Module):
 
 		fc1_d = self.dropout_fc(fc1_h)
 
-		fc2_z = self.fc2(fc1_d)
+		inter = self.quantum_intermediate(fc1_d) if self.quantum else fc1_d
+
+		fc2_z = self.fc2(inter)
 		if self.verbose != 0:
 			print(fc2_z.shape)
 
@@ -149,4 +158,4 @@ class Model_3DCNN(nn.Module):
 
 		out = self.y_mean + self.y_std * fc2_n if hasattr(self, 'y_mean') else fc2_z
 
-		return out, fc1_z
+		return out, inter

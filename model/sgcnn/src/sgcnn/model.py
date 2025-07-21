@@ -64,7 +64,7 @@ def maybe_num_nodes(index, num_nodes=None):
 
     return index.max().item() + 1 if num_nodes is None else num_nodes
 
-
+#gluten free version of filter_adj
 def filter_adj(row, col, edge_attr, mask):
     return row[mask], col[mask], None if edge_attr is None else edge_attr[mask]
 
