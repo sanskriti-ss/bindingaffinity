@@ -132,37 +132,44 @@ class PotentialNetPropagation(torch.nn.Module):
         return h_1
 
 
+
+class PotentialNetFullyConnected(torch.nn.Module):
+    def __init__(self, in_channels, out_channels):
+        super(PotentialNetFullyConnected, self).__init__()
+
+        self.output = nn.Sequential(
+            nn.Linear(in_channels, int(in_channels / 1.5)),
+            nn.ReLU(),
+            nn.Linear(int(in_channels / 1.5), 10),
+            nn.ReLU(),
+            nn.Linear(10, out_channels),
+        )
+
+    def forward(self, data, return_hidden_feature=False):
+
+        if return_hidden_feature:
+            return self.output[:-2](data), self.output(data)
+        else:
+            return self.output(data)
+
+
 class GraphThreshold(torch.nn.Module):
     def __init__(self, t):
         super(GraphThreshold, self).__init__()
-        if torch.cuda.is_available():
-            self.t = nn.Parameter(t, requires_grad=True).cuda()
-        else:
-            self.t = nn.Parameter(t, requires_grad=True)
+        # Let PyTorch handle device placement automatically
+        self.t = nn.Parameter(t.clone().detach(), requires_grad=True)
 
     def filter_adj(self, row, col, edge_attr, mask):
         mask = mask.squeeze()
         return row[mask], col[mask], None if edge_attr is None else edge_attr[mask]
 
     def forward(self, edge_index, edge_attr):
-        """Randomly drops edges from the adjacency matrix
-        :obj:`(edge_index, edge_attr)` with propability :obj:`p` using samples from
-        a Bernoulli distribution.
-
-        Args:
-            edge_index (LongTensor): The edge indices.
-            edge_attr (Tensor): Edge weights or multi-dimensional
-                edge features. (default: :obj:`None`)
-            force_undirected (bool, optional): If set to :obj:`True`, forces undirected output.
-            (default: :obj:`False`)
-            num_nodes (int, optional): The number of nodes, *i.e.*
-            :obj:`max_val + 1` of :attr:`edge_index`. (default: :obj:`None`)
-        """
-
         N = maybe_num_nodes(edge_index, None)
         row, col = edge_index
 
-        mask = edge_attr <= self.t
+        # Use the parameter on the correct device without reassigning
+        t_device = self.t.to(edge_attr.device)
+        mask = edge_attr <= t_device
 
         row, col, edge_attr = self.filter_adj(row, col, edge_attr, mask)
 
@@ -173,26 +180,6 @@ class GraphThreshold(torch.nn.Module):
         edge_index, edge_attr = coalesce(edge_index, edge_attr, N, N)
 
         return edge_index, edge_attr
-
-
-class PotentialNetFullyConnected(torch.nn.Module):
-    def __init__(self, in_channels, out_channels):
-        super(PotentialNetFullyConnected, self).__init__()
-
-        self.output = nn.Sequential(
-            nn.Linear(in_channels, int(in_channels / 1.5)),
-            nn.ReLU(),
-            nn.Linear(int(in_channels / 1.5), int(in_channels / 2)),
-            nn.ReLU(),
-            nn.Linear(int(in_channels / 2), out_channels),
-        )
-
-    def forward(self, data, return_hidden_feature=False):
-
-        if return_hidden_feature:
-            return self.output[:-2](data), self.output[:-4](data), self.output(data)
-        else:
-            return self.output(data)
 
 
 class PotentialNetParallel(torch.nn.Module):
@@ -215,23 +202,14 @@ class PotentialNetParallel(torch.nn.Module):
             and non_covalent_neighbor_threshold is not None
         )
 
-        if torch.cuda.is_available():
-            self.covalent_neighbor_threshold = GraphThreshold(
-                torch.ones(1).cuda() * covalent_neighbor_threshold
-         )
-        else:
-            self.covalent_neighbor_threshold = GraphThreshold(
-                torch.ones(1) * covalent_neighbor_threshold
+        # Remove device-specific initialization - let PyTorch handle it
+        self.covalent_neighbor_threshold = GraphThreshold(
+            torch.ones(1) * covalent_neighbor_threshold
         )
-
-        if torch.cuda.is_available():
-            self.non_covalent_neighbor_threshold = GraphThreshold(
-                torch.ones(1).cuda() * non_covalent_neighbor_threshold
-            )  # need to add params for upper/lower covalent/non_covalent_t
-        else:
-            self.non_covalent_neighbor_threshold = GraphThreshold(
-                torch.ones(1) * non_covalent_neighbor_threshold
-            )
+        
+        self.non_covalent_neighbor_threshold = GraphThreshold(
+            torch.ones(1) * non_covalent_neighbor_threshold
+        )
 
         self.always_return_hidden_feature = always_return_hidden_feature
 
@@ -258,15 +236,8 @@ class PotentialNetParallel(torch.nn.Module):
         )
 
     def forward(self, data, return_hidden_feature=False):
-
-        #import pdb
-        #pdb.set_trace()
-        if torch.cuda.is_available():
-            data.x = data.x.cuda()
-            data.edge_attr = data.edge_attr.cuda()
-            data.edge_index = data.edge_index.cuda()
-            data.batch = data.batch.cuda()
-
+        # Remove manual device assignment - data is already on correct device from test.py
+        
         # make sure that we have undirected graph
         if not is_undirected(data.edge_index):
             data.edge_index = to_undirected(data.edge_index)
@@ -307,8 +278,8 @@ class PotentialNetParallel(torch.nn.Module):
             avg_covalent_x, _ = avg_pool_x(data.batch, covalent_x, data.batch)
             avg_non_covalent_x, _ = avg_pool_x(data.batch, non_covalent_x, data.batch)
 
-            fc0_x, fc1_x, output_x = self.output(pool_x, return_hidden_feature=True)
+            fc0_x, output_x = self.output(pool_x, return_hidden_feature=True)
 
-            return avg_covalent_x, avg_non_covalent_x, pool_x, fc0_x, fc1_x, output_x
+            return avg_covalent_x, avg_non_covalent_x, pool_x, fc0_x, output_x
         else:
             return self.output(pool_x)

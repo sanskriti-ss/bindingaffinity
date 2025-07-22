@@ -150,7 +150,6 @@ def test(args):
                     non_covalent_feature,
                     pool_feature,
                     fc0_feature,
-                    fc1_feature,
                     y_pred,
                 ) = model.module(batched_data, return_hidden_feature=True)
             else:
@@ -160,7 +159,6 @@ def test(args):
                     non_covalent_feature,
                     pool_feature,
                     fc0_feature,
-                    fc1_feature,
                     y_pred,
                 ) = model(batched_data, return_hidden_feature=True)
 
@@ -187,17 +185,7 @@ def test(args):
 
             # Store hidden features
             if args.save_feat:
-                hidden_features = np.concatenate(
-                    (
-                        covalent_feature.cpu().data.numpy(),
-                        non_covalent_feature.cpu().data.numpy(),
-                        pool_feature.cpu().data.numpy(),
-                        fc0_feature.cpu().data.numpy(),
-                        fc1_feature.cpu().data.numpy(),
-                    ),
-                    axis=1,
-                )
-                hidden_features_list.append(hidden_features)
+                hidden_features_list.append(fc0_feature.cpu().data.numpy())
 
             print("[%d/%d] evaluating" % (batch_idx + 1, len(dataloader)))
 
@@ -274,7 +262,6 @@ def test(args):
                             non_covalent_feature,
                             pool_feature,
                             fc0_feature,
-                            fc1_feature,
                             y_,
                         ) = model.module(data_batch, return_hidden_feature=True)
                     else:
@@ -283,26 +270,16 @@ def test(args):
                             non_covalent_feature,
                             pool_feature,
                             fc0_feature,
-                            fc1_feature,
                             y_,
                         ) = model(data_batch, return_hidden_feature=True)
 
                     name_pose_grp.attrs["y_pred"] = y_.cpu().data.numpy()
-                    hidden_features = np.concatenate(
-                        (
-                            covalent_feature.cpu().data.numpy(),
-                            non_covalent_feature.cpu().data.numpy(),
-                            pool_feature.cpu().data.numpy(),
-                            fc0_feature.cpu().data.numpy(),
-                            fc1_feature.cpu().data.numpy(),
-                        ),
-                        axis=1,
-                    )
+                    fc0_numpy = fc0_feature.cpu().data.numpy()
 
                     name_pose_grp.create_dataset(
                         "hidden_features",
-                        (hidden_features.shape[0], hidden_features.shape[1]),
-                        data=hidden_features,
+                        (fc0_numpy.shape[0], fc0_numpy.shape[1]),
+                        data=fc0_numpy,
                     )
                 batch_idx += 1
         print(f"HDF5 output saved to: {output_f}")

@@ -61,7 +61,7 @@ use_cuda = torch.cuda.is_available()
 cuda_count = torch.cuda.device_count()
 if use_cuda:
     device = torch.device(args.device_name)
-    torch.cuda.set_device(int(args.device_name.split(':')[1]))
+    #torch.cuda.set_device(int(args.device_name.split(':')[1]))
 else:
     device = torch.device("cpu")
 print(use_cuda, cuda_count, device)
@@ -93,7 +93,7 @@ def eval():
     gaussian_filter = GaussianFilter(dim=3, channels=22, kernel_size=11, sigma=1, use_cuda=use_cuda)
 
     # define model
-    model = Model_3DCNN(use_cuda=use_cuda, verbose=args.verbose, feat_dim=22)
+    model = Model_3DCNN(use_cuda=use_cuda, verbose=args.verbose, feat_dim=22, quantum=True)
     model._init_normal_(dataset.labels)  # initialize mean and std for normalization
     if args.multi_gpus and cuda_count > 1:
         model = nn.DataParallel(model)
@@ -117,7 +117,7 @@ def eval():
     vol_batch = torch.zeros((batch_size,22,48,48,48)).float().to(device)
     ytrue_arr = np.zeros((len(dataset),), dtype=np.float32)
     ypred_arr = np.zeros((len(dataset),), dtype=np.float32)
-    zfeat_arr = np.zeros((len(dataset), 100), dtype=np.float32)
+    zfeat_arr = np.zeros((len(dataset), 10), dtype=np.float32)
     complex_ids = []  # Store complex IDs
     pred_list = []
 

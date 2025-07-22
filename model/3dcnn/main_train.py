@@ -150,7 +150,7 @@ def train():
 	gaussian_filter = GaussianFilter(dim=3, channels=22, kernel_size=11, sigma=1, use_cuda=use_cuda)
 
 	# define model
-	model = Model_3DCNN(use_cuda=use_cuda, verbose=args.verbose, feat_dim=22)
+	model = Model_3DCNN(use_cuda=use_cuda, verbose=args.verbose, feat_dim=22, quantum=True, dropout_rate=0.2)
 	model._init_normal_(dataset.labels)  # initialize mean and std for normalization
 	#if use_cuda:
 	#	model = model.cuda()
@@ -175,6 +175,7 @@ def train():
 	# load model
 	best_loss = 1e10
 	best_model_path = args.model_path.replace('.pth', '_best_val.pth')
+	best_val_loss = None
 	epoch_start = 0
 	if valid_file(args.model_path):
 		checkpoint = torch.load(args.model_path, map_location=device)
@@ -185,7 +186,7 @@ def train():
 		optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
 		epoch_start = checkpoint["epoch"]
 		loss = checkpoint["loss"]
-		        
+		
 		# Load best validation loss if available
 		if "best_val_loss" in checkpoint:
 			best_val_loss = checkpoint["best_val_loss"]
@@ -207,9 +208,9 @@ def train():
 
 			# transfer to GPU
 			if args.rmsd_weight == True:
-				x_batch_cpu, y_batch_cpu, w_batch_cpu = batch
+				x_batch_cpu, y_batch_cpu, w_batch_cpu, _ = batch
 			else:
-				x_batch_cpu, y_batch_cpu = batch
+				x_batch_cpu, y_batch_cpu, _ = batch
 			x_batch, y_batch = x_batch_cpu.to(device), y_batch_cpu.to(device)
 			
 			# Check if data is already 3D (from 3D CNN HDF) or needs voxelization
@@ -292,9 +293,9 @@ def train():
 			with torch.no_grad():
 				for batch_ind, batch in enumerate(val_dataloader):
 					if args.rmsd_weight == True:
-						x_batch_cpu, y_batch_cpu, w_batch_cpu = batch
+						x_batch_cpu, y_batch_cpu, w_batch_cpu, _ = batch
 					else:
-						x_batch_cpu, y_batch_cpu = batch
+						x_batch_cpu, y_batch_cpu, _ = batch
 					x_batch, y_batch = x_batch_cpu.to(device), y_batch_cpu.to(device)
 					
 					# Check if data is already 3D or needs voxelization
@@ -342,7 +343,9 @@ def train():
 				})
 
 				# Best validation loss checkpointing
-				if val_epoch_loss < best_val_loss:
+				if best_val_loss is None:
+					best_val_loss = val_epoch_loss
+				elif val_epoch_loss < best_val_loss:
 					best_val_loss = val_epoch_loss
 					best_checkpoint_dict = {
 						"model_state_dict": model_to_save.state_dict(),
@@ -368,10 +371,10 @@ def train():
 						"best_model_epoch": epoch_ind + 1
 					})
 
-        # Log all epoch metrics
+		# Log all epoch metrics
 		wandb.log(epoch_metrics)
 
-    # close dataset
+	# close dataset
 	dataset.close()
 	if val_dataset:
 		val_dataset.close()
