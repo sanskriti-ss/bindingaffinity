@@ -280,7 +280,11 @@ class PotentialNetParallel(torch.nn.Module):
         )
 
     def forward(self, data, return_hidden_feature=False):
-
+        # MANVI: new code
+        # from torch_geometric.data import Batch
+        # data = Batch.from_data_list(data)
+        ## MANVI: END of new code
+        
         #import pdb
         #pdb.set_trace()
         if torch.cuda.is_available():
@@ -289,10 +293,7 @@ class PotentialNetParallel(torch.nn.Module):
             data.edge_index = data.edge_index.cuda()
             data.batch = data.batch.cuda()
 
-        # MANVI: new code
-        from torch_geometric.data import Batch
-        data = Batch.from_data_list(data)
-        ## MANVI: END of new code
+       
 
         # make sure that we have undirected graph
         if not is_undirected(data.edge_index):

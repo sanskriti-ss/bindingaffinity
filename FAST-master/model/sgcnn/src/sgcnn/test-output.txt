@@ -1,0 +1,133 @@
+Module(
+  (module): PotentialNetParallel(
+    (covalent_neighbor_threshold): GraphThreshold()
+    (non_covalent_neighbor_threshold): GraphThreshold()
+    (covalent_propagation): PotentialNetPropagation(
+      (neighbor_threshold): GraphThreshold()
+      (edge_network_nn): Sequential(
+        (0): Linear(in_features=1, out_features=10, bias=True)
+        (1): Softsign()
+        (2): Linear(in_features=10, out_features=20, bias=True)
+        (3): Softsign()
+      )
+      (edge_network): NNConv(20, 20, aggr=add, nn=Sequential(
+        (0): Linear(in_features=1, out_features=10, bias=True)
+        (1): Softsign()
+        (2): Linear(in_features=10, out_features=20, bias=True)
+        (3): Softsign()
+      ))
+      (gate): GatedGraphConv(20, num_layers=2)
+      (attention): PotentialNetAttention(
+        (net_i): Sequential(
+          (0): Linear(in_features=40, out_features=20, bias=True)
+          (1): Softsign()
+          (2): Linear(in_features=20, out_features=16, bias=True)
+          (3): Softsign()
+        )
+        (net_j): Sequential(
+          (0): Linear(in_features=20, out_features=16, bias=True)
+          (1): Softsign()
+        )
+      )
+    )
+    (non_covalent_propagation): PotentialNetPropagation(
+      (neighbor_threshold): GraphThreshold()
+      (edge_network_nn): Sequential(
+        (0): Linear(in_features=1, out_features=8, bias=True)
+        (1): Softsign()
+        (2): Linear(in_features=8, out_features=16, bias=True)
+        (3): Softsign()
+      )
+      (edge_network): NNConv(16, 16, aggr=add, nn=Sequential(
+        (0): Linear(in_features=1, out_features=8, bias=True)
+        (1): Softsign()
+        (2): Linear(in_features=8, out_features=16, bias=True)
+        (3): Softsign()
+      ))
+      (gate): GatedGraphConv(16, num_layers=2)
+      (attention): PotentialNetAttention(
+        (net_i): Sequential(
+          (0): Linear(in_features=32, out_features=16, bias=True)
+          (1): Softsign()
+          (2): Linear(in_features=16, out_features=12, bias=True)
+          (3): Softsign()
+        )
+        (net_j): Sequential(
+          (0): Linear(in_features=16, out_features=12, bias=True)
+          (1): Softsign()
+        )
+      )
+    )
+    (output): PotentialNetFullyConnected_v2(
+      (fc1): Linear(in_features=12, out_features=8, bias=True)
+      (fc2): Linear(in_features=8, out_features=6, bias=True)
+      (fc3): Linear(in_features=6, out_features=1, bias=True)
+    )
+  )
+) Module(
+  (module): PotentialNetParallel(
+    (covalent_neighbor_threshold): GraphThreshold()
+    (non_covalent_neighbor_threshold): GraphThreshold()
+    (covalent_propagation): PotentialNetPropagation(
+      (neighbor_threshold): GraphThreshold()
+      (edge_network_nn): Sequential(
+        (0): Linear(in_features=1, out_features=10, bias=True)
+        (1): Softsign()
+        (2): Linear(in_features=10, out_features=20, bias=True)
+        (3): Softsign()
+      )
+      (edge_network): NNConv(20, 20, aggr=add, nn=Sequential(
+        (0): Linear(in_features=1, out_features=10, bias=True)
+        (1): Softsign()
+        (2): Linear(in_features=10, out_features=20, bias=True)
+        (3): Softsign()
+      ))
+      (gate): GatedGraphConv(20, num_layers=2)
+      (attention): PotentialNetAttention(
+        (net_i): Sequential(
+          (0): Linear(in_features=40, out_features=20, bias=True)
+          (1): Softsign()
+          (2): Linear(in_features=20, out_features=16, bias=True)
+          (3): Softsign()
+        )
+        (net_j): Sequential(
+          (0): Linear(in_features=20, out_features=16, bias=True)
+          (1): Softsign()
+        )
+      )
+    )
+    (non_covalent_propagation): PotentialNetPropagation(
+      (neighbor_threshold): GraphThreshold()
+      (edge_network_nn): Sequential(
+        (0): Linear(in_features=1, out_features=8, bias=True)
+        (1): Softsign()
+        (2): Linear(in_features=8, out_features=16, bias=True)
+        (3): Softsign()
+      )
+      (edge_network): NNConv(16, 16, aggr=add, nn=Sequential(
+        (0): Linear(in_features=1, out_features=8, bias=True)
+        (1): Softsign()
+        (2): Linear(in_features=8, out_features=16, bias=True)
+        (3): Softsign()
+      ))
+      (gate): GatedGraphConv(16, num_layers=2)
+      (attention): PotentialNetAttention(
+        (net_i): Sequential(
+          (0): Linear(in_features=32, out_features=16, bias=True)
+          (1): Softsign()
+          (2): Linear(in_features=16, out_features=12, bias=True)
+          (3): Softsign()
+        )
+        (net_j): Sequential(
+          (0): Linear(in_features=16, out_features=12, bias=True)
+          (1): Softsign()
+        )
+      )
+    )
+    (output): PotentialNetFullyConnected_v2(
+      (fc1): Linear(in_features=12, out_features=8, bias=True)
+      (fc2): Linear(in_features=8, out_features=6, bias=True)
+      (fc3): Linear(in_features=6, out_features=1, bias=True)
+    )
+  )
+)

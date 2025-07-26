@@ -118,7 +118,7 @@ class PDBBindDataset(Dataset):
                     )
                 ].keys()
             ):
-                print(pdbid)
+                # print(pdbid)
                 return None
 
             if self.use_docking:
@@ -202,7 +202,7 @@ class PDBBindDataset(Dataset):
 
         else:
             if self.output_info:
-                print("Output info is True")
+                # print("Output info is True")
                 return (pdbid, pose, data)
             else:
                 return data

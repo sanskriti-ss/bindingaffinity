@@ -31,6 +31,9 @@ from model import PotentialNetParallel
 
 import scipy
 
+from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
+from scipy import stats
+
 import numpy as np
 import functools
 torch.serialization.add_safe_globals([
@@ -144,6 +147,9 @@ def test(args):
 
     with h5py.File(output_f, "w") as f:
 
+        y_true = []
+        y_pred = []
+
         for batch in tqdm(dataloader):
 
             batch = [x for x in batch if x is not None]
@@ -200,6 +206,28 @@ def test(args):
                     data=hidden_features,
                 )
 
+                y_true.append(y.cpu().detach().numpy())
+                y_pred.append(y_.cpu().detach().numpy())
+
+    y_true = np.concatenate(y_true).reshape(-1, 1)
+    y_pred = np.concatenate(y_pred).reshape(-1, 1)
+
+    r2 = r2_score(y_true=y_true, y_pred=y_pred)
+    mae = mean_absolute_error(y_true=y_true, y_pred=y_pred)
+    mse = mean_squared_error(y_true=y_true, y_pred=y_pred)
+    pearsonr = stats.pearsonr(y_true.reshape(-1), y_pred.reshape(-1))
+    spearmanr = stats.spearmanr(y_true.reshape(-1), y_pred.reshape(-1))
+
+    tqdm.write(
+        str(
+            "r2: {}\tmae: {}\tmse: {}\tpearsonr: {}\t spearmanr: {}".format(
+                r2, mae, mse, pearsonr, spearmanr
+            )
+        )
+    )
+
+
+
     
 def main(args):
     test(args)
@@ -210,26 +238,26 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--checkpoint", help="path to model checkpoint")
+    parser.add_argument("--checkpoint", default="checkpoint_refined_pdbbind2020_100_epoch/best_checkpoint.pth", help="path to model checkpoint")
 
     parser.add_argument(
         "--preprocessing-type",
         type=str,
         choices=["raw", "processed"],
-        help="idicate raw pdb or (chimera) processed",
-        required=True,
+        default="processed",
+        help="indicate raw pdb or (chimera) processed",
     )
     parser.add_argument(
         "--feature-type",
         type=str,
         choices=["pybel", "rdkit"],
+        default="pybel",
         help="indicate pybel (openbabel) or rdkit features",
-        required=True,
     )
-    parser.add_argument("--dataset-name", type=str, required=True)
+    parser.add_argument("--dataset-name", type=str, default="pdbbind")
 
     parser.add_argument(
-        "--batch-size", type=int, default=1, help="batch size to use for dataloader"
+        "--batch-size", type=int, default=32, help="batch size to use for dataloader"
     )
 
     parser.add_argument(

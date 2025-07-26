@@ -1,0 +1,309 @@
+-----------------------SUMMARY:
+Testing:
+  50 complexes in dataset
+  C:\Users\user\miniconda3\envs\fetch-tg\Lib\site-packages\torch_geometric\deprecation.py:26: UserWarning: 'data.DataListLoader' is deprecated, use 'loader.DataListLoader' instead    
+  warnings.warn(out)
+  9151 total parameters.
+  100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 50/50 [00:00<00:00, 70.21it/s] 
+  r2: 0.1591179370880127  mae: 1.6023221015930176 mse: 4.018080711364746  pearsonr: PearsonRResult(statistic=np.float32(0.45571566), pvalue=np.float64(0.0008820084060402996))     spearmanr: SignificanceResult(statistic=np.float64(0.463548175015892), pvalue=np.float64(0.0006982030489118479))
+
+Validation
+  30 complexes in dataset
+  C:\Users\user\miniconda3\envs\fetch-tg\Lib\site-packages\torch_geometric\deprecation.py:26: UserWarning: 'data.DataListLoader' is deprecated, use 'loader.DataListLoader' instead    
+  warnings.warn(out)
+  9151 total parameters.
+  100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 30/30 [00:00<00:00, 64.36it/s]
+  r2: 0.4051826000213623  mae: 1.2610321044921875 mse: 2.3046813011169434 pearsonr: PearsonRResult(statistic=np.float32(0.6584978), pvalue=np.float64(7.623540630966898e-05))      spearmanr: SignificanceResult(statistic=np.float64(0.6057842046718577), pvalue=np.float64(0.0003888580301229848))
+
+Training:
+  120 complexes in dataset
+  C:\Users\user\miniconda3\envs\fetch-tg\Lib\site-packages\torch_geometric\deprecation.py:26: UserWarning: 'data.DataListLoader' is deprecated, use 'loader.DataListLoader' instead     
+    warnings.warn(out)
+  9151 total parameters.
+  100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 12/12 [00:01<00:00,  9.55it/s] 
+  r2: 0.6284174919128418  mae: 0.9642204642295837 mse: 1.55003821849823   pearsonr: PearsonRResult(statistic=np.float32(0.7964775), pvalue=np.float64(1.5165464168033855e-27))     spearmanr: SignificanceResult(statistic=np.float64(0.7966107877585584), pvalue=np.float64(1.4652302689202768e-27))
+
+(fetch-tg) PS C:\Users\user\Documents\bindingaffinity\FAST-master\model\sgcnn\src\sgcnn> python test.py --checkpoint "checkpoint/best_checkpoint.pth"  --preprocessing-type=processed --feature-type=pybel --dataset-name pdbbind --num-workers 1 --output "sg-eval" --test-data data/test.hdf --output-file-name="eval_sgcnn.hdf"              
+Module(
+  (module): PotentialNetParallel(
+    (covalent_neighbor_threshold): GraphThreshold()
+    (non_covalent_neighbor_threshold): GraphThreshold()
+    (covalent_propagation): PotentialNetPropagation(
+      (neighbor_threshold): GraphThreshold()
+      (edge_network_nn): Sequential(
+        (0): Linear(in_features=1, out_features=10, bias=True)
+        (1): Softsign()
+        (2): Linear(in_features=10, out_features=20, bias=True)
+        (3): Softsign()
+      )
+      (edge_network): NNConv(20, 20, aggr=add, nn=Sequential(
+        (0): Linear(in_features=1, out_features=10, bias=True)
+        (1): Softsign()
+        (2): Linear(in_features=10, out_features=20, bias=True)
+        (3): Softsign()
+      ))
+      (gate): GatedGraphConv(20, num_layers=2)
+      (attention): PotentialNetAttention(
+        (net_i): Sequential(
+          (0): Linear(in_features=40, out_features=20, bias=True)
+          (1): Softsign()
+          (2): Linear(in_features=20, out_features=16, bias=True)
+          (3): Softsign()
+        )
+        (net_j): Sequential(
+          (0): Linear(in_features=20, out_features=16, bias=True)
+          (1): Softsign()
+        )
+      )
+    )
+    (non_covalent_propagation): PotentialNetPropagation(
+      (neighbor_threshold): GraphThreshold()
+      (edge_network_nn): Sequential(
+        (0): Linear(in_features=1, out_features=8, bias=True)
+        (1): Softsign()
+        (2): Linear(in_features=8, out_features=16, bias=True)
+        (3): Softsign()
+      )
+      (edge_network): NNConv(16, 16, aggr=add, nn=Sequential(
+        (0): Linear(in_features=1, out_features=8, bias=True)
+        (1): Softsign()
+        (2): Linear(in_features=8, out_features=16, bias=True)
+        (3): Softsign()
+      ))
+      (gate): GatedGraphConv(16, num_layers=2)
+      (attention): PotentialNetAttention(
+        (net_i): Sequential(
+          (0): Linear(in_features=32, out_features=16, bias=True)
+          (1): Softsign()
+          (2): Linear(in_features=16, out_features=12, bias=True)
+          (3): Softsign()
+        )
+        (net_j): Sequential(
+          (0): Linear(in_features=16, out_features=12, bias=True)
+          (1): Softsign()
+        )
+      )
+    )
+    (output): PotentialNetFullyConnected_v2(
+      (fc1): Linear(in_features=12, out_features=8, bias=True)
+      (fc2): Linear(in_features=8, out_features=6, bias=True)
+      (fc3): Linear(in_features=6, out_features=1, bias=True)
+    )
+  )
+) Module(
+  (module): PotentialNetParallel(
+    (covalent_neighbor_threshold): GraphThreshold()
+    (non_covalent_neighbor_threshold): GraphThreshold()
+    (covalent_propagation): PotentialNetPropagation(
+      (neighbor_threshold): GraphThreshold()
+      (edge_network_nn): Sequential(
+        (0): Linear(in_features=1, out_features=10, bias=True)
+        (1): Softsign()
+        (2): Linear(in_features=10, out_features=20, bias=True)
+        (3): Softsign()
+      )
+      (edge_network): NNConv(20, 20, aggr=add, nn=Sequential(
+        (0): Linear(in_features=1, out_features=10, bias=True)
+        (1): Softsign()
+        (2): Linear(in_features=10, out_features=20, bias=True)
+        (3): Softsign()
+      ))
+      (gate): GatedGraphConv(20, num_layers=2)
+      (attention): PotentialNetAttention(
+        (net_i): Sequential(
+          (0): Linear(in_features=40, out_features=20, bias=True)
+          (1): Softsign()
+          (2): Linear(in_features=20, out_features=16, bias=True)
+          (3): Softsign()
+        )
+        (net_j): Sequential(
+          (0): Linear(in_features=20, out_features=16, bias=True)
+          (1): Softsign()
+        )
+      )
+    )
+    (non_covalent_propagation): PotentialNetPropagation(
+      (neighbor_threshold): GraphThreshold()
+      (edge_network_nn): Sequential(
+        (0): Linear(in_features=1, out_features=8, bias=True)
+        (1): Softsign()
+        (2): Linear(in_features=8, out_features=16, bias=True)
+        (3): Softsign()
+      )
+      (edge_network): NNConv(16, 16, aggr=add, nn=Sequential(
+        (0): Linear(in_features=1, out_features=8, bias=True)
+        (1): Softsign()
+        (2): Linear(in_features=8, out_features=16, bias=True)
+        (3): Softsign()
+      ))
+      (gate): GatedGraphConv(16, num_layers=2)
+      (attention): PotentialNetAttention(
+        (net_i): Sequential(
+          (0): Linear(in_features=32, out_features=16, bias=True)
+          (1): Softsign()
+          (2): Linear(in_features=16, out_features=12, bias=True)
+          (3): Softsign()
+        )
+        (net_j): Sequential(
+          (0): Linear(in_features=16, out_features=12, bias=True)
+          (1): Softsign()
+        )
+      )
+    )
+    (output): PotentialNetFullyConnected_v2(
+      (fc1): Linear(in_features=12, out_features=8, bias=True)
+      (fc2): Linear(in_features=8, out_features=6, bias=True)
+      (fc3): Linear(in_features=6, out_features=1, bias=True)
+    )
+  )
+)
+50 complexes in dataset
+C:\Users\user\miniconda3\envs\fetch-tg\Lib\site-packages\torch_geometric\deprecation.py:26: UserWarning: 'data.DataListLoader' is deprecated, use 'loader.DataListLoader' instead    
+  warnings.warn(out)
+9151 total parameters.
+100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 50/50 [00:00<00:00, 70.21it/s] 
+r2: 0.1591179370880127  mae: 1.6023221015930176 mse: 4.018080711364746  pearsonr: PearsonRResult(statistic=np.float32(0.45571566), pvalue=np.float64(0.0008820084060402996))     spearmanr: SignificanceResult(statistic=np.float64(0.463548175015892), pvalue=np.float64(0.0006982030489118479))
+
+
+(fetch-tg) PS C:\Users\user\Documents\bindingaffinity\FAST-master\model\sgcnn\src\sgcnn> python test.py --checkpoint "checkpoint/best_checkpoint.pth"  --preprocessing-type=processed
+ --feature-type=pybel --dataset-name pdbbind --num-workers 1 --output "sg-eval" --test-data data/val.hdf --output-file-name="val_sgcnn.hdf"
+Module(
+  (module): PotentialNetParallel(
+    (covalent_neighbor_threshold): GraphThreshold()
+    (non_covalent_neighbor_threshold): GraphThreshold()
+    (covalent_propagation): PotentialNetPropagation(
+      (neighbor_threshold): GraphThreshold()
+      (edge_network_nn): Sequential(
+        (0): Linear(in_features=1, out_features=10, bias=True)
+        (1): Softsign()
+        (2): Linear(in_features=10, out_features=20, bias=True)
+        (3): Softsign()
+      )
+      (edge_network): NNConv(20, 20, aggr=add, nn=Sequential(
+        (0): Linear(in_features=1, out_features=10, bias=True)
+        (1): Softsign()
+        (2): Linear(in_features=10, out_features=20, bias=True)
+        (3): Softsign()
+      ))
+      (gate): GatedGraphConv(20, num_layers=2)
+      (attention): PotentialNetAttention(
+        (net_i): Sequential(
+          (0): Linear(in_features=40, out_features=20, bias=True)
+          (1): Softsign()
+          (2): Linear(in_features=20, out_features=16, bias=True)
+          (3): Softsign()
+        )
+        (net_j): Sequential(
+          (0): Linear(in_features=20, out_features=16, bias=True)
+          (1): Softsign()
+        )
+      )
+    )
+    (non_covalent_propagation): PotentialNetPropagation(
+      (neighbor_threshold): GraphThreshold()
+      (edge_network_nn): Sequential(
+        (0): Linear(in_features=1, out_features=8, bias=True)
+        (1): Softsign()
+        (2): Linear(in_features=8, out_features=16, bias=True)
+        (3): Softsign()
+      )
+      (edge_network): NNConv(16, 16, aggr=add, nn=Sequential(
+        (0): Linear(in_features=1, out_features=8, bias=True)
+        (1): Softsign()
+        (2): Linear(in_features=8, out_features=16, bias=True)
+        (3): Softsign()
+      ))
+      (gate): GatedGraphConv(16, num_layers=2)
+      (attention): PotentialNetAttention(
+        (net_i): Sequential(
+          (0): Linear(in_features=32, out_features=16, bias=True)
+          (1): Softsign()
+          (2): Linear(in_features=16, out_features=12, bias=True)
+          (3): Softsign()
+        )
+        (net_j): Sequential(
+          (0): Linear(in_features=16, out_features=12, bias=True)
+          (1): Softsign()
+        )
+      )
+    )
+    (output): PotentialNetFullyConnected_v2(
+      (fc1): Linear(in_features=12, out_features=8, bias=True)
+      (fc2): Linear(in_features=8, out_features=6, bias=True)
+      (fc3): Linear(in_features=6, out_features=1, bias=True)
+    )
+  )
+) Module(
+  (module): PotentialNetParallel(
+    (covalent_neighbor_threshold): GraphThreshold()
+    (non_covalent_neighbor_threshold): GraphThreshold()
+    (covalent_propagation): PotentialNetPropagation(
+      (neighbor_threshold): GraphThreshold()
+      (edge_network_nn): Sequential(
+        (0): Linear(in_features=1, out_features=10, bias=True)
+        (1): Softsign()
+        (2): Linear(in_features=10, out_features=20, bias=True)
+        (3): Softsign()
+      )
+      (edge_network): NNConv(20, 20, aggr=add, nn=Sequential(
+        (0): Linear(in_features=1, out_features=10, bias=True)
+        (1): Softsign()
+        (2): Linear(in_features=10, out_features=20, bias=True)
+        (3): Softsign()
+      ))
+      (gate): GatedGraphConv(20, num_layers=2)
+      (attention): PotentialNetAttention(
+        (net_i): Sequential(
+          (0): Linear(in_features=40, out_features=20, bias=True)
+          (1): Softsign()
+          (2): Linear(in_features=20, out_features=16, bias=True)
+          (3): Softsign()
+        )
+        (net_j): Sequential(
+          (0): Linear(in_features=20, out_features=16, bias=True)
+          (1): Softsign()
+        )
+      )
+    )
+    (non_covalent_propagation): PotentialNetPropagation(
+      (neighbor_threshold): GraphThreshold()
+      (edge_network_nn): Sequential(
+        (0): Linear(in_features=1, out_features=8, bias=True)
+        (1): Softsign()
+        (2): Linear(in_features=8, out_features=16, bias=True)
+        (3): Softsign()
+      )
+      (edge_network): NNConv(16, 16, aggr=add, nn=Sequential(
+        (0): Linear(in_features=1, out_features=8, bias=True)
+        (1): Softsign()
+        (2): Linear(in_features=8, out_features=16, bias=True)
+        (3): Softsign()
+      ))
+      (gate): GatedGraphConv(16, num_layers=2)
+      (attention): PotentialNetAttention(
+        (net_i): Sequential(
+          (0): Linear(in_features=32, out_features=16, bias=True)
+          (1): Softsign()
+          (2): Linear(in_features=16, out_features=12, bias=True)
+          (3): Softsign()
+        )
+        (net_j): Sequential(
+          (0): Linear(in_features=16, out_features=12, bias=True)
+          (1): Softsign()
+        )
+      )
+    )
+    (output): PotentialNetFullyConnected_v2(
+      (fc1): Linear(in_features=12, out_features=8, bias=True)
+      (fc2): Linear(in_features=8, out_features=6, bias=True)
+      (fc3): Linear(in_features=6, out_features=1, bias=True)
+    )
+  )
+)
+30 complexes in dataset
+C:\Users\user\miniconda3\envs\fetch-tg\Lib\site-packages\torch_geometric\deprecation.py:26: UserWarning: 'data.DataListLoader' is deprecated, use 'loader.DataListLoader' instead    
+  warnings.warn(out)
+9151 total parameters.
+100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 30/30 [00:00<00:00, 64.36it/s]
+r2: 0.4051826000213623  mae: 1.2610321044921875 mse: 2.3046813011169434 pearsonr: PearsonRResult(statistic=np.float32(0.6584978), pvalue=np.float64(7.623540630966898e-05))      spearmanr: SignificanceResult(statistic=np.float64(0.6057842046718577), pvalue=np.float64(0.0003888580301229848))
+
