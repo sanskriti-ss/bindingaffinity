@@ -71,26 +71,28 @@ class Dataset_MLHDF(Dataset):
 	def __getitem__(self, idx):
 		pdbid, poseid, rmsd, affinity = self.data_info_list[idx]
 
-		data = np.zeros((self.max_atoms, self.feat_dim), dtype=np.float32)
+		# data = np.zeros((self.max_atoms, self.feat_dim), dtype=np.float32)
 		if self.mlhdf_ver == 1:
 			if self.is_crystal:
 				mlhdf_ds = self.mlhdf[pdbid]["pybel"]["processed"]["pdbbind"]
 			else:
 				mlhdf_ds = self.mlhdf[pdbid]["pybel"]["processed"]["docking"][poseid]
 			actual_data = mlhdf_ds["data"][:]
-			data[:actual_data.shape[0],:] = actual_data
+			# data[:actual_data.shape[0],:] = actual_data
+			x = torch.tensor(actual_data, dtype=torch.float32)
+
 		elif self.mlhdf_ver == 1.5:
 			if self.is_crystal:
 				mlhdf_ds = self.mlhdf["regression"][pdbid]["pybel"]["processed"]
 				# the one in ["pdbbind_3dcnn"] is the actual 19x48x48x48
 				actual_data = mlhdf_ds["pdbbind_sgcnn"]["data0"][:]
-			data[:actual_data.shape[0],:] = actual_data
+			# data[:actual_data.shape[0],:] = actual_data
+			x = torch.tensor(actual_data, dtype=torch.float32)
 
 		if not self.rmsd_weight:
 			affinity = np.asarray(self.mlhdf[pdbid].attrs["affinity"])
 
 
-		x = torch.tensor(data)
 		y = torch.tensor(np.expand_dims(affinity, axis=0))
 		#mask = (x[:,0] != 0) & (x[:,1] != 0) & (x[:,2] != 0)
 		#print(actual_data.shape, x[mask].shape)

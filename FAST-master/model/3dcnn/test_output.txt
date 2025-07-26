@@ -1,0 +1,2 @@
+Evaluation Summary:
+RMSE: 1.894, MAE: 1.457, R^2 score: 0.249, Pearson: 0.502, Spearman: 0.487, mean/std: 6.358/0.994

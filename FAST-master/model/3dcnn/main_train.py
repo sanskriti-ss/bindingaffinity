@@ -45,6 +45,9 @@ from scipy.stats import pearsonr, spearmanr
 #torch.backends.cudnn.benchmark = False  # NOTE: https://discuss.pytorch.org/t/what-does-torch-backends-cudnn-benchmark-do/5936
 #os.environ["PYTHONHASHSEED"] = "0"
 
+import os
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
+
 
 
 # program arguments
@@ -52,11 +55,11 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--device-name", default="cuda:0", help="use cpu or cuda:0, cuda:1 ...")
 parser.add_argument("--data-dir", default="data", help="dataset directory")
 parser.add_argument("--dataset-type", type=float, default=1, help="ml-hdf version, (1: for fusion, 1.5: for cfusion 2: ml-hdf v2)")
-parser.add_argument("--mlhdf-fn", default="pdbbind2021_demo_train.hdf", help="training ml-hdf path")
+parser.add_argument("--mlhdf-fn", default="pdbbind_2020_refined_train.hdf", help="training ml-hdf path")
 parser.add_argument("--csv-fn", default="", help="training csv file name")
-parser.add_argument("--vmlhdf-fn", default="pdbbind2021_demo_val.hdf", help="validation ml-hdf path")
+parser.add_argument("--vmlhdf-fn", default="pdbbind_2020_refined_val.hdf", help="validation ml-hdf path")
 parser.add_argument("--vcsv-fn", default="", help="validation csv file name")
-parser.add_argument("--model-path", default="data/pdbbind2021_a1_demo_model_20250716.pth", help="model checkpoint file path")
+parser.add_argument("--model-path", default="", help="model checkpoint file path")
 parser.add_argument("--complex-type", type=int, default=1, help="1: crystal, 2: docking")
 parser.add_argument("--rmsd-weight", action='store_false', default=0, help="whether rmsd-based weighted loss is used or not")
 parser.add_argument("--rmsd-threshold", type=float, default=2, help="rmsd cut-off threshold in case of docking data and/or --rmsd-weight is true")
@@ -68,6 +71,7 @@ parser.add_argument("--decay-iter", type=int, default=100, help="learning rate d
 parser.add_argument("--checkpoint-dir", default="checkpoint/", help="checkpoint save directory")
 parser.add_argument("--checkpoint-iter", type=int, default=10000, help="number of epochs per checkpoint")
 parser.add_argument("--verbose", type=int, default=0, help="print all input/output shapes or not")
+parser.add_argument("--num-workers", type=int, default=0, help="number of workers for dataloader")
 parser.add_argument("--multi-gpus", default=False, action="store_true", help="whether to use multi-gpus")
 args = parser.parse_args()
 
@@ -95,6 +99,13 @@ class WeightedMSELoss(nn.Module):
 def worker_init_fn(worker_id):
     np.random.seed(int(0))
 
+
+def check_voxelized(x_shape):
+    expected_shape = [19, 48, 48, 48]
+    actual_shape = list(x_shape[1:])
+    print(f"{len(x_shape) == 5}, {actual_shape} and {actual_shape == expected_shape}")
+    return len(x_shape) == 5 and actual_shape == expected_shape
+
 def train():
 
     # load dataset
@@ -102,7 +113,7 @@ def train():
         is_crystal = True
     else:
         is_crystal = False
-    dataset = Dataset_MLHDF(os.path.join(args.data_dir, args.mlhdf_fn), args.dataset_type, os.path.join(args.data_dir, args.csv_fn), is_crystal=is_crystal, rmsd_weight=args.rmsd_weight, rmsd_thres=args.rmsd_threshold)
+    train_dataset = Dataset_MLHDF(os.path.join(args.data_dir, args.mlhdf_fn), args.dataset_type, os.path.join(args.data_dir, args.csv_fn), is_crystal=is_crystal, rmsd_weight=args.rmsd_weight, rmsd_thres=args.rmsd_threshold)
 
     # if validation set is available
     val_dataset = None
@@ -110,18 +121,18 @@ def train():
         val_dataset = Dataset_MLHDF(os.path.join(args.data_dir, args.vmlhdf_fn), args.dataset_type, os.path.join(args.data_dir, args.vcsv_fn), is_crystal=is_crystal, rmsd_weight=args.rmsd_weight, rmsd_thres=args.rmsd_threshold)
 
     # check multi-gpus
-    num_workers = 0
-    if args.multi_gpus and cuda_count > 1:
-        num_workers = cuda_count
+    num_workers = args.num_workers # 0 earlier, pickling issue with h5py
+    # if args.multi_gpus and cuda_count > 1:
+    #     num_workers = cuda_count
 
     # initialize data loader
-    batch_count = len(dataset) // args.batch_size
-    dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True, num_workers=num_workers, worker_init_fn=None)
+    batch_count = len(train_dataset) // args.batch_size
+    train_dataloader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=num_workers, worker_init_fn=None, pin_memory=True)
     
     # if validation set is available
     val_dataloader = None
     if val_dataset:
-        val_dataloader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=num_workers, worker_init_fn=None)
+        val_dataloader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=num_workers, worker_init_fn=None, pin_memory=True)
 
     # define voxelizer, gaussian_filter
     voxelizer = Voxelizer3D(use_cuda=use_cuda, verbose=args.verbose)
@@ -151,20 +162,6 @@ def train():
 
     # load model
     epoch_start = 0
-    if valid_file(args.model_path):
-        checkpoint = torch.load(args.model_path, map_location=device)
-        #checkpoint = torch.load(args.model_path)
-        model_state_dict = checkpoint.pop("model_state_dict")
-        strip_prefix_if_present(model_state_dict, "module.")
-        model_to_save.load_state_dict(model_state_dict, strict=False)
-        optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
-        epoch_start = checkpoint["epoch"]
-        loss = checkpoint["loss"]
-        print("checkpoint loaded: %s" % args.model_path)
-
-    if not os.path.exists(os.path.dirname(args.model_path)):
-        os.makedirs(os.path.dirname(args.model_path))
-    output_dir = os.path.dirname(args.model_path)
 
     step = 0
     
@@ -174,15 +171,16 @@ def train():
 
     for epoch_ind in range(epoch_start, args.epoch_count):
         vol_batch = torch.zeros((args.batch_size,19,48,48,48)).float().to(device)
-        losses = []
         model.train()
 
-        
+        # Assuming `device` is your CUDA device
+        losses = []
+        r2_scores = []
 
-        y_true_arr = np.zeros((len(dataset),), dtype=np.float32)
-        y_pred_arr = np.zeros((len(dataset),), dtype=np.float32)
+        # y_true_arr = np.zeros((len(dataset),), dtype=np.float32)
+        # y_pred_arr = np.zeros((len(dataset),), dtype=np.float32)
 
-        for batch_ind, batch in enumerate(dataloader):
+        for batch_ind, batch in enumerate(train_dataloader):
             # transfer to GPU
             if args.rmsd_weight == True:
                 pdb_id_batch, x_batch_cpu, y_batch_cpu, w_batch_cpu = batch
@@ -191,12 +189,16 @@ def train():
             x_batch, y_batch = x_batch_cpu.to(device), y_batch_cpu.to(device)
             print(f"TRAIN:x_batch shape: {x_batch.shape}, y_batch shape: {y_batch.shape}")
             
-            # voxelize into 3d volume
-            bsize = x_batch.shape[0]
-            for i in range(x_batch.shape[0]):
-                xyz, feat = x_batch[i,:,:3], x_batch[i,:,3:]
-                vol_batch[i,:,:,:,:] = voxelizer(xyz, feat)
-            vol_batch = gaussian_filter(vol_batch)
+            
+            if check_voxelized(x_batch.shape):
+                vol_batch = x_batch
+            else:
+                # voxelize into 3d volume
+                bsize = x_batch.shape[0]
+                for i in range(x_batch.shape[0]):
+                    xyz, feat = x_batch[i,:,:3], x_batch[i,:,3:]
+                    vol_batch[i,:,:,:,:] = voxelizer(xyz, feat)
+                vol_batch = gaussian_filter(vol_batch)
             
             # forward training
             ypred_batch, _ = model(vol_batch[:x_batch.shape[0]])
@@ -205,32 +207,69 @@ def train():
             if args.rmsd_weight == True:
                 loss = loss_fn(ypred_batch.cpu().float(), y_batch_cpu.float(), w_batch_cpu.float())
             else:
-                loss = loss_fn(ypred_batch.cpu().float(), y_batch_cpu.float())
+                loss = loss_fn(ypred_batch.float(), y_batch.float())
+
+            losses.append(loss)
                 
-            print("[%d/%d-%d/%d] training, loss: %.3f, lr: %.7f" % (epoch_ind+1, args.epoch_count, batch_ind+1, batch_count, loss.cpu().data.item(), optimizer.param_groups[0]['lr']))
+            # "[%d/%d-%d/%d] training, loss: %.3f, lr: %.7f" % (epoch_ind+1, args.epoch_count, batch_ind+1, batch_count, loss.cpu().data.item(), optimizer.param_groups[0]['lr']))
             
-            ytrue = y_batch.detach().cpu().float().numpy()[:,0]
-            ypred = ypred_batch.detach().cpu().float().numpy()[:,0]
-            y_true_arr[batch_ind*args.batch_size : batch_ind*args.batch_size+bsize] = ytrue
-            y_pred_arr[batch_ind*args.batch_size : batch_ind*args.batch_size+bsize] = ypred
+            # ytrue = y_batch.detach().cpu().float().numpy()[:,0]
+            # ypred = ypred_batch.detach().cpu().float().numpy()[:,0]
+            # y_true_arr[batch_ind*args.batch_size : batch_ind*args.batch_size+bsize] = ytrue
+            # y_pred_arr[batch_ind*args.batch_size : batch_ind*args.batch_size+bsize] = ypred
+
+
+            # Compute R² on GPU
+            ss_res = torch.sum((y_batch - ypred_batch) ** 2)
+            ss_tot = torch.sum((y_batch - torch.mean(y_batch)) ** 2)
+            r2_score = 1 - ss_res / ss_tot
+            
+
+            r2_scores.append(r2_score)
             
             step += 1
 
-            losses.append(loss.cpu().data.item())
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
             scheduler.step()
 
-        print("[%d/%d] training, epoch loss: %.3f" % (epoch_ind+1, args.epoch_count, np.mean(losses)))
+
+            free_mem, total_mem = torch.cuda.mem_get_info()
+            print("="*20, " Mem stats: step", step, " ", "="*20)
+
+            print(f"Available GPU memory: {free_mem / 1e9:.2f} GB")
+            print(f"Total GPU memory:     {total_mem / 1e9:.2f} GB")
+
+            print("-"*55)
+            print(f"Memory allocated: {torch.cuda.memory_allocated()/1e9:.2f} GB")
+            print(f"Max memory allocated: {torch.cuda.max_memory_allocated()/1e9:.2f} GB")
+            print(f"Memory reserved: {torch.cuda.memory_reserved()/1e9:.2f} GB")
+            torch.cuda.empty_cache()
+
+            import gc
+            gc.collect()
+
+            print("="*55)
+
+        # print("[%d/%d] training, epoch loss: %.3f" % (epoch_ind+1, args.epoch_count, np.mean(losses)))
 
         if (epoch_ind+1) % args.checkpoint_iter == 0:
-            train_metrics = compute_metrics(y_true_arr, y_pred_arr, float(loss))
-        
+            # train_metrics = compute_metrics(y_true_arr, y_pred_arr, float(loss))
+            loss_mean = torch.mean(torch.stack(losses)).item()
+            r2_mean =torch.mean(torch.stack(r2_scores)).item()
+
+            train_metrics = {
+                "loss": loss_mean,
+                "r2": r2_mean
+            }
             tqdm.write(
-                "After Training: \tloss:{:0.4f}\n Metrics: {}"
+                "[{}/{}] Training: \tloss:{:0.4f}\n R2: {}"
                 .format(
-                    loss.cpu().data.numpy(), train_metrics
+                    epoch_ind + 1,
+                    args.epoch_count,
+                    loss_mean,
+                    r2_mean,
                 )
             )
             
@@ -250,8 +289,10 @@ def train():
         torch.save(best_checkpoint_dict, args.checkpoint_dir + "/best_checkpoint.pth")
 
     # close dataset
-    dataset.close()
+    train_dataset.close()
     val_dataset.close()
+
+
 
 
 def compute_metrics(ytrue_arr, ypred_arr, loss):
@@ -284,77 +325,122 @@ def compute_metrics(ytrue_arr, ypred_arr, loss):
     }
 
 def validate(model, val_dataloader, epoch_ind):
+    with torch.no_grad():
+        model.eval()
 
-    model.eval()
+        # y_true_arr = []
+        # y_pred_arr = []
+        # pdbid_list = []
+        # pose_list = []
 
-    y_true_arr = []
-    y_pred_arr = []
-    pdbid_list = []
-    pose_list = []
+        val_batch_count = len(val_dataloader.dataset) // args.batch_size
 
-    val_batch_count = len(val_dataloader.dataset) // args.batch_size
+        # y_true_arr = np.zeros((len(val_dataloader.dataset),), dtype=np.float32)
+        # y_pred_arr = np.zeros((len(val_dataloader.dataset),), dtype=np.float32)
 
-    y_true_arr = np.zeros((len(val_dataloader.dataset),), dtype=np.float32)
-    y_pred_arr = np.zeros((len(val_dataloader.dataset),), dtype=np.float32)
-
-
-    for batch_ind,batch in enumerate(val_dataloader):
-        # transfer to GPU
-        if args.rmsd_weight == True:
-            pdb_id_batch, x_batch_cpu, y_batch_cpu, w_batch_cpu = batch
-        else:
-            pdb_id_batch, x_batch_cpu, y_batch_cpu = batch
-        
-        x_batch, y_batch = x_batch_cpu.to(device), y_batch_cpu.to(device)
-        print(f"VAL: x_batch shape: {x_batch.shape}, y_batch shape: {y_batch.shape}")
-
-        voxelizer = Voxelizer3D(use_cuda=use_cuda, verbose=args.verbose)
-        gaussian_filter = GaussianFilter(dim=3, channels=19, kernel_size=11, sigma=1, use_cuda=use_cuda)
-        
-        vol_batch = torch.zeros((args.batch_size,19,48,48,48)).float().to(device)
-        # voxelize into 3d volume
-        for i in range(x_batch.shape[0]):
-            xyz, feat = x_batch[i,:,:3], x_batch[i,:,3:]
-            vol_batch[i,:,:,:,:] = voxelizer(xyz, feat)
-        vol_batch = gaussian_filter(vol_batch)
-        
-        # forward training
-        bsize = x_batch.shape[0]
-        ypred_batch, _ = model(vol_batch[:x_batch.shape[0]])
-
-        if args.rmsd_weight == True:
-            loss_fn = WeightedMSELoss().float()
-            loss = loss_fn(ypred_batch.cpu().float(), y_batch_cpu.float(), w_batch_cpu.float())
-            # loss = float('nan') # TODO: fix WeightMSELoss
-        else:
-            loss_fn = nn.MSELoss().float()
-            loss = loss_fn(ypred_batch.cpu().float(), y_batch_cpu.float())
-
-        print("[%d/%d-%d/%d] validation, loss: %.3f" % (epoch_ind+1, args.epoch_count, batch_ind+1, val_batch_count, loss.cpu().data.item()))
-        
-        ytrue = y_batch.detach().cpu().float().numpy()[:,0]
-        ypred = ypred_batch.detach().cpu().float().numpy()[:,0]
-
-        y_true_arr[batch_ind*args.batch_size:batch_ind*args.batch_size+bsize] = ytrue
-        y_pred_arr[batch_ind*args.batch_size:batch_ind*args.batch_size+bsize] = ypred
+        # Assuming `device` is your CUDA device
+        losses = []
+        r2_scores = []
 
 
-
-
-    print(f"Len y_true_arr: {len(y_true_arr)}")
-    print(f"Len y_pred_arr: {len(y_pred_arr)}")
-
-    
-    val_metrics = compute_metrics(y_true_arr, y_pred_arr, float(loss))
+        for batch_ind, batch in enumerate(val_dataloader):
+            # transfer to GPU
+            if args.rmsd_weight == True:
+                pdb_id_batch, x_batch_cpu, y_batch_cpu, w_batch_cpu = batch
+            else:
+                pdb_id_batch, x_batch_cpu, y_batch_cpu = batch
             
-    tqdm.write(
-        "[{}/{}-{}/{}] Validation: \tloss:{:0.4f}\n Metrics: {}"
-        .format(
-            epoch_ind+1, args.epoch_count, batch_ind+1, val_batch_count,
-            loss.cpu().data.numpy(),
-            val_metrics
+            x_batch, y_batch = x_batch_cpu.to(device), y_batch_cpu.to(device)
+            print(f"VAL: x_batch shape: {x_batch.shape}, y_batch shape: {y_batch.shape}")
+
+            voxelizer = Voxelizer3D(use_cuda=use_cuda, verbose=args.verbose)
+            gaussian_filter = GaussianFilter(dim=3, channels=19, kernel_size=11, sigma=1, use_cuda=use_cuda)
+            
+            vol_batch = torch.zeros((args.batch_size,19,48,48,48)).float().to(device)
+            
+            if check_voxelized(x_batch.shape):
+                vol_batch = x_batch
+            else:
+                # voxelize into 3d volume
+                for i in range(x_batch.shape[0]):
+                    xyz, feat = x_batch[i,:,:3], x_batch[i,:,3:]
+                    vol_batch[i,:,:,:,:] = voxelizer(xyz, feat)
+                vol_batch = gaussian_filter(vol_batch)
+
+            
+            # forward training
+            bsize = x_batch.shape[0]
+            ypred_batch, _ = model(vol_batch[:x_batch.shape[0]])
+
+            if args.rmsd_weight == True:
+                loss_fn = WeightedMSELoss().float()
+                loss = loss_fn(ypred_batch.cpu().float(), y_batch_cpu.float(), w_batch_cpu.float())
+                # loss = float('nan') # TODO: fix WeightMSELoss
+            else:
+                loss_fn = nn.MSELoss().float()
+                loss = loss_fn(ypred_batch.float(), y_batch.float())
+
+            losses.append(loss)
+
+            ss_res = torch.sum((y_batch - ypred_batch) ** 2)
+            ss_tot = torch.sum((y_batch - torch.mean(y_batch)) ** 2)
+            r2_score = 1 - ss_res / ss_tot
+            
+
+            r2_scores.append(r2_score)
+
+
+            free_mem, total_mem = torch.cuda.mem_get_info()
+            print("="*20, " Mem stats: batch_ind", batch_ind, " ", "="*20)
+
+            print(f"Available GPU memory: {free_mem / 1e9:.2f} GB")
+            print(f"Total GPU memory:     {total_mem / 1e9:.2f} GB")
+
+            print("-"*55)
+            print(f"Memory allocated: {torch.cuda.memory_allocated()/1e9:.2f} GB")
+            print(f"Max memory allocated: {torch.cuda.max_memory_allocated()/1e9:.2f} GB")
+            print(f"Memory reserved: {torch.cuda.memory_reserved()/1e9:.2f} GB")
+            torch.cuda.empty_cache()
+
+            import gc
+            gc.collect()
+
+            print("="*55)
+
+
+            # print("[%d/%d-%d/%d] validation, loss: %.3f" % (epoch_ind+1, args.epoch_count, batch_ind+1, val_batch_count, loss.cpu().data.item()))
+            
+            # ytrue = y_batch.detach().cpu().float().numpy()[:,0]
+            # ypred = ypred_batch.detach().cpu().float().numpy()[:,0]
+
+            # y_true_arr[batch_ind*args.batch_size:batch_ind*args.batch_size+bsize] = ytrue
+            # y_pred_arr[batch_ind*args.batch_size:batch_ind*args.batch_size+bsize] = ypred
+
+
+
+
+        # print(f"Len y_true_arr: {len(y_true_arr)}")
+        # print(f"Len y_pred_arr: {len(y_pred_arr)}")
+
+        
+        # val_metrics = compute_metrics(y_true_arr, y_pred_arr, float(loss))
+
+        loss_mean = torch.mean(torch.stack(losses)).item()
+        r2_mean = torch.mean(torch.stack(r2_scores)).item()
+
+        val_metrics = {
+            "loss": loss_mean,
+            "r2": r2_mean
+        }
+                
+        tqdm.write(
+            "[{}/{}] Validation: \tloss:{:0.4f}\n R2: {}"
+            .format(
+                epoch_ind+1, args.epoch_count,
+                loss_mean,
+                r2_mean,
+            )
         )
-    )
 
     model.train() # restore to train mode
     return val_metrics

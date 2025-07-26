@@ -120,7 +120,8 @@ class Voxelizer3D(nn.Module):
 
 		# initialize vol data
 		if self.use_cuda:
-			vol_data = torch.cuda.FloatTensor(self.vol_dim, self.vol_dim, self.vol_dim, self.feat_dim).fill_(0)
+			# vol_data = torch.cuda.FloatTensor(self.vol_dim, self.vol_dim, self.vol_dim, self.feat_dim).fill_(0)
+			vol_data = torch.zeros(self.vol_dim, self.vol_dim, self.vol_dim, self.feat_dim, dtype=torch.float32, device='cuda')
 		else:
 			vol_data = torch.zeros((self.vol_dim, self.vol_dim, self.vol_dim, self.feat_dim)).float()
 
