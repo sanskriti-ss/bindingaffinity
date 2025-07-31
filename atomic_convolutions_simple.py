@@ -62,9 +62,9 @@ def main():
     
     # 1. Setup featurizer
     print("Setting up featurizer...")
-    f1_num_atoms = 50    # reduced ligand atoms 
-    f2_num_atoms = 500   # reduced protein atoms 
-    max_num_neighbors = 4  # further reduced
+    f1_num_atoms = 100    
+    f2_num_atoms = 1000 
+    max_num_neighbors = 12  
     
     acf = AtomicConvFeaturizer(
         frag1_num_atoms=f1_num_atoms,
@@ -87,9 +87,9 @@ def main():
         save_dir=data_dir,
         data_dir=data_dir,
         pocket=True,
-        splitter='random',
+        # splitter='random',
         reload=False,  # Changed to False to use cached data if available
-        subset='core'  # Use 'refined' for larger dataset
+        subset='refined'  # Use 'refined' for larger dataset
     )
     
     print(f"Data loaded in {time.time() - start_time:.1f}s")
@@ -113,9 +113,8 @@ def main():
     
     # 4. Create and train model
     print("Creating AtomicConvModel...")
-    try:
         # Try with the original parameters first
-        model = AtomicConvModel(
+    model = AtomicConvModel(
             n_tasks=1,
             frag1_num_atoms=f1_num_atoms,
             frag2_num_atoms=f2_num_atoms,
@@ -125,43 +124,13 @@ def main():
             layer_sizes=[32, 32, 16],
             learning_rate=0.001,
         )
-        print("Model created successfully!")
-    except Exception as e:
-        print(f"Error creating model with original parameters: {e}")
-        print("Trying with simplified parameters...")
-        # Try with minimal parameters and different architecture
-        try:
-            model = AtomicConvModel(
-                n_tasks=1,
-                frag1_num_atoms=f1_num_atoms,
-                frag2_num_atoms=f2_num_atoms,
-                complex_num_atoms=f1_num_atoms + f2_num_atoms,
-                max_num_neighbors=max_num_neighbors,
-                batch_size=8,
-                layer_sizes=[16, 8],
-                learning_rate=0.001,
-            )
-            print("Model created with simplified parameters!")
-        except Exception as e2:
-            print(f"Error with simplified parameters: {e2}")
-            # Try with even more basic settings
-            model = AtomicConvModel(
-                n_tasks=1,
-                frag1_num_atoms=f1_num_atoms,
-                frag2_num_atoms=f2_num_atoms,
-                complex_num_atoms=f1_num_atoms + f2_num_atoms,
-                max_num_neighbors=max_num_neighbors,
-                batch_size=4,
-                layer_sizes=[8],
-                learning_rate=0.001,
-            )
-            print("Model created with minimal parameters!")
-    
+    print("Model created successfully!")
+   
     # Training with progress tracking
     losses, val_losses = [], []
     metric = dc.metrics.Metric(dc.metrics.score_function.rms_score)
-    step_cutoff = max(1, len(train) // 12)  # Ensure at least 1
-    
+    step_cutoff = max(1, len(train) // 12)  # Ensure at least 1 step
+
     def validation_callback(model, step):
         if step % step_cutoff != 0:
             return

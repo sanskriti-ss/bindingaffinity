@@ -1,4 +1,4 @@
-name: acnn_env
+name: acnn
 channels:
   - conda-forge
   - defaults
@@ -17,8 +17,8 @@ dependencies:
   - openmm>=7.7.0
   - qiskit>=0.39.0,<1.0.0
   - qiskit-machine-learning>=0.5.0,<1.0.0
-  - tensorflow>=2.8.0,<2.16.0
+  - tensorflow>=2.8.0
   - pip
   - pip:
-    - tensorflow>=2.8.0,<2.16.0
-    - deepchem>=2.7.0
+    - tensorflow>=2.8.0
+    - deepchem>=2.6.0
