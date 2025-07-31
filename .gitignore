@@ -9,3 +9,43 @@ v2013-core
 *.pth
 best_*_model.pth
 *model.pth
+
+# Large HDF5 dataset files
+*.h5
+*.hdf5
+datasets/
+**/datasets/
+explore_quantum/qmprot/datasets/
+explore_quantum/qmprot/datasets/**
+
+# Large data files and archives
+*.tar.gz
+*.zip
+data/
+model_ready_data/
+train_val_hdf_data/
+demo_data_PROCESSED/
+demo_data_UNPROCESSED/
+
+# Model and checkpoint files
+*.h5
+*.ckpt
+*.checkpoint
+*_best.h5
+*_weights.h5
+
+# Environment files
+acnn_env/
+__pycache__/
+*.pyc
+*.pyo
+
+# Temporary and output files
+*.png
+*.jpg
+*.jpeg
+*.pdf
+*.log
+*.tmp
+step4_outputs/
+pth_files/

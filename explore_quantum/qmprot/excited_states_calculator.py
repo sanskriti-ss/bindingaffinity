@@ -354,6 +354,9 @@ class ExcitedStatesCalculator:
         
         oscillator_strengths = []
         
+        '''
+        Oscillator strength is a dimensionless quantity that expresses the probability of absorption or emission of electromagnetic radiation in transitions between energy levels of an atom or molecule.
+        '''
         for excited_params in excited_params_list:
             # Calculate transition dipole moments
             dipole_x = transition_dipole(ground_params, excited_params, 'x')
