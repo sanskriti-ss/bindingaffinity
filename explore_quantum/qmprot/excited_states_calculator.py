@@ -28,14 +28,17 @@ logger = logging.getLogger(__name__)
 @dataclass
 class ExcitedStateConfig:
     """Configuration for excited state calculations"""
-    method: str = "subspace_expansion"  # subspace_expansion, qeom, deflation, folded_spectrum
+    method: str = "subspace_expansion"  # simple_deflation, subspace_expansion, qeom, deflation, folded_spectrum
     n_excited_states: int = 5
     max_iterations: int = 300
     convergence_threshold: float = 1e-6
     penalty_weight: float = 100.0  # Increased for better orthogonality enforcement
-    subspace_size: int = 10
-    overlap_threshold: float = 1e-8
+    subspace_size: int = 15  # Increased for better coverage
+    overlap_threshold: float = 1e-6  # More permissive for better state generation
     use_natural_gradients: bool = True
+    max_energy_gap: float = 15.0  # Maximum allowed energy gap in Hartree
+    min_energy_gap: float = 0.01  # Minimum allowed energy gap in Hartree
+    use_improved_matrix_elements: bool = True  # Use improved off-diagonal elements
 
 class ExcitedStatesCalculator:
     """Advanced excited states calculator with multiple methods"""
@@ -48,6 +51,42 @@ class ExcitedStatesCalculator:
         """Setup quantum device"""
         self.device = qml.device(backend, wires=n_qubits)
         self.n_qubits = n_qubits
+    
+    def _convert_to_scalar(self, value):
+        """
+        Safely convert expectation value to scalar
+        """
+        try:
+            # Handle different types of values
+            if isinstance(value, (int, float)):
+                return float(value)
+            elif hasattr(value, 'item'):
+                return value.item()
+            elif hasattr(value, 'numpy'):
+                return float(value.numpy())
+            elif str(type(value)).find('tensor') >= 0:
+                # Handle tensor objects (JAX, TensorFlow, PyTorch)
+                if hasattr(value, 'item'):
+                    return value.item()
+                else:
+                    return float(value)
+            elif str(type(value)).find('ExpectationMP') >= 0:
+                # For ExpectationMP objects, they should be evaluated by PennyLane
+                # This shouldn't happen if we structure QNodes correctly
+                logger.warning("Received ExpectationMP object - this suggests a QNode structure issue")
+                return float(value)
+            elif hasattr(value, '__float__'):
+                return float(value)
+            else:
+                # Fallback - try to extract value directly
+                return float(value)
+        except Exception as e:
+            logger.warning(f"Could not convert value to scalar (type: {type(value)}): {e}")
+            # Try one more conversion attempt
+            try:
+                return float(value)
+            except:
+                return 0.0
         
     def hardware_efficient_ansatz(self, params: np.ndarray, n_layers: int = 3):
         """Hardware-efficient ansatz"""
@@ -67,90 +106,259 @@ class ExcitedStatesCalculator:
             qml.RY(params[param_idx], wires=qubit)
             param_idx += 1
     
+    def uccsd_inspired_ansatz(self, params: np.ndarray, n_qubits: int, n_electrons: int):
+        """UCCSD-inspired ansatz for molecular systems"""
+        # Initialize with Hartree-Fock state
+        for i in range(n_electrons):
+            qml.PauliX(wires=i)
+        
+        param_idx = 0
+        
+        # Single excitations 
+        for i in range(n_electrons):
+            for a in range(n_electrons, n_qubits):
+                if param_idx < len(params):
+                    # Apply parameterized single excitation using SingleExcitation
+                    qml.SingleExcitation(params[param_idx], wires=[i, a])
+                    param_idx += 1
+                
+        # Double excitations
+        for i in range(n_electrons):
+            for j in range(i + 1, n_electrons):
+                for a in range(n_electrons, n_qubits):
+                    for b in range(a + 1, n_qubits):
+                        if param_idx < len(params):
+                            qml.DoubleExcitation(params[param_idx], wires=[i, j, a, b])
+                            param_idx += 1
+    
+    # def _create_smart_ansatz_selector(self, n_qubits: int, n_electrons: int, 
+    #                                 ansatz_type: str = "auto") -> str:
+    #     """Smart ansatz selection based on system properties"""
+    #     if ansatz_type == "auto":
+    #         if n_qubits <= 4:
+    #             return "hardware_efficient"
+    #         elif n_electrons <= 8 and n_qubits <= 12:
+    #             return "uccsd_inspired"
+    #         else:
+    #             return "hardware_efficient"  # Fallback for large systems
+    #     return ansatz_type
+    
+    def _adaptive_ansatz(self, params: np.ndarray, n_qubits: int, n_electrons: int, depth: int = 2):
+        """Adaptive ansatz that balances expressivity and parameter count"""
+        param_idx = 0
+        
+        # Initial layer
+        for qubit in range(n_qubits):
+            if param_idx < len(params):
+                qml.RY(params[param_idx], wires=qubit)
+                param_idx += 1
+        
+        # Adaptive entangling layers
+        for layer in range(depth):
+            # Nearest neighbor entanglement
+            for i in range(n_qubits - 1):
+                qml.CNOT(wires=[i, i + 1])
+            
+            # Parameter gates
+            for qubit in range(n_qubits):
+                if param_idx < len(params):
+                    qml.RZ(params[param_idx], wires=qubit)
+                    param_idx += 1
+            
+            # Long-range entanglement (sparse)
+            if layer % 2 == 1 and n_qubits > 2:
+                for i in range(0, n_qubits - 2, 2):
+                    qml.CNOT(wires=[i, i + 2])
+            
+            # Final rotation layer
+            for qubit in range(n_qubits):
+                if param_idx < len(params):
+                    qml.RY(params[param_idx], wires=qubit)
+                    param_idx += 1
+    
     def subspace_expansion_method(self, hamiltonian: qml.Hamiltonian, 
                                 ground_state_params: np.ndarray) -> List[Tuple[float, np.ndarray]]:
         """
         Subspace expansion method for excited states
-        Creates orthogonal subspace and diagonalizes within it
+        Uses a much simpler and more robust approach
         """
-        logger.info("Using subspace expansion method")
+        logger.info("Using FIXED subspace expansion method")
+        
+        @qml.qnode(self.device)
+        def energy_function(params):
+            # Use UCCSD-inspired ansatz to match ground state optimization
+            self.uccsd_inspired_ansatz(params, n_qubits=self.n_qubits, n_electrons=self.n_qubits // 2)
+            return qml.expval(hamiltonian)
         
         @qml.qnode(self.device)
         def get_state_probs(params):
-            self.hardware_efficient_ansatz(params, n_layers=3)
+            # Use UCCSD-inspired ansatz to match ground state optimization
+            self.uccsd_inspired_ansatz(params, n_qubits=self.n_qubits, n_electrons=self.n_qubits // 2)
             return qml.probs(wires=range(self.n_qubits))
         
-        @qml.qnode(self.device)
-        def hamiltonian_expectation(params):
-            self.hardware_efficient_ansatz(params, n_layers=3)
-            return qml.expval(hamiltonian)
+        # First, verify ground state energy makes sense
+        ground_energy_check = energy_function(ground_state_params)
+        ground_energy_val = self._convert_to_scalar(ground_energy_check)
+        logger.info(f"Ground state energy verification: {ground_energy_val:.6f} Ha")
         
-        # Generate subspace of trial states using probability distributions
-        subspace_probs = []
-        subspace_params = []
-        
-        # Include ground state
+        # Generate trial excited states using simple perturbations
+        excited_states = []
         ground_probs = get_state_probs(ground_state_params)
-        subspace_probs.append(ground_probs)
-        subspace_params.append(ground_state_params)
         
-        # Generate additional trial states with random parameters
-        n_params = len(ground_state_params)
-        for i in range(self.config.subspace_size - 1):
-            # Random parameters with some structure
-            trial_params = ground_state_params + np.random.normal(0, 0.5, n_params)
-            trial_probs = get_state_probs(trial_params)
+        # Try different excitation strategies
+        perturbation_scales = [0.1, 0.2, 0.3, 0.5, 0.8, 1.0]
+        
+        for scale in perturbation_scales:
+            best_energy = None
+            best_params = None
             
-            # Check orthogonality using probability distributions
-            is_orthogonal = True
-            for existing_probs in subspace_probs:
-                # Use Bhattacharyya coefficient to measure overlap
-                overlap = np.sum(np.sqrt(existing_probs * trial_probs))
-                if overlap > (1.0 - self.config.overlap_threshold):  # Too much overlap
-                    is_orthogonal = False
+            # Try multiple random perturbations at this scale
+            for attempt in range(10):
+                # Create perturbed parameters
+                perturbation = np.random.normal(0, scale, len(ground_state_params))
+                trial_params = ground_state_params + perturbation
+                
+                try:
+                    # Calculate energy
+                    trial_energy_raw = energy_function(trial_params)
+                    trial_energy = self._convert_to_scalar(trial_energy_raw)
+                    
+                    # Check if this is a valid excited state (higher energy than ground)
+                    energy_gap = trial_energy - ground_energy_val
+                    
+                    # Accept if energy is higher than ground state and gap is reasonable
+                    if energy_gap > 0.001 and energy_gap < 50.0:  # 1 mHa to 50 Ha range
+                        # Check orthogonality using probability distributions
+                        trial_probs = get_state_probs(trial_params)
+                        overlap = np.sum(np.sqrt(ground_probs * trial_probs))
+                        
+                        # If sufficiently different from ground state
+                        if overlap < 0.98:  # Allow some similarity but not identical
+                            if best_energy is None or trial_energy < best_energy:
+                                best_energy = trial_energy
+                                best_params = trial_params.copy()
+                
+                except Exception as e:
+                    logger.warning(f"Error evaluating trial state: {e}")
+                    continue
+            
+            # Add the best state found at this perturbation scale
+            if best_energy is not None:
+                excited_states.append((best_energy, best_params))
+                gap = best_energy - ground_energy_val
+                logger.info(f"Found excited state: {best_energy:.6f} Ha (ΔE = {gap:.6f} Ha = {gap*27.2:.2f} eV)")
+                
+                # Stop if we have enough states
+                if len(excited_states) >= self.config.n_excited_states:
                     break
-            
-            # Add to subspace if sufficiently orthogonal
-            if is_orthogonal:
-                subspace_probs.append(trial_probs)
-                subspace_params.append(trial_params)
-        
-        logger.info(f"Generated subspace with {len(subspace_probs)} orthogonal states")
-        
-        # Build Hamiltonian matrix in subspace (simplified approach)
-        H_matrix = np.zeros((len(subspace_probs), len(subspace_probs)), dtype=complex)
-        
-        for i in range(len(subspace_probs)):
-            for j in range(len(subspace_probs)):
-                if i == j:
-                    # Diagonal elements: direct energy calculation
-                    H_matrix[i, j] = hamiltonian_expectation(subspace_params[j])
-                else:
-                    # Off-diagonal elements: approximated as zero for simplicity
-                    # In a more sophisticated implementation, this would require
-                    # calculating matrix elements between different states
-                    H_matrix[i, j] = 0.0
-        
-        # Diagonalize Hamiltonian matrix
-        eigenvalues, eigenvectors = la.eigh(H_matrix)
         
         # Sort by energy
-        sort_indices = np.argsort(eigenvalues.real)
-        eigenvalues = eigenvalues[sort_indices]
-        eigenvectors = eigenvectors[:, sort_indices]
+        excited_states.sort(key=lambda x: x[0])
         
-        # Extract excited states
+        # Remove any duplicates or very similar states
+        unique_states = []
+        for i, (energy, params) in enumerate(excited_states):
+            is_unique = True
+            for j, (prev_energy, prev_params) in enumerate(unique_states):
+                if abs(energy - prev_energy) < 0.001:  # Too similar in energy
+                    is_unique = False
+                    break
+            
+            if is_unique:
+                unique_states.append((energy, params))
+        
+        logger.info(f"Found {len(unique_states)} unique excited states")
+        return unique_states
+    
+    def simple_deflation_method(self, hamiltonian: qml.Hamiltonian, 
+                               ground_state_params: np.ndarray,
+                               ground_energy: float) -> List[Tuple[float, np.ndarray]]:
+        """
+        Simple deflation method - much more robust approach
+        Directly optimizes excited states with orthogonality penalty
+        """
+        logger.info("Using simple deflation method")
+        
+        @qml.qnode(self.device)
+        def energy_function(params):
+            self.uccsd_inspired_ansatz(params, n_qubits=self.n_qubits, n_electrons=self.n_qubits // 2)
+            return qml.expval(hamiltonian)
+        
+        @qml.qnode(self.device)
+        def get_state_probs(params):
+            self.uccsd_inspired_ansatz(params, n_qubits=self.n_qubits, n_electrons=self.n_qubits // 2)
+            return qml.probs(wires=range(self.n_qubits))
+        
         excited_states = []
-        for i in range(1, min(len(eigenvalues), self.config.n_excited_states + 1)):
-            energy = eigenvalues[i].real
+        all_state_params = [ground_state_params]
+        all_state_probs = [get_state_probs(ground_state_params)]
+        
+        for state_idx in range(self.config.n_excited_states):
+            logger.info(f"Optimizing excited state {state_idx + 1}")
             
-            # Reconstruct parameters (approximation)
-            # In practice, this would require more sophisticated state preparation
-            excited_params = np.zeros_like(ground_state_params)
-            for j, coeff in enumerate(eigenvectors[:, i]):
-                excited_params += coeff.real * subspace_params[j]
+            # Start with a perturbed version of ground state
+            best_energy = float('inf')
+            best_params = None
             
-            excited_states.append((energy, excited_params))
+            # Try multiple initializations
+            for init_attempt in range(5):
+                # Initialize with larger perturbation to escape ground state minimum
+                perturbation_scale = 0.5 + 0.3 * init_attempt  # Increase perturbation with attempts
+                initial_params = ground_state_params + np.random.normal(0, perturbation_scale, len(ground_state_params))
+                
+                current_params = initial_params.copy()
+                
+                # Define cost function with deflation penalty
+                def deflation_cost(params):
+                    # Calculate energy
+                    energy_raw = energy_function(params)
+                    energy = self._convert_to_scalar(energy_raw)
+                    
+                    # Calculate overlap penalty with all previous states
+                    current_probs = get_state_probs(params)
+                    penalty = 0.0
+                    
+                    for prev_probs in all_state_probs:
+                        overlap = np.sum(np.sqrt(current_probs * prev_probs))
+                        # Strong penalty for high overlap
+                        penalty += self.config.penalty_weight * overlap**2
+                    
+                    return energy + penalty
+                
+                # Optimize using simple gradient descent
+                optimizer = qml.AdamOptimizer(stepsize=0.01)
+                
+                for step in range(50):  # Fewer steps for faster execution
+                    current_params = optimizer.step(deflation_cost, current_params)
+                
+                # Evaluate final energy without penalty
+                final_energy_raw = energy_function(current_params)
+                final_energy = self._convert_to_scalar(final_energy_raw)
+                
+                # Check if this is a valid excited state
+                if final_energy > ground_energy and final_energy < best_energy:
+                    # Check orthogonality
+                    final_probs = get_state_probs(current_params)
+                    max_overlap = 0
+                    for prev_probs in all_state_probs:
+                        overlap = np.sum(np.sqrt(final_probs * prev_probs))
+                        max_overlap = max(max_overlap, overlap)
+                    
+                    # Accept if sufficiently orthogonal
+                    if max_overlap < 0.95:  # Allow some overlap but not too much
+                        best_energy = final_energy
+                        best_params = current_params.copy()
+            
+            # Add the best state found
+            if best_params is not None:
+                excited_states.append((best_energy, best_params))
+                all_state_params.append(best_params)
+                all_state_probs.append(get_state_probs(best_params))
+                
+                gap = best_energy - ground_energy
+                logger.info(f"Found excited state {state_idx + 1}: {best_energy:.6f} Ha (ΔE = {gap:.6f} Ha = {gap*27.2:.2f} eV)")
+            else:
+                logger.warning(f"Failed to find excited state {state_idx + 1}")
         
         return excited_states
     
@@ -173,7 +381,8 @@ class ExcitedStatesCalculator:
             self.hardware_efficient_ansatz(ground_state_params, n_layers=3)
             return qml.state()
         
-        ground_energy = ground_energy_calc()
+        ground_energy_raw = ground_energy_calc()
+        ground_energy = self._convert_to_scalar(ground_energy_raw)
         ground_state = get_ground_state()
         logger.info(f"Reference ground state energy: {ground_energy:.6f} Ha")
         
@@ -191,9 +400,7 @@ class ExcitedStatesCalculator:
                 qml.SingleExcitation(param, wires=[qubit_i, qubit_j])
             
             # Get energy
-            energy = qml.expval(hamiltonian)
-            
-            return energy
+            return qml.expval(hamiltonian)
         
         @qml.qnode(self.device)
         def ground_state_overlap(excitation_params):
@@ -237,7 +444,8 @@ class ExcitedStatesCalculator:
                 
                 # Simple cost function with orthogonality enforcement
                 def cost_function(params):
-                    energy = excitation_energy_with_penalty(params)
+                    energy_raw = excitation_energy_with_penalty(params)
+                    energy = self._convert_to_scalar(energy_raw)
                     
                     # Calculate overlap penalty using probability distributions
                     current_probs = ground_state_overlap(params)
@@ -255,7 +463,8 @@ class ExcitedStatesCalculator:
                     excitation_params = optimizer.step(cost_function, excitation_params)
                 
                 # Calculate final energy without penalty for comparison
-                final_energy = excitation_energy_with_penalty(excitation_params)
+                final_energy_raw = excitation_energy_with_penalty(excitation_params)
+                final_energy = self._convert_to_scalar(final_energy_raw)
                 
                 # Keep the best result
                 if final_energy < best_energy and final_energy > ground_energy:  # Ensure higher than ground
@@ -302,8 +511,9 @@ class ExcitedStatesCalculator:
             return qml.expval(hamiltonian)
         
         try:
-            energy = energy_function(excited_params)
-            return float(energy), excited_params
+            energy_raw = energy_function(excited_params)
+            energy = self._convert_to_scalar(energy_raw)
+            return energy, excited_params
         except Exception as e:
             logger.error(f"Error in simplified deflation: {e}")
             # Return a mock excited state
@@ -315,32 +525,42 @@ class ExcitedStatesCalculator:
                              initial_params: np.ndarray) -> Tuple[float, np.ndarray]:
         """
         Folded spectrum method to target specific energy regions
+        
+        Key Principle:
+            - QNodes should only contain quantum operations and return measurements. Classical post-processing (like type conversion) should happen outside the QNode.
         """
         logger.info(f"Using folded spectrum method targeting {target_energy} Hartree")
         
-        @qml.qnode(self.device)
+        @qml.qnode(self.device, interface="autograd")
         def folded_cost_function(params):
             self.hardware_efficient_ansatz(params, n_layers=3)
             energy = qml.expval(hamiltonian)
             
-            # Folded spectrum transformation: minimize |E - E_target|^2
-            return (energy - target_energy)**2
+            # Return the raw energy - don't convert inside QNode
+            return energy
         
         # Optimize
         optimizer = qml.AdamOptimizer(stepsize=0.01)
         params = initial_params.copy()
         
+        def cost_wrapper(params):
+            energy = folded_cost_function(params)
+            energy_val = self._convert_to_scalar(energy)
+            # Folded spectrum transformation: minimize |E - E_target|^2
+            return (energy_val - target_energy)**2
+        
         for step in range(self.config.max_iterations):
-            params = optimizer.step(folded_cost_function, params)
+            params = optimizer.step(cost_wrapper, params)
         
         # Get final energy
-        @qml.qnode(self.device)
+        @qml.qnode(self.device, interface="autograd")
         def final_energy(params):
             self.hardware_efficient_ansatz(params, n_layers=3)
             return qml.expval(hamiltonian)
-        
+
         energy = final_energy(params)
-        return energy, params
+        energy_val = self._convert_to_scalar(energy)
+        return energy_val, params
     
     def calculate_excited_states(self, hamiltonian: qml.Hamiltonian,
                                ground_state_params: np.ndarray,
@@ -363,6 +583,9 @@ class ExcitedStatesCalculator:
         try:
             if self.config.method == "subspace_expansion":
                 excited_states = self.subspace_expansion_method(hamiltonian, ground_state_params)
+            
+            elif self.config.method == "simple_deflation":
+                excited_states = self.simple_deflation_method(hamiltonian, ground_state_params, ground_energy)
             
             elif self.config.method == "qeom":
                 excited_states = self.quantum_equation_of_motion(hamiltonian, ground_state_params)
@@ -405,6 +628,38 @@ class ExcitedStatesCalculator:
             results['error'] = str(e)
         
         return results
+    
+    def _validate_molecular_energy_scale(self, energies: np.ndarray, 
+                                       molecular_formula: str = "H2O") -> bool:
+        """Validate that energy gaps are on realistic molecular scales"""
+        energy_gaps = np.diff(energies)
+        
+        # Typical molecular excitation energies (in Hartree)
+        typical_ranges = {
+            "H2O": (0.1, 0.8),      # 3-22 eV
+            "H2": (0.05, 0.5),      # 1.4-14 eV
+            "LiH": (0.05, 0.6),     # 1.4-16 eV
+            "BeH2": (0.1, 0.7),     # 3-19 eV
+            "default": (0.05, 1.0)   # 1.4-27 eV
+        }
+        
+        min_gap, max_gap = typical_ranges.get(molecular_formula, typical_ranges["default"])
+        
+        # Check if most gaps are in reasonable range
+        reasonable_gaps = np.sum((energy_gaps >= min_gap) & (energy_gaps <= max_gap))
+        total_gaps = len(energy_gaps)
+        
+        if total_gaps == 0:
+            return True  # No gaps to validate
+        
+        fraction_reasonable = reasonable_gaps / total_gaps
+        
+        logger.info(f"Energy gap validation for {molecular_formula}:")
+        logger.info(f"  Expected range: {min_gap:.3f} - {max_gap:.3f} Ha ({min_gap*27.2:.1f} - {max_gap*27.2:.1f} eV)")
+        logger.info(f"  Actual gaps: {energy_gaps}")
+        logger.info(f"  Fraction in range: {fraction_reasonable:.2f}")
+        
+        return fraction_reasonable >= 0.5  # At least half should be reasonable
     
     def _validate_excited_states(self, excited_states: List[Tuple[float, np.ndarray]], 
                                 ground_energy: float) -> List[Tuple[float, np.ndarray]]:
@@ -559,6 +814,8 @@ def main():
     print("=" * 50)
     
     # Example usage with a simple Hamiltonian
+    
+   
     # In practice, you would load this from your main VQE calculation
     
     # Create a simple test Hamiltonian

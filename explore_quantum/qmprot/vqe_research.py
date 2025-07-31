@@ -570,8 +570,8 @@ def main():
     parser.add_argument('--max-iterations', type=int, default=200, help='Max VQE iterations')
     parser.add_argument('--n-layers', type=int, default=3, help='Ansatz layers')
     parser.add_argument('--learning-rate', type=float, default=0.01, help='Optimizer learning rate')
-    parser.add_argument('--excited-method', default='qeom', 
-                       choices=['subspace_expansion', 'deflation', 'qeom','folded_spectrum'],
+    parser.add_argument('--excited-method', default='deflation', 
+                       choices=['subspace_expansion', 'deflation', 'qeom','folded_spectrum', 'simple_deflation'],
                        help='Excited states method')
     
     args = parser.parse_args()
