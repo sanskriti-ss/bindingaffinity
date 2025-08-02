@@ -47,7 +47,7 @@ class ExcitedStatesCalculator:
         self.config = config
         self.device = None
         
-    def setup_device(self, n_qubits: int, backend: str = "default.qubit"):
+    def setup_device(self, n_qubits: int, backend: str = "lightning.qubit"):
         """Setup quantum device"""
         self.device = qml.device(backend, wires=n_qubits)
         self.n_qubits = n_qubits

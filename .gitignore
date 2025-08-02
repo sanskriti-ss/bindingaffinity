@@ -41,7 +41,7 @@ __pycache__/
 *.pyo
 
 # Temporary and output files
-*.png
+
 *.jpg
 *.jpeg
 *.pdf

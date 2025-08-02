@@ -10,7 +10,7 @@ This script provides a complete workflow for VQE calculations including:
 5. Research-quality visualizations
 
 Usage:
-    python vqe_research.py --molecule water --max-iterations 200 --excited-method subspace_expansion --n-layers 4  
+    python vqe_research.py --molecule water --max-iterations 200 --excited-method subspace_expansion --n-layers 4  --excited-states
 """
 
 import os
@@ -586,9 +586,9 @@ def main():
     # Setup environment
     if args.gpu:
         gpu_available = setup_gpu_environment()
-        backend = "auto" if gpu_available else "default.qubit"
+        backend = "auto" if gpu_available else "lightning.qubit"
     else:
-        backend = "default.qubit"
+        backend = "lightning.qubit"
         logger.info("Using CPU backend")
     
     try:

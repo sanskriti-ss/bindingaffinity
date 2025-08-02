@@ -64,7 +64,7 @@ class VQEConfig:
     learning_rate: float = 0.01
     n_layers: int = 3
     shots: Optional[int] = None  # None for exact simulation
-    backend: str = "default.qubit"  # default.qubit, default.qubit.jax, default.qubit.tf
+    backend: str = "lightning.qubit"  # lightning.qubit, lightning.qubit.jax, lightning.qubit.tf
     device_name: str = "auto"  # auto, cpu, gpu
     save_results: bool = True
     plot_convergence: bool = True
@@ -100,41 +100,41 @@ class QuantumVQE:
         
         # Determine the best available backend
         if self.config.backend == "auto":
-            if JAX_AVAILABLE and "default.qubit.jax" in available_devices and self.config.device_name in ["auto", "gpu"]:
+            if JAX_AVAILABLE and "lightning.qubit.jax" in available_devices and self.config.device_name in ["auto", "gpu"]:
                 try:
                     # Check if GPU is available
                     devices = jax.devices()
                     gpu_devices = [d for d in devices if d.device_kind == 'gpu']
                     if gpu_devices:
-                        self.config.backend = "default.qubit.jax"
+                        self.config.backend = "lightning.qubit.jax"
                         logger.info(f"Using JAX GPU backend with {len(gpu_devices)} GPU(s)")
                     else:
-                        self.config.backend = "default.qubit.jax"
+                        self.config.backend = "lightning.qubit.jax"
                         logger.info("Using JAX CPU backend")
                 except Exception as e:
                     logger.warning(f"JAX setup failed: {e}, falling back to default")
-                    self.config.backend = "default.qubit"
-            elif TF_AVAILABLE and "default.qubit.tf" in available_devices and self.config.device_name in ["auto", "gpu"]:
+                    self.config.backend = "lightning.qubit"
+            elif TF_AVAILABLE and "lightning.qubit.tf" in available_devices and self.config.device_name in ["auto", "gpu"]:
                 try:
                     gpus = tf.config.list_physical_devices('GPU')
                     if gpus:
-                        self.config.backend = "default.qubit.tf"
+                        self.config.backend = "lightning.qubit.tf"
                         logger.info(f"Using TensorFlow GPU backend with {len(gpus)} GPU(s)")
                     else:
-                        self.config.backend = "default.qubit.tf"
+                        self.config.backend = "lightning.qubit.tf"
                         logger.info("Using TensorFlow CPU backend")
                 except Exception as e:
                     logger.warning(f"TensorFlow setup failed: {e}, falling back to default")
-                    self.config.backend = "default.qubit"
+                    self.config.backend = "lightning.qubit"
             else:
-                self.config.backend = "default.qubit"
+                self.config.backend = "lightning.qubit"
                 logger.info("Using default PennyLane backend (GPU backends not available)")
         
         # Fallback if the selected backend is not available
         if self.config.backend not in available_devices:
             logger.warning(f"Backend {self.config.backend} not available, using default.qubit")
-            self.config.backend = "default.qubit"
-    
+            self.config.backend = "lightning.qubit"
+
     def create_device(self, n_qubits: int):
         """Create quantum device for given number of qubits"""
         device_kwargs = {"wires": n_qubits}
