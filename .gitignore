@@ -9,3 +9,13 @@ v2013-core
 *.pth
 best_*_model.pth
 *model.pth
+
+*.hdf
+*.zip
+*.tar.gz
+PDBbind_v2020_refined/
+
+
+**/__pycache__/*
+**/checkpoint*/**
+**/data/parallel_refined_2020_hydro/**
