@@ -235,16 +235,16 @@ def train():
             scheduler.step()
 
 
-            free_mem, total_mem = torch.cuda.mem_get_info()
-            print("="*20, " Mem stats: step", step, " ", "="*20)
+            # free_mem, total_mem = torch.cuda.mem_get_info()
+            # print("="*20, " Mem stats: step", step, " ", "="*20)
 
-            print(f"Available GPU memory: {free_mem / 1e9:.2f} GB")
-            print(f"Total GPU memory:     {total_mem / 1e9:.2f} GB")
+            # print(f"Available GPU memory: {free_mem / 1e9:.2f} GB")
+            # print(f"Total GPU memory:     {total_mem / 1e9:.2f} GB")
 
-            print("-"*55)
-            print(f"Memory allocated: {torch.cuda.memory_allocated()/1e9:.2f} GB")
-            print(f"Max memory allocated: {torch.cuda.max_memory_allocated()/1e9:.2f} GB")
-            print(f"Memory reserved: {torch.cuda.memory_reserved()/1e9:.2f} GB")
+            # print("-"*55)
+            # print(f"Memory allocated: {torch.cuda.memory_allocated()/1e9:.2f} GB")
+            # print(f"Max memory allocated: {torch.cuda.max_memory_allocated()/1e9:.2f} GB")
+            # print(f"Memory reserved: {torch.cuda.memory_reserved()/1e9:.2f} GB")
             torch.cuda.empty_cache()
 
             import gc
@@ -255,7 +255,6 @@ def train():
         # print("[%d/%d] training, epoch loss: %.3f" % (epoch_ind+1, args.epoch_count, np.mean(losses)))
 
         if (epoch_ind+1) % args.checkpoint_iter == 0:
-            # train_metrics = compute_metrics(y_true_arr, y_pred_arr, float(loss))
             loss_mean = torch.mean(torch.stack(losses)).item()
             r2_mean =torch.mean(torch.stack(r2_scores)).item()
 
@@ -293,36 +292,6 @@ def train():
     val_dataset.close()
 
 
-
-
-def compute_metrics(ytrue_arr, ypred_arr, loss):
-    print("Compute metrics shape debug: true/pred", ytrue_arr.shape, "/", ypred_arr.shape)
-    rmse = math.sqrt(mean_squared_error(ytrue_arr, ypred_arr))
-    mae = mean_absolute_error(ytrue_arr, ypred_arr)
-    r2 = r2_score(ytrue_arr, ypred_arr)
-    
-    try:
-        pearson, ppval = pearsonr(ytrue_arr, ypred_arr)
-    except:
-        pearson, ppval = float('nan'), float('nan')
-
-    try:
-        spearman, spval = spearmanr(ytrue_arr, ypred_arr)
-    except:
-        spearman, spval = float('nan'), float('nan')
-
-    return {
-        "loss": float(loss),
-        "rmse": float(rmse),
-        "r2": float(r2),
-        "pearson": float(pearson),
-        "spearman": float(spearman),
-        "mae": float(mae),
-        "label_mean": float(np.mean(ytrue_arr)),
-        "label_stdev": float(np.std(ytrue_arr)),
-        "pred_mean": float(np.mean(ypred_arr)),
-        "pred_stdev": float(np.std(ypred_arr)),
-    }
 
 def validate(model, val_dataloader, epoch_ind):
     with torch.no_grad():
@@ -423,8 +392,6 @@ def validate(model, val_dataloader, epoch_ind):
         # print(f"Len y_pred_arr: {len(y_pred_arr)}")
 
         
-        # val_metrics = compute_metrics(y_true_arr, y_pred_arr, float(loss))
-
         loss_mean = torch.mean(torch.stack(losses)).item()
         r2_mean = torch.mean(torch.stack(r2_scores)).item()
 
