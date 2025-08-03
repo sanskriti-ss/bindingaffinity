@@ -8,10 +8,11 @@ Note that the original 3D-CNN implementation used in the paper below has been mo
 Follow steps mentioned in `data_util` to generate the input HDF that can be used by 3d-cnn and sg-cnn. 
 In general, the steps are:
 - ChimeraX: Add H
-- Featurization: Using OpenBabel. Note this done by `tfbio_featurizer.py` file.
+- Featurization: Using OpenBabel. Use `extract_pafnucy_data_with_docking.py`.
+> Note: They were using tfbio dependency but I get dependency conflicts now. So, I pulled relevant code from tfbio into `tf_bio_featurizer.py` file.
 
 ### Step 2: Voxelise HDF
-Run `voxelise_hdf.py` file here in this folder to generate voxelised HDF to reduce the training time by avoiding voxelisation in each epoch for so many proteins.
+Run `voxelise_protein_hdf.py` file here in this folder to generate voxelised HDF to reduce the training time by avoiding voxelisation in each epoch for so many proteins.
 
 > [NOTE][Fetch Devs] Voxelised files are huge like 30 GB so makes sure you have some space.
 
