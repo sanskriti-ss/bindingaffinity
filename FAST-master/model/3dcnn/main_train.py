@@ -103,7 +103,7 @@ def worker_init_fn(worker_id):
 def check_voxelized(x_shape):
     expected_shape = [19, 48, 48, 48]
     actual_shape = list(x_shape[1:])
-    print(f"{len(x_shape) == 5}, {actual_shape} and {actual_shape == expected_shape}")
+    # print(f"{len(x_shape) == 5}, {actual_shape} and {actual_shape == expected_shape}")
     return len(x_shape) == 5 and actual_shape == expected_shape
 
 def train():
@@ -187,7 +187,7 @@ def train():
             else:
                 pdb_id_batch, x_batch_cpu, y_batch_cpu = batch
             x_batch, y_batch = x_batch_cpu.to(device), y_batch_cpu.to(device)
-            print(f"TRAIN:x_batch shape: {x_batch.shape}, y_batch shape: {y_batch.shape}")
+            # print(f"TRAIN:x_batch shape: {x_batch.shape}, y_batch shape: {y_batch.shape}")
             
             
             if check_voxelized(x_batch.shape):
@@ -250,7 +250,7 @@ def train():
             import gc
             gc.collect()
 
-            print("="*55)
+            print(f"{"="*20}, epoch ={epoch_ind}, step = {step}, {"="*20}") 
 
         # print("[%d/%d] training, epoch loss: %.3f" % (epoch_ind+1, args.epoch_count, np.mean(losses)))
 
@@ -263,7 +263,7 @@ def train():
                 "r2": r2_mean
             }
             tqdm.write(
-                "[{}/{}] Training: \tloss:{:0.4f}\n R2: {}"
+                "[{}/{}] TRAINING: \tloss:{:0.4f}\n R2: {}"
                 .format(
                     epoch_ind + 1,
                     args.epoch_count,
@@ -320,7 +320,7 @@ def validate(model, val_dataloader, epoch_ind):
                 pdb_id_batch, x_batch_cpu, y_batch_cpu = batch
             
             x_batch, y_batch = x_batch_cpu.to(device), y_batch_cpu.to(device)
-            print(f"VAL: x_batch shape: {x_batch.shape}, y_batch shape: {y_batch.shape}")
+            # print(f"VAL: x_batch shape: {x_batch.shape}, y_batch shape: {y_batch.shape}")
 
             voxelizer = Voxelizer3D(use_cuda=use_cuda, verbose=args.verbose)
             gaussian_filter = GaussianFilter(dim=3, channels=19, kernel_size=11, sigma=1, use_cuda=use_cuda)
@@ -359,22 +359,22 @@ def validate(model, val_dataloader, epoch_ind):
             r2_scores.append(r2_score)
 
 
-            free_mem, total_mem = torch.cuda.mem_get_info()
-            print("="*20, " Mem stats: batch_ind", batch_ind, " ", "="*20)
+            # free_mem, total_mem = torch.cuda.mem_get_info()
+            # print("="*20, " Mem stats: batch_ind", batch_ind, " ", "="*20)
 
-            print(f"Available GPU memory: {free_mem / 1e9:.2f} GB")
-            print(f"Total GPU memory:     {total_mem / 1e9:.2f} GB")
+            # print(f"Available GPU memory: {free_mem / 1e9:.2f} GB")
+            # print(f"Total GPU memory:     {total_mem / 1e9:.2f} GB")
 
-            print("-"*55)
-            print(f"Memory allocated: {torch.cuda.memory_allocated()/1e9:.2f} GB")
-            print(f"Max memory allocated: {torch.cuda.max_memory_allocated()/1e9:.2f} GB")
-            print(f"Memory reserved: {torch.cuda.memory_reserved()/1e9:.2f} GB")
+            # print("-"*55)
+            # print(f"Memory allocated: {torch.cuda.memory_allocated()/1e9:.2f} GB")
+            # print(f"Max memory allocated: {torch.cuda.max_memory_allocated()/1e9:.2f} GB")
+            # print(f"Memory reserved: {torch.cuda.memory_reserved()/1e9:.2f} GB")
             torch.cuda.empty_cache()
 
             import gc
             gc.collect()
 
-            print("="*55)
+            # print("="*55)
 
 
             # print("[%d/%d-%d/%d] validation, loss: %.3f" % (epoch_ind+1, args.epoch_count, batch_ind+1, val_batch_count, loss.cpu().data.item()))
@@ -401,7 +401,7 @@ def validate(model, val_dataloader, epoch_ind):
         }
                 
         tqdm.write(
-            "[{}/{}] Validation: \tloss:{:0.4f}\n R2: {}"
+            "[{}/{}] VALIDATION: \tloss:{:0.4f}\n R2: {}"
             .format(
                 epoch_ind+1, args.epoch_count,
                 loss_mean,
