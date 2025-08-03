@@ -1,9 +1,14 @@
+"""
+Script to copy proteins from orginal dataset to the hydro dataset
+"""
+
+
 import os
 import shutil
 
 # Source and destination root directories
-source_dir = "demo_v2021/demo"
-destination_dir = "demo_hydro_charges"
+source_dir = "PDBbind_v2020_refined/refined-set"
+destination_dir = "parallel_refined_2020_hydro"
 
 # Loop through each subfolder in the source directory
 for protein in os.listdir(source_dir):
@@ -16,4 +21,4 @@ for protein in os.listdir(source_dir):
                 source_file = os.path.join(protein_folder, file)
                 dest_file = os.path.join(dest_folder, file)
                 shutil.copy2(source_file, dest_file)
-                print(f"Copied {file} to {dest_folder}")
+                print(f"Copied {source_file} to {dest_file}")
