@@ -514,13 +514,14 @@ class QuantumVQE:
         
         logger.info(f"Results saved to {filename}")
 
-def load_hamiltonian_from_pennylane(molecule_name: str = 'ala', max_terms: int = 10000) -> MolecularSystem:
+def load_hamiltonian_from_pennylane(molecule_name: str = 'qchem', max_terms: int = 10000) -> MolecularSystem:
     """Load molecular Hamiltonian from PennyLane datasets"""
     logger.info(f"Loading {molecule_name} dataset from PennyLane...")
     
     try:
         # Load dataset
         ds = qml.data.load('other', name=molecule_name)
+        #ds = qml.data.load("qchem", molname="CO2", bondlength=1.162, basis="STO-3G")
         
         if isinstance(ds, list):
             dataset = ds[0]
