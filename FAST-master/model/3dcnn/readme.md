@@ -47,12 +47,13 @@ python main_train.py --checkpoint-dir checkpoint-lr-1e-3-dr-0.95 --checkpoint-it
 
 
 #### Manvi Decay rate experiments
-python main_train.py --checkpoint-dir checkpoint-lr-4e-3-dr-0.95 --batch-size 16 --learning-rate 4e-3 --decay-rate 0.95
-python main_train.py --checkpoint-dir checkpoint-lr-4e-3-dr-0.95 --batch-size 16 --learning-rate 4e-3 --decay-rate 0.9
-python main_train.py --checkpoint-dir checkpoint-lr-4e-3-dr-0.95 --batch-size 16 --learning-rate 4e-3 --decay-rate 0.85
-python main_train.py --checkpoint-dir checkpoint-lr-4e-3-dr-0.95 --batch-size 16 --learning-rate 4e-3 --decay-rate 0.8
-python main_train.py --checkpoint-dir checkpoint-lr-4e-3-dr-0.95 --batch-size 16 --learning-rate 4e-3 --decay-rate 0.5
+python main_train.py --checkpoint-dir checkpoint-lr-4e-3-dr-0.95 --batch-size 32 --learning-rate 4e-3 --decay-rate 0.95
+python main_train.py --checkpoint-dir checkpoint-lr-4e-3-dr-0.95 --batch-size 32 --learning-rate 4e-3 --decay-rate 0.9
+python main_train.py --checkpoint-dir checkpoint-lr-4e-3-dr-0.95 --batch-size 32 --learning-rate 4e-3 --decay-rate 0.85
+python main_train.py --checkpoint-dir checkpoint-lr-4e-3-dr-0.95 --batch-size 32 --learning-rate 4e-3 --decay-rate 0.8
+python main_train.py --checkpoint-dir checkpoint-lr-4e-3-dr-0.95 --batch-size 32 --learning-rate 4e-3 --decay-rate 0.5
 
+> NOTE: on my Nvidia 5060 Ti(16 gb) and AmdRyzen 32 gb system, parallelisation makes performance worse, so I will do these runs sequentially
 
 
 ### Step 4: Evaluate 3D CNN model
