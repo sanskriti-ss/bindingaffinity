@@ -25,7 +25,7 @@ Now train 3D CNN model using `main_train.py` script.
 #### Sample Run
 **NOTE:** Just run 2-5 epoch to see if things are working as expected
 
-python main_train.py --checkpoint-dir checkpoint-try --checkpoint-iter 1 --epoch-count 2 --batch-size 32 --learning-rate 1e-3 --decay-rate 0.95
+python main_train.py --checkpoint-dir checkpoint-try --verbose 1 --checkpoint-iter 1 --epoch-count 2 --batch-size 32 --learning-rate 1e-3 --decay-rate 0.95
 
 
 
@@ -39,6 +39,13 @@ python main_train.py --checkpoint-dir checkpoint-lr-1e-3-dr-0.9 --checkpoint-ite
 python main_train.py --checkpoint-dir checkpoint-lr-1e-3-dr-0.95 --checkpoint-iter 1 --epoch-count 100 --batch-size 32 --learning-rate 1e-3 --decay-rate 0.95
 
 
+
+#### Manvi Decay rate experiments
+python main_train.py --checkpoint-dir checkpoint-lr-4e-3-dr-0.95 --batch-size 16 --learning-rate 4e-3 --decay-rate 0.95
+python main_train.py --checkpoint-dir checkpoint-lr-4e-3-dr-0.95 --batch-size 16 --learning-rate 4e-3 --decay-rate 0.9
+python main_train.py --checkpoint-dir checkpoint-lr-4e-3-dr-0.95 --batch-size 16 --learning-rate 4e-3 --decay-rate 0.85
+python main_train.py --checkpoint-dir checkpoint-lr-4e-3-dr-0.95 --batch-size 16 --learning-rate 4e-3 --decay-rate 0.8
+python main_train.py --checkpoint-dir checkpoint-lr-4e-3-dr-0.95 --batch-size 16 --learning-rate 4e-3 --decay-rate 0.5
 
 
 

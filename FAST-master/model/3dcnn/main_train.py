@@ -55,21 +55,21 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--device-name", default="cuda:0", help="use cpu or cuda:0, cuda:1 ...")
 parser.add_argument("--data-dir", default="data", help="dataset directory")
 parser.add_argument("--dataset-type", type=float, default=1, help="ml-hdf version, (1: for fusion, 1.5: for cfusion 2: ml-hdf v2)")
-parser.add_argument("--mlhdf-fn", default="pdbbind_2020_refined_train.hdf", help="training ml-hdf path")
+parser.add_argument("--mlhdf-fn", default="pdbbind_2020_refined_train_voxelised.hdf", help="training ml-hdf path")
 parser.add_argument("--csv-fn", default="", help="training csv file name")
-parser.add_argument("--vmlhdf-fn", default="pdbbind_2020_refined_val.hdf", help="validation ml-hdf path")
+parser.add_argument("--vmlhdf-fn", default="pdbbind_2020_refined_val_voxelised.hdf", help="validation ml-hdf path")
 parser.add_argument("--vcsv-fn", default="", help="validation csv file name")
 parser.add_argument("--model-path", default="", help="model checkpoint file path")
 parser.add_argument("--complex-type", type=int, default=1, help="1: crystal, 2: docking")
 parser.add_argument("--rmsd-weight", action='store_false', default=0, help="whether rmsd-based weighted loss is used or not")
 parser.add_argument("--rmsd-threshold", type=float, default=2, help="rmsd cut-off threshold in case of docking data and/or --rmsd-weight is true")
 parser.add_argument("--epoch-count", type=int, default=50, help="number of training epochs")
-parser.add_argument("--batch-size", type=int, default=50, help="mini-batch size")
-parser.add_argument("--learning-rate", type=float, default=0.0007, help="initial learning rate")
+parser.add_argument("--batch-size", type=int, default=16, help="mini-batch size")
+parser.add_argument("--learning-rate", type=float, default=4e-3, help="initial learning rate")
 parser.add_argument("--decay-rate", type=float, default=0.95, help="learning rate decay")
-parser.add_argument("--decay-iter", type=int, default=100, help="learning rate decay")
+parser.add_argument("--decay-iter", type=int, default=1, help="learning rate decay")
 parser.add_argument("--checkpoint-dir", default="checkpoint/", help="checkpoint save directory")
-parser.add_argument("--checkpoint-iter", type=int, default=10000, help="number of epochs per checkpoint")
+parser.add_argument("--checkpoint-iter", type=int, default=1, help="number of epochs per checkpoint")
 parser.add_argument("--verbose", type=int, default=0, help="print all input/output shapes or not")
 parser.add_argument("--num-workers", type=int, default=0, help="number of workers for dataloader")
 parser.add_argument("--multi-gpus", default=False, action="store_true", help="whether to use multi-gpus")
@@ -84,9 +84,10 @@ if use_cuda:
     torch.cuda.set_device(int(args.device_name.split(':')[1]))
 else:
     device = torch.device("cpu")
+
 print(f"Use cuda: {use_cuda}, count: {cuda_count}, device: {device}") 
 
-
+print(f"Train args: {args}")
 
 class WeightedMSELoss(nn.Module):
     def __init__(self):
@@ -100,13 +101,29 @@ def worker_init_fn(worker_id):
     np.random.seed(int(0))
 
 
+
+
 def check_voxelized(x_shape):
+    # ANSI escape code for yellow foreground
+    YELLOW = '\033[93m'
+    # ANSI escape code to reset to default color
+    RESET = '\033[0m'
+
     expected_shape = [19, 48, 48, 48]
     actual_shape = list(x_shape[1:])
-    # print(f"{len(x_shape) == 5}, {actual_shape} and {actual_shape == expected_shape}")
-    return len(x_shape) == 5 and actual_shape == expected_shape
+
+    is_voxelized = len(x_shape) == 5 and actual_shape == expected_shape
+    if args.verbose:
+        print(f"IS VOXELIZED (Train) {is_voxelized}: {len(x_shape) == 5} and {actual_shape} and {actual_shape == expected_shape}")
+
+    if not is_voxelized:
+        print(f"{YELLOW} WARNING: (Train) - Voxelizer is not applied to the dataset, training time might increase significantly.!{RESET}")
+
+    return is_voxelized
 
 def train():
+    import time
+    start_time = time.time()
 
     # load dataset
     if args.complex_type == 1:
@@ -187,7 +204,9 @@ def train():
             else:
                 pdb_id_batch, x_batch_cpu, y_batch_cpu = batch
             x_batch, y_batch = x_batch_cpu.to(device), y_batch_cpu.to(device)
-            # print(f"TRAIN:x_batch shape: {x_batch.shape}, y_batch shape: {y_batch.shape}")
+
+            if args.verbose:
+                print(f"TRAIN:x_batch shape: {x_batch.shape}, y_batch shape: {y_batch.shape}")
             
             
             if check_voxelized(x_batch.shape):
@@ -232,19 +251,19 @@ def train():
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            scheduler.step()
 
+            if args.verbose:
+                free_mem, total_mem = torch.cuda.mem_get_info()
+                print("="*20, " Mem stats: step", step, " ", "="*20)
 
-            # free_mem, total_mem = torch.cuda.mem_get_info()
-            # print("="*20, " Mem stats: step", step, " ", "="*20)
+                print(f"Available GPU memory: {free_mem / 1e9:.2f} GB")
+                print(f"Total GPU memory:     {total_mem / 1e9:.2f} GB")
 
-            # print(f"Available GPU memory: {free_mem / 1e9:.2f} GB")
-            # print(f"Total GPU memory:     {total_mem / 1e9:.2f} GB")
+                print("-"*55)
+                print(f"Memory allocated: {torch.cuda.memory_allocated()/1e9:.2f} GB")
+                print(f"Max memory allocated: {torch.cuda.max_memory_allocated()/1e9:.2f} GB")
+                print(f"Memory reserved: {torch.cuda.memory_reserved()/1e9:.2f} GB")
 
-            # print("-"*55)
-            # print(f"Memory allocated: {torch.cuda.memory_allocated()/1e9:.2f} GB")
-            # print(f"Max memory allocated: {torch.cuda.max_memory_allocated()/1e9:.2f} GB")
-            # print(f"Memory reserved: {torch.cuda.memory_reserved()/1e9:.2f} GB")
             torch.cuda.empty_cache()
 
             import gc
@@ -253,6 +272,8 @@ def train():
             print(f"{"="*20}, epoch ={epoch_ind}, step = {step}, {"="*20}") 
 
         # print("[%d/%d] training, epoch loss: %.3f" % (epoch_ind+1, args.epoch_count, np.mean(losses)))
+        # update lr after epoch
+        scheduler.step()
 
         if (epoch_ind+1) % args.checkpoint_iter == 0:
             loss_mean = torch.mean(torch.stack(losses)).item()
@@ -291,6 +312,18 @@ def train():
     train_dataset.close()
     val_dataset.close()
 
+    end_time = time.time()
+
+    time_delta_seconds = end_time - start_time
+
+    hours = time_delta_seconds // 3600  # 3600 seconds in an hour
+    minutes = (time_delta_seconds % 3600) // 60  # 60 seconds in a minute
+    seconds = time_delta_seconds % 60
+
+    print(f"TRAINING took {int(hours)} hours, {int(minutes)} minutes, and {seconds:.2f} seconds.")
+
+    print(f"TRAIN ARGS: {args}")
+
 
 
 def validate(model, val_dataloader, epoch_ind):
@@ -320,7 +353,9 @@ def validate(model, val_dataloader, epoch_ind):
                 pdb_id_batch, x_batch_cpu, y_batch_cpu = batch
             
             x_batch, y_batch = x_batch_cpu.to(device), y_batch_cpu.to(device)
-            # print(f"VAL: x_batch shape: {x_batch.shape}, y_batch shape: {y_batch.shape}")
+
+            if args.verbose:
+                print(f"VAL: x_batch shape: {x_batch.shape}, y_batch shape: {y_batch.shape}")
 
             voxelizer = Voxelizer3D(use_cuda=use_cuda, verbose=args.verbose)
             gaussian_filter = GaussianFilter(dim=3, channels=19, kernel_size=11, sigma=1, use_cuda=use_cuda)
@@ -358,38 +393,27 @@ def validate(model, val_dataloader, epoch_ind):
 
             r2_scores.append(r2_score)
 
+            if args.verbose:
+                free_mem, total_mem = torch.cuda.mem_get_info()
+                print("="*20, " Mem stats: batch_ind", batch_ind, " ", "="*20)
 
-            # free_mem, total_mem = torch.cuda.mem_get_info()
-            # print("="*20, " Mem stats: batch_ind", batch_ind, " ", "="*20)
+                print(f"Available GPU memory: {free_mem / 1e9:.2f} GB")
+                print(f"Total GPU memory:     {total_mem / 1e9:.2f} GB")
 
-            # print(f"Available GPU memory: {free_mem / 1e9:.2f} GB")
-            # print(f"Total GPU memory:     {total_mem / 1e9:.2f} GB")
+                print("-"*55)
+                print(f"Memory allocated: {torch.cuda.memory_allocated()/1e9:.2f} GB")
+                print(f"Max memory allocated: {torch.cuda.max_memory_allocated()/1e9:.2f} GB")
+                print(f"Memory reserved: {torch.cuda.memory_reserved()/1e9:.2f} GB")
 
-            # print("-"*55)
-            # print(f"Memory allocated: {torch.cuda.memory_allocated()/1e9:.2f} GB")
-            # print(f"Max memory allocated: {torch.cuda.max_memory_allocated()/1e9:.2f} GB")
-            # print(f"Memory reserved: {torch.cuda.memory_reserved()/1e9:.2f} GB")
+                print("="*55)
+
+            
+            
             torch.cuda.empty_cache()
 
             import gc
             gc.collect()
 
-            # print("="*55)
-
-
-            # print("[%d/%d-%d/%d] validation, loss: %.3f" % (epoch_ind+1, args.epoch_count, batch_ind+1, val_batch_count, loss.cpu().data.item()))
-            
-            # ytrue = y_batch.detach().cpu().float().numpy()[:,0]
-            # ypred = ypred_batch.detach().cpu().float().numpy()[:,0]
-
-            # y_true_arr[batch_ind*args.batch_size:batch_ind*args.batch_size+bsize] = ytrue
-            # y_pred_arr[batch_ind*args.batch_size:batch_ind*args.batch_size+bsize] = ypred
-
-
-
-
-        # print(f"Len y_true_arr: {len(y_true_arr)}")
-        # print(f"Len y_pred_arr: {len(y_pred_arr)}")
 
         
         loss_mean = torch.mean(torch.stack(losses)).item()

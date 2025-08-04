@@ -22,6 +22,24 @@ from torch_geometric.data import Data
 # Note: if csv_path exists, the following columns should be included:
 #pdb_id/compound_id, pose_id, rmsd, affinity
 # if csv doesn't exist, rmsd and affinity become unknown -> only testing is available (no evaluation)
+def check_voxelized(x_shape, verbose = True):
+	# ANSI escape code for yellow foreground
+	YELLOW = '\033[93m'
+	# ANSI escape code to reset to default color
+	RESET = '\033[0m' 
+	
+	expected_shape = [19, 48, 48, 48]
+	actual_shape = list(x_shape[:]) # here dont ignore first param since we get only one protein
+
+	is_voxelized = len(x_shape) == 4 and actual_shape == expected_shape
+	if verbose:
+		print(f"IS VOXELIZED (Data Reader) {is_voxelized}: {x_shape}, {len(x_shape) == 4} and {actual_shape} and {actual_shape == expected_shape}")
+
+	if not is_voxelized:
+		print(f"{YELLOW} WARNING: (Data Reader) - Voxelizer is not applied to the dataset, training time might increase significantly.!{RESET}")
+		
+	return is_voxelized
+
 
 class Dataset_MLHDF(Dataset):
 	def __init__(self, mlhdf_path, mlhdf_ver, csv_path="", is_crystal=False, rmsd_weight=False, rmsd_thres=2, max_atoms=2000, feat_dim=22):
@@ -71,27 +89,35 @@ class Dataset_MLHDF(Dataset):
 	def __getitem__(self, idx):
 		pdbid, poseid, rmsd, affinity = self.data_info_list[idx]
 
-		# data = np.zeros((self.max_atoms, self.feat_dim), dtype=np.float32)
+		data = np.zeros((self.max_atoms, self.feat_dim), dtype=np.float32)
+		actual_data = None
+		
 		if self.mlhdf_ver == 1:
 			if self.is_crystal:
 				mlhdf_ds = self.mlhdf[pdbid]["pybel"]["processed"]["pdbbind"]
 			else:
 				mlhdf_ds = self.mlhdf[pdbid]["pybel"]["processed"]["docking"][poseid]
 			actual_data = mlhdf_ds["data"][:]
-			# data[:actual_data.shape[0],:] = actual_data
-			x = torch.tensor(actual_data, dtype=torch.float32)
+			
+			if check_voxelized(actual_data.shape):
+				x = torch.tensor(actual_data, dtype=torch.float32)
+			else:
+				data[:actual_data.shape[0],:] = actual_data
+				x = torch.tensor(data, dtype=torch.float32)
+			# x = torch.tensor(actual_data, dtype=torch.float32)
 
 		elif self.mlhdf_ver == 1.5:
 			if self.is_crystal:
 				mlhdf_ds = self.mlhdf["regression"][pdbid]["pybel"]["processed"]
 				# the one in ["pdbbind_3dcnn"] is the actual 19x48x48x48
 				actual_data = mlhdf_ds["pdbbind_sgcnn"]["data0"][:]
-			# data[:actual_data.shape[0],:] = actual_data
-			x = torch.tensor(actual_data, dtype=torch.float32)
+			data[:actual_data.shape[0],:] = actual_data
+			# x = torch.tensor(actual_data, dtype=torch.float32)
 
 		if not self.rmsd_weight:
 			affinity = np.asarray(self.mlhdf[pdbid].attrs["affinity"])
 
+		
 
 		y = torch.tensor(np.expand_dims(affinity, axis=0))
 		#mask = (x[:,0] != 0) & (x[:,1] != 0) & (x[:,2] != 0)

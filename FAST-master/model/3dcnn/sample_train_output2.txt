@@ -1,0 +1,36 @@
+IS VOXELIZED (Data Reader) True: (19, 48, 48, 48), True and [19, 48, 48, 48] and True
+IS VOXELIZED (Data Reader) True: (19, 48, 48, 48), True and [19, 48, 48, 48] and True
+IS VOXELIZED (Data Reader) True: (19, 48, 48, 48), True and [19, 48, 48, 48] and True
+IS VOXELIZED (Data Reader) True: (19, 48, 48, 48), True and [19, 48, 48, 48] and True
+IS VOXELIZED (Data Reader) True: (19, 48, 48, 48), True and [19, 48, 48, 48] and True
+IS VOXELIZED (Data Reader) True: (19, 48, 48, 48), True and [19, 48, 48, 48] and True
+IS VOXELIZED (Data Reader) True: (19, 48, 48, 48), True and [19, 48, 48, 48] and True
+IS VOXELIZED (Data Reader) True: (19, 48, 48, 48), True and [19, 48, 48, 48] and True
+IS VOXELIZED (Data Reader) True: (19, 48, 48, 48), True and [19, 48, 48, 48] and True
+IS VOXELIZED (Data Reader) True: (19, 48, 48, 48), True and [19, 48, 48, 48] and True
+VAL: x_batch shape: torch.Size([14, 19, 48, 48, 48]), y_batch shape: torch.Size([14, 1])
+IS VOXELIZED (Train) True: True and [19, 48, 48, 48] and True
+torch.Size([14, 64, 24, 24, 24])
+torch.Size([14, 64, 24, 24, 24])
+torch.Size([14, 64, 24, 24, 24])
+torch.Size([14, 64, 24, 24, 24])
+torch.Size([14, 64, 24, 24, 24])
+torch.Size([14, 128, 8, 8, 8])
+torch.Size([14, 128, 4, 4, 4])
+torch.Size([14, 256, 2, 2, 2])
+torch.Size([14, 2048])
+torch.Size([14, 10])
+torch.Size([14, 1])
+====================  Mem stats: batch_ind 30   ====================
+Available GPU memory: 14.39 GB
+Total GPU memory:     17.10 GB
+-------------------------------------------------------
+Memory allocated: 0.44 GB
+Max memory allocated: 1.65 GB
+Memory reserved: 1.37 GB
+=======================================================
+[2/2] VALIDATION:       loss:55439.7305
+ R2: -19517.685673698015
+best checkpoint epoch: 0, r2: -561.3528
+TRAINING took 0 hours, 5 minutes, and 14.53 seconds.
+TRAIN ARGS: Namespace(device_name='cuda:0', data_dir='data', dataset_type=1, mlhdf_fn='pdbbind_2020_refined_train_voxelised.hdf', csv_fn='', vmlhdf_fn='pdbbind_2020_refined_val_voxelised.hdf', vcsv_fn='', model_path='', complex_type=1, rmsd
