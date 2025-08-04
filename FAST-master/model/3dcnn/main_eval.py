@@ -60,6 +60,29 @@ print(use_cuda, cuda_count, device)
 
 
 
+def custom_collate_fn(batch):
+    """
+    Custom collate function to handle variable-sized tensors.
+    Pads tensors to the maximum size in the batch.
+    """
+    # For eval, rmsd_weight is always False, so we don't need to handle w_tensors
+    pdb_ids, x_tensors, y_tensors = zip(*batch)
+    
+    # Find the maximum number of atoms in this batch
+    max_atoms = max(x.size(0) for x in x_tensors)
+    batch_size = len(x_tensors)
+    feat_dim = x_tensors[0].size(1)
+    
+    # Create padded tensor for x
+    x_batch = torch.zeros(batch_size, max_atoms, feat_dim, dtype=torch.float32)
+    for i, x in enumerate(x_tensors):
+        x_batch[i, :x.size(0), :] = x
+    
+    # Stack y tensors
+    y_batch = torch.stack(y_tensors, 0)
+    
+    return list(pdb_ids), x_batch, y_batch
+
 
 def eval():
 
@@ -78,7 +101,7 @@ def eval():
 	# initialize data loader
 	batch_size = args.batch_size
 	batch_count = len(dataset) // batch_size
-	dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, worker_init_fn=None)
+	dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, worker_init_fn=None, collate_fn=custom_collate_fn)
 
 	# define voxelizer, gaussian_filter
 	voxelizer = Voxelizer3D(use_cuda=use_cuda, verbose=0)

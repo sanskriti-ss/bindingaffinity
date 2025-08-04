@@ -71,8 +71,8 @@ parser.add_argument("--decay-iter", type=int, default=1, help="learning rate dec
 parser.add_argument("--checkpoint-dir", default="checkpoint/", help="checkpoint save directory")
 parser.add_argument("--checkpoint-iter", type=int, default=1, help="number of epochs per checkpoint")
 parser.add_argument("--verbose", type=int, default=0, help="print all input/output shapes or not")
-parser.add_argument("--num-workers", type=int, default=0, help="number of workers for dataloader")
-parser.add_argument("--multi-gpus", default=False, action="store_true", help="whether to use multi-gpus")
+parser.add_argument("--num-workers", type=int, default=1, help="number of workers for dataloader")
+parser.add_argument("--multi-gpus", default=True, action="store_true", help="whether to use multi-gpus")
 args = parser.parse_args()
 
 
@@ -101,6 +101,46 @@ def worker_init_fn(worker_id):
     np.random.seed(int(0))
 
 
+def custom_collate_fn(batch):
+    """
+    Custom collate function to handle variable-sized tensors.
+    Pads tensors to the maximum size in the batch.
+    """
+    if args.rmsd_weight:
+        pdb_ids, x_tensors, y_tensors, w_tensors = zip(*batch)
+        
+        # Find the maximum number of atoms in this batch
+        max_atoms = max(x.size(0) for x in x_tensors)
+        batch_size = len(x_tensors)
+        feat_dim = x_tensors[0].size(1)
+        
+        # Create padded tensor for x
+        x_batch = torch.zeros(batch_size, max_atoms, feat_dim, dtype=torch.float32)
+        for i, x in enumerate(x_tensors):
+            x_batch[i, :x.size(0), :] = x
+        
+        # Stack y and w tensors (these should have the same size)
+        y_batch = torch.stack(y_tensors, 0)
+        w_batch = torch.stack(w_tensors, 0)
+        
+        return list(pdb_ids), x_batch, y_batch, w_batch
+    else:
+        pdb_ids, x_tensors, y_tensors = zip(*batch)
+        
+        # Find the maximum number of atoms in this batch
+        max_atoms = max(x.size(0) for x in x_tensors)
+        batch_size = len(x_tensors)
+        feat_dim = x_tensors[0].size(1)
+        
+        # Create padded tensor for x
+        x_batch = torch.zeros(batch_size, max_atoms, feat_dim, dtype=torch.float32)
+        for i, x in enumerate(x_tensors):
+            x_batch[i, :x.size(0), :] = x
+        
+        # Stack y tensors
+        y_batch = torch.stack(y_tensors, 0)
+        
+        return list(pdb_ids), x_batch, y_batch
 
 
 def check_voxelized(x_shape):
@@ -144,12 +184,12 @@ def train():
 
     # initialize data loader
     batch_count = len(train_dataset) // args.batch_size
-    train_dataloader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=num_workers, worker_init_fn=None, pin_memory=True)
+    train_dataloader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=num_workers, worker_init_fn=None, pin_memory=True, collate_fn=custom_collate_fn)
     
     # if validation set is available
     val_dataloader = None
     if val_dataset:
-        val_dataloader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=num_workers, worker_init_fn=None, pin_memory=True)
+        val_dataloader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=num_workers, worker_init_fn=None, pin_memory=True, collate_fn=custom_collate_fn)
 
     # define voxelizer, gaussian_filter
     voxelizer = Voxelizer3D(use_cuda=use_cuda, verbose=args.verbose)

@@ -44,6 +44,7 @@ python main_train.py --checkpoint-dir checkpoint-lr-1e-3-dr-0.9 --checkpoint-ite
 
 python main_train.py --checkpoint-dir checkpoint-lr-1e-3-dr-0.95 --checkpoint-iter 1 --epoch-count 100 --batch-size 32 --learning-rate 1e-3 --decay-rate 0.95
 
+python main_train.py --checkpoint-dir clyde-train-2 --checkpoint-iter 1 --epoch-count 50 --batch-size 12 --learning-rate 1e-3 --decay-rate 0.97
 
 
 #### Manvi Decay rate experiments
@@ -64,22 +65,18 @@ After training the model, run `main_eval.py` file to see the model performance o
 If satisfied with the test performance, run this command again to 
 save the intermendiate FC 10 layer for different complexes, the prediction values, etc 
 
-
-
 #### Testing
 
 python main_eval.py --mlhdf-fn "pdbbind2016_core_test.hdf" --model-path "checkpoint_3dcnn_refined_2020_lr_1e-3/best_checkpoint.pth" --batch-size 32
 python main_eval.py --mlhdf-fn "pdbbind_2020_refined_val.hdf" --model-path "checkpoint_3dcnn_refined_2020_lr_1e-3/best_checkpoint.pth" --batch-size 32
 python main_eval.py --mlhdf-fn "pdbbind_2020_refined_train.hdf" --model-path "checkpoint_3dcnn_refined_2020_lr_1e-3/best_checkpoint.pth" --batch-size 32
 
-
-
 #### Testing Eval Summaries
 [TEST-lR=7E-4] Evaluation Summary:
 RMSE: 1.660, MAE: 1.317, R^2 score: 0.415, Pearson: 0.673, Spearman: 0.669, mean/std: 6.643/1.070
 
-[TEST-lR=1E-3]Evaluation Summary:
+[TEST-lR=1E-3 stops at 50 epochs]Evaluation Summary:
 RMSE: 1.658, MAE: 1.319, R^2 score: 0.417, Pearson: 0.680, Spearman: 0.654, mean/std: 6.592/1.023
 
-
-
+[TEST-lr=1E-3 batch size 12 decay rate 0.97 stops at 15 epochs WITHOUT voxalization] Evaluation Summary:
+RMSE: 1.729, MAE: 1.352, R^2 score: 0.365, Pearson: 0.649, Spearman: 0.639, mean/std: 6.090/1.084
