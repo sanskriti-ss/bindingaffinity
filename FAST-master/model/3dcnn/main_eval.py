@@ -42,7 +42,7 @@ parser.add_argument("--model-path", default="checkpoint_3dcnn_refined_2020/best_
 parser.add_argument("--complex-type", type=int, default=1, help="1: crystal, 2: docking")
 parser.add_argument("--rmsd-threshold", type=float, default=2, help="rmsd cut-off threshold in case of docking data and/or --rmsd-weight is true")
 parser.add_argument("--batch-size", type=int, default=10, help="mini-batch size")
-parser.add_argument("--multi-gpus", default=False, action="store_true", help="whether to use multi-gpus")
+parser.add_argument("--multi-gpus", default=True, action="store_true", help="whether to use multi-gpus")
 parser.add_argument("--save-pred", default=True, action="store_true", help="whether to save prediction results in csv")
 parser.add_argument("--save-feat", default=True, action="store_true", help="whether to save fully connected features in npy")
 args = parser.parse_args()
@@ -68,15 +68,19 @@ def custom_collate_fn(batch):
     # For eval, rmsd_weight is always False, so we don't need to handle w_tensors
     pdb_ids, x_tensors, y_tensors = zip(*batch)
     
-    # Find the maximum number of atoms in this batch
-    max_atoms = max(x.size(0) for x in x_tensors)
-    batch_size = len(x_tensors)
-    feat_dim = x_tensors[0].size(1)
-    
-    # Create padded tensor for x
-    x_batch = torch.zeros(batch_size, max_atoms, feat_dim, dtype=torch.float32)
-    for i, x in enumerate(x_tensors):
-        x_batch[i, :x.size(0), :] = x
+    # Check if data is already voxelized (5D: batch, channels, depth, height, width)
+    if len(x_tensors[0].shape) == 4:  # Already voxelized: [19, 48, 48, 48]
+        x_batch = torch.stack(x_tensors, 0)
+    else:  # Raw atomic data: [N_atoms, features]
+        # Find the maximum number of atoms in this batch
+        max_atoms = max(x.size(0) for x in x_tensors)
+        batch_size = len(x_tensors)
+        feat_dim = x_tensors[0].size(1)
+        
+        # Create padded tensor for x
+        x_batch = torch.zeros(batch_size, max_atoms, feat_dim, dtype=torch.float32)
+        for i, x in enumerate(x_tensors):
+            x_batch[i, :x.size(0), :] = x
     
     # Stack y tensors
     y_batch = torch.stack(y_tensors, 0)

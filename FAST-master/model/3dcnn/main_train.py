@@ -71,7 +71,7 @@ parser.add_argument("--decay-iter", type=int, default=1, help="learning rate dec
 parser.add_argument("--checkpoint-dir", default="checkpoint/", help="checkpoint save directory")
 parser.add_argument("--checkpoint-iter", type=int, default=1, help="number of epochs per checkpoint")
 parser.add_argument("--verbose", type=int, default=0, help="print all input/output shapes or not")
-parser.add_argument("--num-workers", type=int, default=1, help="number of workers for dataloader")
+parser.add_argument("--num-workers", type=int, default=0, help="number of workers for dataloader")
 parser.add_argument("--multi-gpus", default=True, action="store_true", help="whether to use multi-gpus")
 args = parser.parse_args()
 
@@ -109,15 +109,19 @@ def custom_collate_fn(batch):
     if args.rmsd_weight:
         pdb_ids, x_tensors, y_tensors, w_tensors = zip(*batch)
         
-        # Find the maximum number of atoms in this batch
-        max_atoms = max(x.size(0) for x in x_tensors)
-        batch_size = len(x_tensors)
-        feat_dim = x_tensors[0].size(1)
-        
-        # Create padded tensor for x
-        x_batch = torch.zeros(batch_size, max_atoms, feat_dim, dtype=torch.float32)
-        for i, x in enumerate(x_tensors):
-            x_batch[i, :x.size(0), :] = x
+        # Check if data is already voxelized (5D: batch, channels, depth, height, width)
+        if len(x_tensors[0].shape) == 4:  # Already voxelized: [19, 48, 48, 48]
+            x_batch = torch.stack(x_tensors, 0)
+        else:  # Raw atomic data: [N_atoms, features]
+            # Find the maximum number of atoms in this batch
+            max_atoms = max(x.size(0) for x in x_tensors)
+            batch_size = len(x_tensors)
+            feat_dim = x_tensors[0].size(1)
+            
+            # Create padded tensor for x
+            x_batch = torch.zeros(batch_size, max_atoms, feat_dim, dtype=torch.float32)
+            for i, x in enumerate(x_tensors):
+                x_batch[i, :x.size(0), :] = x
         
         # Stack y and w tensors (these should have the same size)
         y_batch = torch.stack(y_tensors, 0)
@@ -127,15 +131,19 @@ def custom_collate_fn(batch):
     else:
         pdb_ids, x_tensors, y_tensors = zip(*batch)
         
-        # Find the maximum number of atoms in this batch
-        max_atoms = max(x.size(0) for x in x_tensors)
-        batch_size = len(x_tensors)
-        feat_dim = x_tensors[0].size(1)
-        
-        # Create padded tensor for x
-        x_batch = torch.zeros(batch_size, max_atoms, feat_dim, dtype=torch.float32)
-        for i, x in enumerate(x_tensors):
-            x_batch[i, :x.size(0), :] = x
+        # Check if data is already voxelized (5D: batch, channels, depth, height, width)
+        if len(x_tensors[0].shape) == 4:  # Already voxelized: [19, 48, 48, 48]
+            x_batch = torch.stack(x_tensors, 0)
+        else:  # Raw atomic data: [N_atoms, features]
+            # Find the maximum number of atoms in this batch
+            max_atoms = max(x.size(0) for x in x_tensors)
+            batch_size = len(x_tensors)
+            feat_dim = x_tensors[0].size(1)
+            
+            # Create padded tensor for x
+            x_batch = torch.zeros(batch_size, max_atoms, feat_dim, dtype=torch.float32)
+            for i, x in enumerate(x_tensors):
+                x_batch[i, :x.size(0), :] = x
         
         # Stack y tensors
         y_batch = torch.stack(y_tensors, 0)
