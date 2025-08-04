@@ -33,7 +33,7 @@ if __name__ != "__main__":
 parser = argparse.ArgumentParser()
 parser.add_argument("--device-name", default="cuda:0", help="use cpu or cuda:0, cuda:1 ...")
 # parser.add_argument("--mlhdf-fn", default="pdbbind_2020_refined_train.hdf", help="imput hdf path")
-parser.add_argument("--mlhdf-fn", default="data/pdbbind2016_core_test.hdf", help="imput hdf path")
+parser.add_argument("--mlhdf-fn", default="data\pdbbind_2020_refined_val.hdf", help="imput hdf path")
 
 parser.add_argument("--csv-fn", default="", help="input csv file")
 parser.add_argument("--rmsd-weight", action='store_false', default=0, help="whether rmsd-based weighted loss is used or not")
@@ -41,7 +41,7 @@ parser.add_argument("--rmsd-threshold", type=float, default=2, help="rmsd cut-of
 parser.add_argument("--verbose", type=int, default=0, help="print all input/output shapes or not")
 
 
-parser.add_argument("--output-file", default="data/pdbbind2016_core_test_voxelised.hdf", help="output hdf path")
+parser.add_argument("--output-file", default="data/pdbbind_2020_refined_val_voxelised.hdf", help="output hdf path")
 # parser.add_argument("--output-file", default="pdbbind_2020_refined_train_voxelised.hdf", help="output HDF filename")
 args = parser.parse_args()
 

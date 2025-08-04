@@ -88,6 +88,24 @@ def custom_collate_fn(batch):
     return list(pdb_ids), x_batch, y_batch
 
 
+def check_voxelized(x_shape):
+    # ANSI escape code for yellow foreground
+    YELLOW = '\033[93m'
+    # ANSI escape code to reset to default color
+    RESET = '\033[0m'
+
+    expected_shape = [19, 48, 48, 48]
+    actual_shape = list(x_shape[1:])
+
+    is_voxelized = len(x_shape) == 5 and actual_shape == expected_shape
+    if len(x_shape) == 5:
+        print(f"Data is already voxelized: shape {list(x_shape)}")
+    else:
+        print(f"{YELLOW}Data requires voxelization: shape {list(x_shape)}{RESET}")
+
+    return is_voxelized
+
+
 def eval():
 
 	# load dataset
@@ -150,12 +168,18 @@ def eval():
 			pdb_id_batch, x_batch_cpu, y_batch_cpu = batch
 			x_batch, y_batch = x_batch_cpu.to(device), y_batch_cpu.to(device)
 			
-			# voxelize into 3d volume
+			# Get batch size
 			bsize = x_batch.shape[0]
-			for i in range(bsize):
-				xyz, feat = x_batch[i,:,:3], x_batch[i,:,3:]
-				vol_batch[i,:,:,:,:] = voxelizer(xyz, feat)
-			vol_batch = gaussian_filter(vol_batch)
+			
+			# Check if data is already voxelized and handle accordingly
+			if check_voxelized(x_batch.shape):
+				vol_batch = x_batch
+			else:
+				# voxelize into 3d volume
+				for i in range(bsize):
+					xyz, feat = x_batch[i,:,:3], x_batch[i,:,3:]
+					vol_batch[i,:,:,:,:] = voxelizer(xyz, feat)
+				vol_batch = gaussian_filter(vol_batch)
 			
 			# forward training
 			ypred_batch, zfeat_batch = model(vol_batch[:x_batch.shape[0]])

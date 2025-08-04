@@ -46,6 +46,8 @@ python main_train.py --checkpoint-dir checkpoint-lr-1e-3-dr-0.95 --checkpoint-it
 
 python main_train.py --checkpoint-dir clyde-train-2 --checkpoint-iter 1 --epoch-count 50 --batch-size 12 --learning-rate 1e-3 --decay-rate 0.97
 
+python main_train.py --checkpoint-dir clyde-train-3 --checkpoint-iter 1 --epoch-count 50 --batch-size 64 --learning-rate 5e-3 --decay-rate 0.97
+
 
 #### Manvi Decay rate experiments
 python main_train.py --checkpoint-dir checkpoint-lr-4e-3-dr-0.95 --batch-size 16 --learning-rate 4e-3 --decay-rate 0.95
@@ -72,11 +74,14 @@ python main_eval.py --mlhdf-fn "pdbbind_2020_refined_val.hdf" --model-path "chec
 python main_eval.py --mlhdf-fn "pdbbind_2020_refined_train.hdf" --model-path "checkpoint_3dcnn_refined_2020_lr_1e-3/best_checkpoint.pth" --batch-size 32
 
 #### Testing Eval Summaries
-[TEST-lR=7E-4] Evaluation Summary:
+[TEST-lR=7E-4 WITH voxalization] Evaluation Summary:
 RMSE: 1.660, MAE: 1.317, R^2 score: 0.415, Pearson: 0.673, Spearman: 0.669, mean/std: 6.643/1.070
 
-[TEST-lR=1E-3 stops at 50 epochs]Evaluation Summary:
+[TEST-lR=1E-3 stops at 50 epochs WITH voxalization]Evaluation Summary:
 RMSE: 1.658, MAE: 1.319, R^2 score: 0.417, Pearson: 0.680, Spearman: 0.654, mean/std: 6.592/1.023
 
 [TEST-lr=1E-3 batch size 12 decay rate 0.97 stops at 15 epochs WITHOUT voxalization] Evaluation Summary:
 RMSE: 1.729, MAE: 1.352, R^2 score: 0.365, Pearson: 0.649, Spearman: 0.639, mean/std: 6.090/1.084
+
+[TEST-lr=5E-3 batch size 64 decay rate 0.97 stops at 50 epochs WITH voxalization] Evaluation Summary:
+RMSE: 1.716, MAE: 1.362, R^2 score: 0.375, Pearson: 0.658, Spearman: 0.643, mean/std: 6.271/0.950

@@ -1,0 +1,34 @@
+# Requirements for Quantum-Enhanced 3D CNN
+# Core scientific computing
+numpy
+pandas
+matplotlib
+
+# Deep learning framework
+torch
+torchvision
+torchaudio
+
+# Quantum computing
+pennylane
+pennylane-lightning[gpu]  # GPU acceleration for quantum circuits
+pennylane-qiskit  # Optional: IBM Qiskit backend
+
+# Machine learning utilities
+scikit-learn
+scipy
+tqdm
+
+# Chemistry and molecular data processing
+rdkit
+
+# HDF5 support
+h5py
+
+# Utilities
+pathlib
+typing
+
+# Optional: Additional quantum backends
+# qiskit  # IBM quantum framework
+# cirq    # Google quantum framework
