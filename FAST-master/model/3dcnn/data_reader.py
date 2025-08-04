@@ -22,7 +22,7 @@ from torch_geometric.data import Data
 # Note: if csv_path exists, the following columns should be included:
 #pdb_id/compound_id, pose_id, rmsd, affinity
 # if csv doesn't exist, rmsd and affinity become unknown -> only testing is available (no evaluation)
-def check_voxelized(x_shape, verbose = True):
+def check_voxelized(x_shape, verbose):
 	# ANSI escape code for yellow foreground
 	YELLOW = '\033[93m'
 	# ANSI escape code to reset to default color
@@ -42,7 +42,7 @@ def check_voxelized(x_shape, verbose = True):
 
 
 class Dataset_MLHDF(Dataset):
-	def __init__(self, mlhdf_path, mlhdf_ver, csv_path="", is_crystal=False, rmsd_weight=False, rmsd_thres=2, max_atoms=2000, feat_dim=22):
+	def __init__(self, mlhdf_path, mlhdf_ver, csv_path="", is_crystal=False, rmsd_weight=False, rmsd_thres=2, max_atoms=2000, feat_dim=22, verbose=0):
 		super(Dataset_MLHDF, self).__init__()
 		self.mlhdf_ver = mlhdf_ver
 		self.mlhdf_path = mlhdf_path
@@ -52,6 +52,7 @@ class Dataset_MLHDF(Dataset):
 		self.rmsd_thres = rmsd_thres
 		self.max_atoms = max_atoms
 		self.feat_dim = feat_dim
+		self.verbose = verbose
 
 		self.mlhdf = h5py.File(self.mlhdf_path, 'r')
 		self.data_info_list = []
@@ -99,7 +100,7 @@ class Dataset_MLHDF(Dataset):
 				mlhdf_ds = self.mlhdf[pdbid]["pybel"]["processed"]["docking"][poseid]
 			actual_data = mlhdf_ds["data"][:]
 			
-			if check_voxelized(actual_data.shape):
+			if check_voxelized(actual_data.shape, self.verbose):
 				x = torch.tensor(actual_data, dtype=torch.float32)
 			else:
 				data[:actual_data.shape[0],:] = actual_data
