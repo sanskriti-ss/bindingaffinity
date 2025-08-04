@@ -2,7 +2,7 @@
 
 This directory contains a quantum-enhanced version of the FAST 3D CNN model for predicting protein-ligand binding affinity. The quantum enhancement aims to improve model performance through quantum computing techniques.
 
-## 🚀 Key Features
+## Key Features
 
 ### Quantum Enhancements
 - **Quantum Feature Layers**: Variational quantum circuits for feature transformation
@@ -25,30 +25,30 @@ Quantum Prediction Layer (4 qubits, 2 layers)
 Output (Binding Affinity)
 ```
 
-## 📋 Files
+## Files
 
 - `quantum_enhanced_model.py` - Quantum-enhanced 3D CNN model implementation
 - `main_train_quantum.py` - Training script with quantum support
 - `compare_models.py` - Utility to compare classical vs quantum performance
 - `requirements_quantum.txt` - Dependencies including PennyLane
 
-## 🛠️ Installation
+## Installation
 
 ### Install Quantum Dependencies
 ```bash
 pip install -r requirements_quantum.txt
 ```
 
-### For GPU-accelerated quantum computing (optional):
+### For GPU-accelerated quantum computing (optional): You gotta follow pennylane ai instructions on how to install their lightning GPU
 ```bash
 pip install pennylane-lightning[gpu]
 ```
 
-## 🎯 Usage
+## Usage
 
 ### Quick Start - Train Quantum Model
 ```bash
-python main_train_quantum.py --use-quantum --epochs 10 --batch-size 4
+python main_train_quantum.py --checkpoint-dir quantum-train --checkpoint-iter 1 --epoch-count 50 --batch-size 64 --learning-rate 1e-3 --decay-rate 0.97 --use-quantum --quantum-features --quantum-attention --quantum-qubits 6 --quantum-layers 3  
 ```
 
 ### Compare Classical vs Quantum Models
@@ -102,14 +102,6 @@ python main_train_quantum.py \
 - **Architecture**: 2-layer variational circuit
 - **Output**: 4-dimensional quantum features → classical linear layer
 
-## 📊 Expected Improvements
-
-Based on quantum machine learning research, the quantum enhancement may provide:
-
-1. **Enhanced Feature Learning**: Quantum circuits can capture complex non-linear relationships
-2. **Improved Generalization**: Quantum interference effects may reduce overfitting
-3. **Better Attention Mechanism**: Quantum superposition for attention weight computation
-4. **Reduced Model Complexity**: Quantum circuits can be more parameter-efficient
 
 ## 🔧 Troubleshooting
 
@@ -132,49 +124,14 @@ Quantum circuits add computational overhead:
 - Use smaller models for initial experiments
 - Consider using `lightning.gpu` backend for acceleration
 
-## 📈 Performance Monitoring
-
-The training script outputs both classical and quantum metrics:
-
-```
-[5/10] QUANTUM TRAINING:     loss:0.1234
- R2: 0.8567
-
-[5/10] QUANTUM VALIDATION:   loss:0.1456
- R2: 0.8234
-```
-
-Compare with classical baseline using:
-```bash
-python compare_models.py --mode compare
-```
-
-## 🎓 Technical Notes
-
-### Quantum Advantage Considerations
-- **Circuit Depth**: Deeper circuits may provide more expressivity but suffer from noise
-- **Qubit Count**: More qubits increase computational complexity exponentially
-- **Measurement Strategy**: Expectation values vs. probability measurements
-- **Classical Post-processing**: Important for translating quantum outputs to predictions
-
-### Gradient Computation
-- Uses PennyLane's automatic differentiation
-- Parameter-shift rule for gradient computation
-- Compatible with standard PyTorch optimizers
-
-### Hardware Requirements
-- **Simulation**: Standard GPU/CPU for quantum circuit simulation
-- **Real Quantum Hardware**: Optional connection to IBM, Google, or other quantum computers
-- **Memory**: Quantum simulations can be memory-intensive for large circuits
-
-## 📚 References
+## References
 
 1. Quantum Machine Learning for Molecular Property Prediction
 2. Variational Quantum Algorithms for Classification
 3. Quantum Neural Networks and Deep Learning
 4. PennyLane Documentation: https://pennylane.ai/
 
-## 🤝 Contributing
+## Contributing
 
 To extend the quantum functionality:
 1. Add new quantum layers in `quantum_enhanced_model.py`
@@ -182,6 +139,6 @@ To extend the quantum functionality:
 3. Try alternative encoding strategies
 4. Test on different molecular datasets
 
-## 📄 License
+## License
 
 Same as the original FAST project (MIT License)

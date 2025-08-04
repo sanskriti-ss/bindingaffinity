@@ -11,7 +11,7 @@ torchaudio
 
 # Quantum computing
 pennylane
-pennylane-lightning[gpu]  # GPU acceleration for quantum circuits
+pennylane-lightning  
 pennylane-qiskit  # Optional: IBM Qiskit backend
 
 # Machine learning utilities
