@@ -23,7 +23,13 @@ Run `voxelise_protein_hdf.py` file here in this folder to generate voxelised HDF
 Now train 3D CNN model using `main_train.py` script. 
 
 #### Sample Run
-**NOTE:** Just run 2-5 epoch to see if things are working as expected
+
+> **NOTE 1:** Just run 2-5 epoch to see if things are working as expected
+
+> **NOTE 2:** Sample training output files files help to debug.
+
+> **NOTE 3:** Ignore voxelisation at your own risk!!!
+![alt text](sample_run.png)
 
 python main_train.py --checkpoint-dir checkpoint-try --verbose 1 --checkpoint-iter 1 --epoch-count 2 --batch-size 32 --learning-rate 1e-3 --decay-rate 0.95
 
