@@ -1,108 +1,108 @@
 import torch
 import os
 
-
+import matplotlib as mpl
 import matplotlib.pyplot as plt
-
-
 import numpy as np
 
 os.environ["OMP_NUM_THREADS"] = "1"
 os.environ["MKL_NUM_THREADS"] = "1"
-
-fig, (ax, ax2) = plt.subplots(2, 1, sharex=True)
-# Hide the spines between ax and ax2
-ax.spines['bottom'].set_visible(False)
-ax2.spines['top'].set_visible(False)
-ax.xaxis.tick_top()
-ax.tick_params(labeltop=False)  # Don't put tick labels at the top
-ax2.xaxis.tick_bottom()
-
-
-# best_checkpoint_path = "checkpoint2/best_checkpoint.pth"
-# best_checkpoint_dict = torch.load(best_checkpoint_path, map_location=torch.device('cpu'), weights_only=False)
-# print(best_checkpoint_dict.keys())
-# print(best_checkpoint_dict['model_state_dict'].keys())
-
-checkpoint_dir = "checkpoint-lr_1e-4"
-
-r2_scores = []
-epochs = []
-losses = []
-
-for epoch in range(100):
-    checkpoint_path = f"{checkpoint_dir}/model-epoch-{epoch}.pth"
-    # output_file(f"{checkpoint_path[:-4]}.html")
-
-
-    if not os.path.exists(checkpoint_path):
-        print(f"Missing: {checkpoint_path}")
-        continue
-
-    epoch_dict = torch.load(checkpoint_path, map_location=torch.device('cpu'), weights_only=False)
-    r2 = epoch_dict['validate_dict']['r2']
-    loss = epoch_dict['validate_dict']['loss']
-
-    losses.append(loss)
-    r2_scores.append(r2)
-    # print(epoch, ",",loss, ",", r2)
-    epochs.append(epoch)
-
-
-import numpy as np
-
-r2_scores_np = np.array(r2_scores, dtype=np.float32)
-losses_np = np.array(losses, dtype=np.float32)
-
-# Set the y-limits to only show the positive values in ax2 and negative values in ax
-ax.set_ylim(0, max(r2_scores_np))
-ax2.set_ylim(min(r2_scores_np), 0)
-
-best_checkpoint_path = f"{checkpoint_dir}/best_checkpoint.pth"
-best_checkpoint_dict = torch.load(best_checkpoint_path, map_location=torch.device('cpu'), weights_only=False)
-
-best_r2 = best_checkpoint_dict['validate_dict']['r2']
-if best_r2 > 0:
-    ax.axhline(y=best_r2, color='red', linewidth=2, linestyle='--', label=f'Best R2: {best_r2:.4f}')
-
-else:
-    ax2.axhline(y=best_r2, color='red', linewidth=2, linestyle='--', label=f'Best R2: {best_r2:.4f}')
+# os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 
 
-lr = best_checkpoint_dict['args']['learning_rate']
-ax2.plot(epochs, r2_scores_np)
-ax.plot(epochs, r2_scores_np)
+def get_checkpoint_data(checkpoint_dir):
 
-ax.legend(handles=ax.lines)
-ax2.legend(handles=ax2.lines)
+    val_r2_scores = []
+
+    best_ckpt_val_r2 = -1e16
+    best_ckpt_epoch = None
+    best_ckpt_loss = None
+
+    for epoch in range(50):
+        checkpoint_path = f"{checkpoint_dir}/model-epoch-{epoch}.pth"
+        # output_file(f"{checkpoint_path[:-4]}.html")
 
 
-fig.suptitle(f'3D-CNN - Val R2 for lr={lr}')
+        if not os.path.exists(checkpoint_path):
+            print(f"Missing: {checkpoint_path}")
+            continue
 
-plt.xlabel('Epochs')
-plt.ylabel('R2')
-plt.legend()
-fig.subplots_adjust(hspace=0)
+        epoch_dict = torch.load(checkpoint_path, map_location=torch.device('cpu'), weights_only=False)
+        r2 = epoch_dict['validate_dict']['r2']
+
+        if r2 > best_ckpt_val_r2:
+            best_ckpt_val_r2 = r2
+            best_ckpt_epoch = epoch
+            best_ckpt_loss = epoch_dict['validate_dict']['loss']
+
+        val_r2_scores.append(r2)
+
+        
+
+    return val_r2_scores,best_ckpt_val_r2, best_ckpt_epoch, best_ckpt_loss
+
+
+checkpoint_dirs = [r"C:\Users\user\Documents\bindingaffinity\FAST-master\model\3dcnn\checkpoint-lr-4e-3-dr-0.95",
+                   r"C:\Users\user\Documents\bindingaffinity\FAST-master\model\3dcnn\checkpoint-lr-4e-3-dr-0.9",
+                   r"C:\Users\user\Documents\bindingaffinity\FAST-master\model\3dcnn\checkpoint-lr-4e-3-dr-0.85",
+                   r"C:\Users\user\Documents\bindingaffinity\FAST-master\model\3dcnn\checkpoint-lr-4e-3-dr-0.5",
+
+                   
+                #    r"C:\Users\user\Documents\bindingaffinity\FAST-master\model\3dcnn\checkpoint-lr-1e-2-dr-0.95",
+                   ]
+
+# Create figure with two subplots
+fig, axs = plt.subplots(2, 1, sharex=True) #figsize=(12, 10),
+best_r2_axs0 = []
+best_r2_ax1 = []
+
+default_cycler = mpl.rcParams['axes.prop_cycle']
+color_cycle = iter(default_cycler)
+
+for checkpoint_dir in checkpoint_dirs:
+    val_r2_scores, best_ckpt_val_r2, best_ckpt_epoch, best_ckpt_loss = get_checkpoint_data(checkpoint_dir)
+
+    color = next(color_cycle)['color']
+
+    epoch_0_path = f"{checkpoint_dir}/model-epoch-0.pth"
+    epoch_0_dict = torch.load(epoch_0_path, map_location=torch.device('cpu'), weights_only=False)
+
+    lr = epoch_0_dict['args']['learning_rate']
+    dr = epoch_0_dict['args']['decay_rate']
+
+    label = f'Best R2(dr={dr}): {best_ckpt_val_r2:.4f}'
+
+    # Subplot 1: Full range with symlog
+    epochs = list(range(len(val_r2_scores)))
+    axs[0].plot(epochs, val_r2_scores, linestyle='-', color=color, label=label)
+    axs[0].set_yscale('symlog', linthresh=1)
+    axs[0].set_ylabel('Validation R²')
+    axs[0].set_title('Validation R² - Full Range (symlog scale)')
+    axs[0].grid(True, which='both', linestyle='--', linewidth=0.5)
+    axs[0].legend()
+
+    # Subplot 2: Even tighter zoom on positive region
+    axs[1].plot(epochs, val_r2_scores, linestyle='-', color=color, label='val_r2')
+    axs[1].set_ylim(0.2, 0.5)  # Even narrower range
+    axs[1].set_ylabel('Validation R²')
+    axs[1].set_xlabel('Epoch')
+    axs[1].set_title('Validation R² - Zoomed In (0.2 to 0.5)')
+    axs[1].grid(True, which='both', linestyle='--', linewidth=0.5)
+ 
+
+    # best_r2_line1 = axs[0].axhline(y=best_ckpt_val_r2, color=color, linewidth=2, linestyle='--', label=label)
+    # best_r2_axs0.append(best_r2_line1)
+
+    best_r2_line2 = axs[1].axhline(y=best_ckpt_val_r2, color=color, linewidth=2, linestyle='--', label=label)
+    best_r2_ax1.append(best_r2_line2)
+    # axs[1].legend()
+
+# axs[0].legend(handles=best_r2_axs0)
+axs[0].legend()
+axs[1].legend(handles=best_r2_ax1)
+
+fig.suptitle(f'[3D-CNN] Validation R2 variation for lr={lr} with varying decay rates')
+plt.tight_layout()
 plt.show()
 
-
-# # Set the y-limits to only show the positive values in ax2 and negative values in ax
-# ax.set_ylim(0, max(losses_np))
-# ax2.set_ylim(min(losses_np), 0)
-
-
-# ax2.plot(epochs, losses_np, label="lr=1e-3")
-# ax.plot(epochs, losses_np, label="lr=1e-3")
-
-# fig.suptitle('3D-CNN - loss variation over val epochs')
-# plt.xlabel('Epochs')
-# plt.ylabel('Losses')
-# plt.legend()
-# plt.show()
-# plt.plot(epochs, losses_np, label="lr=1e-3")
-# plt.title('3D-CNN - Loss variation over training epochs')
-# plt.xlabel('Epochs')
-# plt.ylabel('Loss')
-# plt.legend()
-# plt.show()
