@@ -52,6 +52,14 @@ checkpoint_dirs = [r"C:\Users\user\Documents\bindingaffinity\FAST-master\model\3
                 #    r"C:\Users\user\Documents\bindingaffinity\FAST-master\model\3dcnn\checkpoint-lr-1e-2-dr-0.95",
                    ]
 
+# checkpoint_dirs = [
+#     r"C:\Users\user\Documents\bindingaffinity\FAST-master\model\3dcnn\checkpoint-hyp-param\bsize-32\checkpoint-lr-1e-4-dr-0.95",
+#     r"C:\Users\user\Documents\bindingaffinity\FAST-master\model\3dcnn\checkpoint-hyp-param\bsize-32\checkpoint-lr-1e-3-dr-0.95",
+#     r"C:\Users\user\Documents\bindingaffinity\FAST-master\model\3dcnn\checkpoint-lr-4e-3-dr-0.95",
+#     r"C:\Users\user\Documents\bindingaffinity\FAST-master\model\3dcnn\checkpoint-lr-7e-3-dr-0.95",
+#     r"C:\Users\user\Documents\bindingaffinity\FAST-master\model\3dcnn\checkpoint-lr-1e-2-dr-0.95",
+# ]
+
 # Create figure with two subplots
 fig, axs = plt.subplots(2, 1, sharex=True) #figsize=(12, 10),
 best_r2_axs0 = []
