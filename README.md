@@ -1,6 +1,7 @@
 # Protein-Ligand Binding Affinity Prediction
 
-A binding affinity prediction project demonstrating that traditional machine learning with proper feature engineering dramatically outperforms deep learning approaches on molecular datasets. This project provides a complete comparison framework across traditional ML, hybrid CNN+ML, and advanced deep learning techniques, with practical insights for molecular property prediction in drug discovery.
+A binding affinity prediction project demonstrating that traditional machine learning with proper feature engineering dramatically outperforms deep learning approaches on molecular datasets. This project provides a complete comparison framework across hybrid CNNs SGCNNs, QMLs, and advanced deep learning techniques, with practical insights for molecular property prediction in drug discovery, in order to speet up and provide a proof-of-concept to other similar research papers
+
 
 ## Project Overview
 
