@@ -124,15 +124,15 @@ def setup_gpu_environment():
     
     if not gpu_available:
         logger.warning("⚠ No GPU acceleration detected on any framework")
-        logger.info("💡 Your NVIDIA GPU is detected by system but not by ML frameworks")
-        logger.info("💡 This is common with Python 3.13 - VQE will run on CPU (still functional)")
+        logger.info(" Your NVIDIA GPU is detected by system but not by ML frameworks")
+        logger.info(" This is common with Python 3.13 - VQE will run on CPU (still functional)")
     
     return gpu_available
 
 def run_ground_state_optimization(molecular_system: MolecularSystem, 
                                 config: VQEConfig) -> tuple:
     """Run ground state VQE optimization"""
-    logger.info(f"🎯 Starting ground state optimization for {molecular_system.name}")
+    logger.info(f" Starting ground state optimization for {molecular_system.name}")
     
     # Initialize VQE
     vqe = QuantumVQE(config)
@@ -169,7 +169,7 @@ def run_excited_states_calculation(molecular_system: MolecularSystem,
                                  ground_energy: float,
                                  excited_config: ExcitedStateConfig) -> dict:
     """Run excited states calculations"""
-    logger.info("⚡ Starting excited states calculations")
+    logger.info(" Starting excited states calculations")
     
     calculator = ExcitedStatesCalculator(excited_config)
     
@@ -211,15 +211,15 @@ def run_excited_states_calculation(molecular_system: MolecularSystem,
         
         logger.info("")
     elif 'error' in excited_results:
-        logger.error(f"❌ Excited states calculation failed: {excited_results['error']}")
+        logger.error(f" Excited states calculation failed: {excited_results['error']}")
     else:
-        logger.warning("⚠️  No excited states calculated")
+        logger.warning("  No excited states calculated")
     
     return excited_results
 
 def compare_with_classical_methods(molecular_system: MolecularSystem):
     """Compare VQE results with classical quantum chemistry methods"""
-    logger.info("🔬 Comparing with classical methods")
+    logger.info(" Comparing with classical methods")
     
     try:
         # This would require PySCF or similar classical quantum chemistry package
@@ -306,7 +306,7 @@ def create_research_quality_plots(molecular_system: MolecularSystem,
                                 excited_results: dict,
                                 accuracy_metrics: dict):
     """Create publication-quality plots"""
-    logger.info("📊 Creating research-quality visualizations")
+    logger.info(" Creating research-quality visualizations")
     
     # Set up publication style
     plt.style.use('seaborn-v0_8-paper')
@@ -576,7 +576,7 @@ def main():
     
     args = parser.parse_args()
     
-    print("🚀 VQE RESEARCH WORKFLOW")
+    print(" VQE RESEARCH WORKFLOW")
     print("=" * 60)
     print(f"Molecule: {args.molecule}")
     print(f"GPU Acceleration: {args.gpu}")
@@ -593,7 +593,7 @@ def main():
     
     try:
         # 1. Load molecular system
-        logger.info("📥 Loading molecular system...")
+        logger.info(" Loading molecular system...")
         
         try:
             molecular_system = load_hamiltonian_from_pennylane(args.molecule, args.max_terms)
@@ -608,7 +608,7 @@ def main():
         # 2. Configure VQE
         vqe_config = VQEConfig(
             max_iterations=args.max_iterations,
-            convergence_threshold=1e-6,
+            convergence_threshold=1e-3,
             patience=50,
             optimizer="adam",
             learning_rate=args.learning_rate,
@@ -653,23 +653,23 @@ def main():
         )
         
         # 8. Final summary
-        print("\n🎉 RESEARCH WORKFLOW COMPLETED")
+        print("\n RESEARCH WORKFLOW COMPLETED")
         print("=" * 60)
-        print(f"✓ Ground state energy: {ground_energy:.6f} Hartree")
+        print(f" Ground state energy: {ground_energy:.6f} Hartree")
         
         if accuracy_metrics:
-            print(f"✓ Accuracy: {accuracy_metrics['relative_error']:.3f}% relative error")
+            print(f" Accuracy: {accuracy_metrics['relative_error']:.3f}% relative error")
         
         if excited_results and 'excited_states' in excited_results:
-            print(f"✓ Excited states: {len(excited_results['excited_states'])} calculated")
+            print(f" Excited states: {len(excited_results['excited_states'])} calculated")
         
-        print(f"✓ Results saved to: {results_file}")
-        print("✓ Plots and analysis generated")
+        print(f" Results saved to: {results_file}")
+        print(" Plots and analysis generated")
         
         return True
         
     except Exception as e:
-        logger.error(f"❌ Research workflow failed: {e}")
+        logger.error(f" Research workflow failed: {e}")
         return False
 
 if __name__ == "__main__":

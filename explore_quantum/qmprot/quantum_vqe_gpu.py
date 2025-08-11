@@ -31,6 +31,14 @@ import logging
 import pennylane as qml
 from pennylane import numpy as qml_numpy
 
+# Import large system handler
+try:
+    from large_system_handler import LargeSystemHandler, LargeSystemConfig, create_reduced_vqe_config
+    LARGE_SYSTEM_HANDLER_AVAILABLE = True
+except ImportError:
+    LARGE_SYSTEM_HANDLER_AVAILABLE = False
+    print("⚠ Large system handler not available")
+
 # Try to import GPU-accelerated backends
 try:
     import jax
@@ -84,12 +92,15 @@ class MolecularSystem:
 class QuantumVQE:
     """Advanced VQE implementation with GPU support and excited states"""
     
-    def __init__(self, config: VQEConfig):
+    def __init__(self, config: VQEConfig, large_system_config: Optional[LargeSystemConfig] = None):
         self.config = config
+        self.large_system_config = large_system_config or LargeSystemConfig()
+        self.large_system_handler = LargeSystemHandler(self.large_system_config) if LARGE_SYSTEM_HANDLER_AVAILABLE else None
         self.setup_device()
         self.energies_history = []
         self.excited_states_history = []
         self.quantum_fisher_info = []
+        self.processing_results = None  # Store large system processing results
         
     def setup_device(self):
         """Setup quantum device with GPU acceleration if available"""
@@ -264,16 +275,69 @@ class QuantumVQE:
             logger.warning(f"QFI calculation failed: {e}")
             return None
     
+    def prepare_molecular_system(self, molecular_system: MolecularSystem) -> MolecularSystem:
+        """Prepare molecular system for computation, handling large systems"""
+        if not LARGE_SYSTEM_HANDLER_AVAILABLE or molecular_system.n_qubits <= self.large_system_config.max_qubits:
+            logger.info(f"System size ({molecular_system.n_qubits} qubits) suitable for direct simulation")
+            return molecular_system
+        
+        logger.info(f"Large system detected ({molecular_system.n_qubits} qubits) - applying reduction strategies")
+        
+        # Process large system
+        self.processing_results = self.large_system_handler.process_large_system(
+            molecular_system.hamiltonian, molecular_system.name
+        )
+        
+        strategy = self.processing_results['strategy_used']
+        
+        if strategy == 'classical_approximation':
+            # System too large for quantum simulation
+            logger.error("System too large for quantum simulation")
+            raise RuntimeError(f"System with {molecular_system.n_qubits} qubits is too large for classical simulation. "
+                             f"Consider using classical quantum chemistry methods instead.")
+        
+        elif self.processing_results.get('reduced_hamiltonian') is not None:
+            # Use reduced Hamiltonian
+            reduced_h = self.processing_results['reduced_hamiltonian']
+            reduced_system = MolecularSystem(
+                name=f"{molecular_system.name}_reduced",
+                n_qubits=reduced_h.num_wires,
+                n_electrons=reduced_h.num_wires // 2,  # Estimate
+                hamiltonian=reduced_h,
+                exact_energy=molecular_system.exact_energy,  # Keep original for comparison
+                molecular_data=molecular_system.molecular_data
+            )
+            
+            # Update VQE config for reduced system
+            if self.processing_results.get('mapping_info'):
+                original_config = self.config
+                self.config = create_reduced_vqe_config(original_config, reduced_system.n_qubits)
+                logger.info(f"Updated VQE config for reduced system: {self.config.n_layers} layers, "
+                           f"{self.config.max_iterations} iterations")
+            
+            logger.info(f"Using reduced system: {reduced_system.n_qubits} qubits "
+                       f"(reduced from {molecular_system.n_qubits})")
+            return reduced_system
+        
+        else:
+            # Fallback - try with original system but warn user
+            logger.warning("Could not reduce system size - attempting with original (may fail)")
+            return molecular_system
+
+    # def optimize_ground_state(self, molecular_system: MolecularSystem) -> Tuple[float, np.ndarray, List[float]]:
     def optimize_ground_state(self, molecular_system: MolecularSystem) -> Tuple[float, np.ndarray, List[float]]:
         """Optimize ground state energy using VQE"""
-        logger.info(f"Starting ground state optimization for {molecular_system.name}")
+        # Prepare system (handle large systems)
+        prepared_system = self.prepare_molecular_system(molecular_system)
+        
+        logger.info(f"Starting ground state optimization for {prepared_system.name}")
         
         # Create device and cost function
-        self.create_device(molecular_system.n_qubits)
-        cost_function = self.create_cost_function(molecular_system.hamiltonian)
+        self.create_device(prepared_system.n_qubits)
+        cost_function = self.create_cost_function(prepared_system.hamiltonian)
         
         # Initialize parameters
-        n_params = self.get_n_parameters(molecular_system.n_qubits)
+        n_params = self.get_n_parameters(prepared_system.n_qubits)
         np.random.seed(42)
         params = qml_numpy.array(np.random.uniform(0, 2*np.pi, n_params), requires_grad=True)
         
@@ -346,7 +410,21 @@ class QuantumVQE:
         if not self.config.calculate_excited_states:
             return []
         
-        logger.info(f"Calculating {self.config.n_excited_states} excited states")
+        # Use the same prepared system as ground state optimization
+        prepared_system = molecular_system
+        if hasattr(self, 'processing_results') and self.processing_results:
+            if self.processing_results.get('reduced_hamiltonian') is not None:
+                reduced_h = self.processing_results['reduced_hamiltonian']
+                prepared_system = MolecularSystem(
+                    name=f"{molecular_system.name}_reduced",
+                    n_qubits=reduced_h.num_wires,
+                    n_electrons=reduced_h.num_wires // 2,
+                    hamiltonian=reduced_h,
+                    exact_energy=molecular_system.exact_energy,
+                    molecular_data=molecular_system.molecular_data
+                )
+        
+        logger.info(f"Calculating {self.config.n_excited_states} excited states for {prepared_system.name}")
         excited_states = []
         previous_states_params = [ground_state_params]
         
@@ -355,7 +433,7 @@ class QuantumVQE:
             
             # Create cost function with orthogonality constraints
             cost_function = self.create_excited_state_cost_function(
-                molecular_system.hamiltonian, 
+                prepared_system.hamiltonian, 
                 ground_state_params,
                 excited_level=level
             )
@@ -514,53 +592,77 @@ class QuantumVQE:
         
         logger.info(f"Results saved to {filename}")
 
-def load_hamiltonian_from_pennylane(molecule_name: str = 'qchem', max_terms: int = 10000) -> MolecularSystem:
+def load_hamiltonian_from_pennylane(molecule_name: str = 'ala', max_terms: int = 100) -> MolecularSystem:
     """Load molecular Hamiltonian from PennyLane datasets"""
     logger.info(f"Loading {molecule_name} dataset from PennyLane...")
     
     try:
-        # Load dataset
-        ds = qml.data.load('other', name=molecule_name)
-        #ds = qml.data.load("qchem", molname="CO2", bondlength=1.162, basis="STO-3G")
+        # Handle different molecule types and datasets
+        if molecule_name.lower() in ['water', 'h2o']:
+            # Load H2O from qchem dataset
+            ds = qml.data.load("qchem", molname="H2O", bondlength=0.958, basis="STO-3G") # or 6-31G++
+            dataset = ds[0] if isinstance(ds, list) else ds
+            
+            # Extract Hamiltonian and energy directly from qchem dataset
+            hamiltonian = dataset.hamiltonian
+            exact_energy = dataset.fci_energy if hasattr(dataset, 'fci_energy') else None
+            
+            # Get molecular parameters
+            n_qubits = hamiltonian.num_wires
+            n_electrons = 10  # Water has 10 electrons (8 from O + 2 from H atoms)
+            
+            logger.info(f"Loaded {molecule_name}: {n_qubits} qubits, {len(hamiltonian.coeffs)} terms")
+            
+            return MolecularSystem(
+                name=molecule_name,
+                n_qubits=n_qubits,
+                n_electrons=n_electrons,
+                hamiltonian=hamiltonian,
+                exact_energy=exact_energy
+            )
         
-        if isinstance(ds, list):
-            dataset = ds[0]
         else:
-            dataset = ds
-        
-        # Extract exact energy
-        exact_energy = dataset.energy if hasattr(dataset, 'energy') else None
-        
-        # Extract Hamiltonian chunks
-        hamiltonian_chunks = []
-        if hasattr(dataset, 'list_attributes'):
-            for key in dataset.list_attributes():
-                if "hamiltonian" in key:
-                    hamiltonian_chunks.append(getattr(dataset, key))
-        
-        if not hamiltonian_chunks:
-            raise ValueError("No Hamiltonian data found in dataset")
-        
-        # Combine and parse Hamiltonian
-        full_hamiltonian = "".join(hamiltonian_chunks)
-        coefficients, operators = parse_hamiltonian_string(full_hamiltonian, max_terms)
-        
-        # Build PennyLane Hamiltonian
-        hamiltonian = qml.Hamiltonian(coefficients, operators)
-        
-        # Estimate number of electrons (simplified)
-        n_qubits = hamiltonian.num_wires
-        n_electrons = n_qubits // 2  # Rough estimate
-        
-        logger.info(f"Loaded {molecule_name}: {n_qubits} qubits, {len(coefficients)} terms")
-        
-        return MolecularSystem(
-            name=molecule_name,
-            n_qubits=n_qubits,
-            n_electrons=n_electrons,
-            hamiltonian=hamiltonian,
-            exact_energy=exact_energy
-        )
+            # Load other molecules from 'other' dataset
+            ds = qml.data.load('other', name=molecule_name)
+            
+            if isinstance(ds, list):
+                dataset = ds[0]
+            else:
+                dataset = ds
+            
+            # Extract exact energy
+            exact_energy = dataset.energy if hasattr(dataset, 'energy') else None
+            
+            # Extract Hamiltonian chunks
+            hamiltonian_chunks = []
+            if hasattr(dataset, 'list_attributes'):
+                for key in dataset.list_attributes():
+                    if "hamiltonian" in key:
+                        hamiltonian_chunks.append(getattr(dataset, key))
+            
+            if not hamiltonian_chunks:
+                raise ValueError("No Hamiltonian data found in dataset")
+            
+            # Combine and parse Hamiltonian
+            full_hamiltonian = "".join(hamiltonian_chunks)
+            coefficients, operators = parse_hamiltonian_string(full_hamiltonian, max_terms)
+            
+            # Build PennyLane Hamiltonian
+            hamiltonian = qml.Hamiltonian(coefficients, operators)
+            
+            # Estimate number of electrons (simplified)
+            n_qubits = hamiltonian.num_wires
+            n_electrons = n_qubits // 2  # Rough estimate
+            
+            logger.info(f"Loaded {molecule_name}: {n_qubits} qubits, {len(coefficients)} terms")
+            
+            return MolecularSystem(
+                name=molecule_name,
+                n_qubits=n_qubits,
+                n_electrons=n_electrons,
+                hamiltonian=hamiltonian,
+                exact_energy=exact_energy
+            )
         
     except Exception as e:
         logger.error(f"Failed to load {molecule_name}: {e}")
@@ -652,7 +754,7 @@ def compare_ansatz_performance(molecular_system: MolecularSystem, config: VQECon
     logger.info("Comparing ansatz performance...")
     
     results = {}
-    ansatz_types = ["hardware_efficient"]  # Can add "uccsd" when implemented
+    ansatz_types = ["hardware_efficient", "uccsd"]  # Can add "uccsd" when implemented
     
     for ansatz_type in ansatz_types:
         logger.info(f"Testing {ansatz_type} ansatz...")
@@ -673,7 +775,7 @@ def compare_ansatz_performance(molecular_system: MolecularSystem, config: VQECon
 
 def main():
     """Main function to run VQE calculations"""
-    print("🚀 Advanced VQE Implementation with GPU Support")
+    print("VQE Implementation")
     print("=" * 60)
     
     # Configuration
@@ -701,17 +803,17 @@ def main():
         vqe = QuantumVQE(config)
         
         # Optimize ground state
-        print("\n🎯 Optimizing Ground State...")
+        print("\nOptimizing Ground State...")
         ground_energy, ground_params, energy_history = vqe.optimize_ground_state(molecular_system)
         
         # Calculate excited states
         excited_states = []
         if config.calculate_excited_states:
-            print("\n⚡ Calculating Excited States...")
+            print("\nCalculating Excited States...")
             excited_states = vqe.calculate_excited_states(molecular_system, ground_params)
         
         # Analysis and results
-        print("\n📊 RESULTS SUMMARY")
+        print("\nRESULTS SUMMARY")
         print("=" * 60)
         print(f"Molecular system: {molecular_system.name}")
         print(f"Number of qubits: {molecular_system.n_qubits}")
@@ -741,7 +843,11 @@ def main():
         # Save results
         vqe.save_results(molecular_system, ground_energy, ground_params, excited_states)
         
-        print("\n✅ VQE calculation completed successfully!")
+        print("\nVQE calculation completed successfully!")
+        
+        # Comparing Ansatz
+        print("\nComparing Ansatz Performance...")
+        compare_ansatz_performance(vqe, molecular_system, ground_params)
         
     except Exception as e:
         logger.error(f"VQE calculation failed: {e}")

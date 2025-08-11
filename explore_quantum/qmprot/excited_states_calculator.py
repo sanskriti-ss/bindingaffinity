@@ -182,7 +182,7 @@ class ExcitedStatesCalculator:
         Subspace expansion method for excited states
         Uses a much simpler and more robust approach
         """
-        logger.info("Using FIXED subspace expansion method")
+        logger.info("Using subspace expansion method")
         
         @qml.qnode(self.device)
         def energy_function(params):
@@ -840,7 +840,7 @@ def main():
     )
     
     # Display results
-    print("\n📊 EXCITED STATES COMPARISON")
+    print("\nEXCITED STATES COMPARISON")
     print("=" * 50)
     
     for method, results in methods_comparison.items():
@@ -868,7 +868,7 @@ def main():
         # Plot results
         calculator.plot_energy_spectrum(detailed_results)
         
-        print(f"\n✅ Excited states calculation completed using {best_method}")
+        print(f"\nExcited states calculation completed using {best_method}")
 
 if __name__ == "__main__":
     main()
