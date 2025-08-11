@@ -2,7 +2,7 @@
 """
 
 This implementation tries to extend the basic VQE approach to include:
-1. GPU acceleration using PennyLane with JAX/TensorFlow backends
+1. GPU acceleration using PennyLane with JAX/TensorFlow backends (optional)
 2. Ground state and excited state calculations
 3. Advanced ansatz circuits (UCCSD-inspired)
 4. Quantum natural gradients
