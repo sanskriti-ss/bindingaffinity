@@ -27,3 +27,7 @@ typing
 
 # Note: google.colab is only available in Google Colab environment
 # If running locally, you would need to comment out or remove any google.colab imports
+
+#quantum
+qiskit
+scikit-learn
