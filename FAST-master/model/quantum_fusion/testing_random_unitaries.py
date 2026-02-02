@@ -1,10 +1,17 @@
+### instructions
+"""
+cd FAST-master/model/
+pip install requirements.txt
+python -m quantum_fusion.testing_random_unitaries
+"""
+
 import numpy as np
 import torch
 import pandas as pd
 import matplotlib.pyplot as plt
 from qiskit import QuantumCircuit
 from qiskit.circuit.random import random_circuit
-from quantum_fusion.main_train import QuantumFusionModel, FusionDataset, evaluate_model
+from .main_train import QuantumFusionModel, FusionDataset, evaluate_model
 
 # 1. Generate 10 random unitary circuits
 def generate_random_circuits(n_qubits, depth, num_circuits=10):
