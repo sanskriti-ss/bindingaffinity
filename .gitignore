@@ -9,3 +9,4 @@ v2013-core
 *.pth
 best_*_model.pth
 *model.pth
+*.h5
