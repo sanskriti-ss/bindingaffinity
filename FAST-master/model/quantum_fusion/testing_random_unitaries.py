@@ -11,7 +11,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from qiskit import QuantumCircuit
 from qiskit.circuit.random import random_circuit
-from .main_train import QuantumFusionModel, FusionDataset, evaluate_model
+from qiskit_machine_learning.connectors import TorchConnector
+from .main_train import ModelHybridFC, FusionDataset, evaluate_model
 
 # 1. Generate 10 random unitary circuits
 def generate_random_circuits(n_qubits, depth, num_circuits=10):
@@ -25,77 +26,83 @@ def generate_random_circuits(n_qubits, depth, num_circuits=10):
 # Replace with actual data loading logic
 
 def load_small_pdbbind_subset():
-    # Load features and labels from sample_data/core_test.hdf and pdbbind_2016_train_val_test.csv
-    import h5py
-    # Paths to sample data
-    hdf_path = '../../sample_data/core_test.hdf'
-    csv_path = '../../sample_data/pdbbind_2016_train_val_test.csv'
-    # Load features from HDF5
-    with h5py.File(hdf_path, 'r') as hdf:
-        sgcnn_features = np.array(hdf['sgcnn_features'])
-        cnn3d_features = np.array(hdf['cnn3d_features'])
-        complex_ids = np.array(hdf['complex_ids']).astype(str)
-    # Load labels from CSV
-    df = pd.read_csv(csv_path)
-    id_to_label = dict(zip(df['complex_id'].astype(str), df['label']))
-    # Filter to only those with labels
-    valid_idx = [i for i, cid in enumerate(complex_ids) if cid in id_to_label]
-    sgcnn_features = sgcnn_features[valid_idx]
-    cnn3d_features = cnn3d_features[valid_idx]
-    complex_ids = complex_ids[valid_idx]
-    labels = np.array([id_to_label[cid] for cid in complex_ids])
+    """Load a small subset from the main data loading function"""
+    from .main_train import load_sample_data
+    
+    # Load the full dataset
+    sgcnn_features, cnn3d_features, labels, complex_ids = load_sample_data()
+    
     # Select small subset for train/val
     train_idx = np.arange(0, 100)
     val_idx = np.arange(100, 110)
+    
     train_dataset = FusionDataset(
         sgcnn_features[train_idx], cnn3d_features[train_idx], labels[train_idx]
     )
     val_dataset = FusionDataset(
         sgcnn_features[val_idx], cnn3d_features[val_idx], labels[val_idx]
     )
+    
     return train_dataset, val_dataset
 
 # 2. Run each circuit and record performance
 
-def run_circuits_and_evaluate(circuits, train_dataset, val_dataset, n_qubits):
+def run_circuits_and_evaluate(circuits, train_dataset, val_dataset, n_qubits=4):
     results = []
+    sgcnn_dim = train_dataset.sgcnn_features.shape[1]
+    cnn3d_dim = train_dataset.cnn3d_features.shape[1]
+    total_dim = sgcnn_dim + cnn3d_dim
+    
     for idx, qc in enumerate(circuits):
-        # Create a QuantumFusionModel with the random circuit
-        model = QuantumFusionModel(sgcnn_dim=20, cnn3d_dim=20, n_qubits=n_qubits)
-        model.qc = qc  # Replace circuit
-        # You may need to update qnn and quantum_layer as well
-        model.qnn = model._create_qnn()
-        model.quantum_layer = TorchConnector(model.qnn)
+        print(f"Testing circuit {idx + 1}/{len(circuits)}")
+        
+        # Create a quantum model
+        model = ModelHybridFC(
+            in_features=total_dim,
+            out_features=1,
+            qc_input_size=n_qubits,
+            qc_n_layers=10,
+            qc_encoding='amplitude',
+            qc_ansatz=1,
+            backend='default.qubit'
+        )
+        
         # Train for a few epochs
         train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=8, shuffle=True)
         val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=8, shuffle=False)
         optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
         criterion = torch.nn.MSELoss()
         train_losses, val_losses = [], []
+        
         for epoch in range(5):
             model.train()
             train_loss = 0.0
             for sgcnn_feat, cnn3d_feat, labels in train_loader:
                 optimizer.zero_grad()
-                preds = model(sgcnn_feat, cnn3d_feat)
+                combined = torch.cat([sgcnn_feat, cnn3d_feat], dim=1)
+                preds = model(combined)
                 loss = criterion(preds, labels)
                 loss.backward()
                 optimizer.step()
                 train_loss += loss.item()
             train_loss /= len(train_loader)
             train_losses.append(train_loss)
+            
             # Validation
             model.eval()
             val_loss = 0.0
             with torch.no_grad():
                 for sgcnn_feat, cnn3d_feat, labels in val_loader:
-                    preds = model(sgcnn_feat, cnn3d_feat)
+                    combined = torch.cat([sgcnn_feat, cnn3d_feat], dim=1)
+                    preds = model(combined)
                     loss = criterion(preds, labels)
                     val_loss += loss.item()
             val_loss /= len(val_loader)
             val_losses.append(val_loss)
+        
         # Evaluate final performance
-        rmse, mae, r2, pearson, spearman, labels, preds = evaluate_model(model, val_loader, 'cpu')
+        rmse, mae, r2, pearson, spearman = evaluate_model(model, val_loader)
+        
         results.append({
             'circuit_idx': idx,
             'train_losses': train_losses,
@@ -106,6 +113,9 @@ def run_circuits_and_evaluate(circuits, train_dataset, val_dataset, n_qubits):
             'pearson': pearson,
             'spearman': spearman
         })
+        
+        print(f"Circuit {idx}: RMSE={rmse:.4f}, R2={r2:.4f}")
+    
     return results
 
 # 3. Select top 5 circuits and save results
@@ -128,9 +138,9 @@ def save_and_plot_results(results):
     plt.show()
 
 if __name__ == "__main__":
-    n_qubits = 20
-    depth = 4
-    circuits = generate_random_circuits(n_qubits, depth)
+    n_qubits = 4  # Reduced for faster testing
+    depth = 2     # Reduced depth for faster generation
+    circuits = generate_random_circuits(n_qubits, depth, num_circuits=3)  # Test with 3 circuits first
     train_dataset, val_dataset = load_small_pdbbind_subset()
     results = run_circuits_and_evaluate(circuits, train_dataset, val_dataset, n_qubits)
     save_and_plot_results(results)
