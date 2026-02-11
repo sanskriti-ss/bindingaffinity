@@ -41,26 +41,49 @@ def load_preprocessed_data():
     import json
     import os
     
-    # Get the working directory (should be FAST-master/model)
-    current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    data_dir = os.path.join(current_dir, '..', '..', 'model_ready_data')
+    # Try multiple possible paths for the data directory
+    # The script is at: bindingaffinity/FAST-master/model/quantum_fusion/testing_random_unitaries.py
+    # We need to reach: bindingaffinity/model_ready_data
+    script_dir = os.path.dirname(os.path.abspath(__file__))  # quantum_fusion dir
+    
+    possible_paths = [
+        # Relative to current working directory (when running from bindingaffinity root)
+        'model_ready_data',
+        # Relative to script location (go up 4 levels: quantum_fusion -> model -> FAST-master -> bindingaffinity)
+        os.path.join(script_dir, '..', '..', '..', 'model_ready_data'),
+        # Also try from FAST-master root
+        os.path.join(script_dir, '..', '..', '..', '..', 'model_ready_data'),
+    ]
+    
+    data_dir = None
+    for path in possible_paths:
+        abs_path = os.path.abspath(path)
+        if os.path.exists(abs_path):
+            data_dir = abs_path
+            break
+    
+    if data_dir is None:
+        raise FileNotFoundError(
+            f"Could not find model_ready_data directory. Tried:\n"
+            + "\n".join([f"  - {os.path.abspath(p)}" for p in possible_paths])
+        )
     
     print(f"Loading preprocessed data from: {data_dir}")
     
     # Load ligand grids and metadata
-    ligand_npz_path = os.path.join(data_dir, 'ligand_data', 'ligand_data.npz')
+    ligand_npz_path = os.path.join(data_dir, 'ligand_grids.npz')
     ligand_npz = np.load(ligand_npz_path)
     ligand_grids = ligand_npz['arr_0']
     
-    with open(os.path.join(data_dir, 'ligand_data', 'ligand_metadata.json'), 'r') as f:
+    with open(os.path.join(data_dir, 'ligand_metadata.json'), 'r') as f:
         ligand_metadata = json.load(f)
     
     # Load pocket grids and metadata
-    pocket_npz_path = os.path.join(data_dir, 'pocket_data', 'pocket_grids.npz')
+    pocket_npz_path = os.path.join(data_dir, 'pocket_grids.npz')
     pocket_npz = np.load(pocket_npz_path)
     pocket_grids = pocket_npz['arr_0']
     
-    with open(os.path.join(data_dir, 'pocket_data', 'pocket_metadata.json'), 'r') as f:
+    with open(os.path.join(data_dir, 'pocket_metadata.json'), 'r') as f:
         pocket_metadata = json.load(f)
     
     # Flatten grids for input to the model
@@ -71,15 +94,45 @@ def load_preprocessed_data():
     ligand_features = ligand_grids[:num_samples].reshape(num_samples, -1)
     pocket_features = pocket_grids[:num_samples].reshape(num_samples, -1)
     
-    # Get binding affinity labels from metadata
-    # Extract dG values (binding affinity) from ligand metadata
-    labels = np.array([ligand_metadata[str(i)].get('dG', 0.0) for i in range(num_samples)], dtype=np.float32)
-    labels = labels.reshape(-1, 1)  # Reshape for regression
+    # Get binding affinity labels from CSV
+    # Load the binding affinity data from CSV
+    import pandas as pd
+    csv_path = os.path.join(os.path.dirname(data_dir), 'pdbbind_with_dG.csv')
+    if not os.path.exists(csv_path):
+        csv_path = 'pdbbind_with_dG.csv'  # Try current directory
+    
+    df_affinity = pd.read_csv(csv_path)
+    
+    # Create a mapping from PDB ID to binding affinity
+    pdb_to_affinity = {}
+    for _, row in df_affinity.iterrows():
+        pdb_id = row['protein']
+        dg = row['ΔG_kcal_per_mol']
+        pdb_to_affinity[pdb_id] = dg
+    
+    # Extract labels using ligand_id from metadata
+    labels = []
+    for i in range(num_samples):
+        ligand_id = ligand_metadata[i].get('ligand_id', None)
+        if ligand_id in pdb_to_affinity:
+            labels.append(pdb_to_affinity[ligand_id])
+        else:
+            labels.append(np.nan)  # Use NaN for missing values
+    
+    labels = np.array(labels, dtype=np.float32)
+    
+    # Remove samples with NaN labels
+    valid_idx = ~np.isnan(labels)
+    ligand_features = ligand_features[valid_idx]
+    pocket_features = pocket_features[valid_idx]
+    labels = labels[valid_idx]
+    num_samples = len(labels)
+    # Keep labels as 1D - FusionDataset will unsqueeze(1) to make it 2D
     
     print(f"Loaded {num_samples} samples")
     print(f"Ligand features shape: {ligand_features.shape}")
     print(f"Pocket features shape: {pocket_features.shape}")
-    print(f"Labels shape: {labels.shape}")
+    print(f"Labels shape (before unsqueeze): {labels.shape}")
     
     # Split into train/val
     train_size = int(0.9 * num_samples)
