@@ -73,28 +73,29 @@ cd bindingaffinity
 pip install -r requirements.txt (and other requirements.txt if needed)
 ```
 
-3. Install ChimeraX (for preprocessing):
+3. (Optional for exploratory steps) Install ChimeraX (for preprocessing):
    - Download from [ChimeraX website](https://www.cgl.ucsf.edu/chimerax/)
    - Update the path in `batch_process_chimerax.py`
-
-
-#### Data Processing
 
 ```bash
 # Molecular preprocessing with ChimeraX
 python batch_process_chimerax.py
 ```
-#### Run the files in FAST-master
-Instructions in the repo!
-e.g. To train or test fusion model, run `model/fusion/main_fusion_pdbbind.py`
-but really read the repo :)
 
-#### (NOT the code, just for demos)
+(Optional, NOT the code, just for demos)
 
 ```bash
 jupyter notebook step4_spatial_representation_3d.ipynb
 jupyter notebook step5_basicML.ipynb
 ```
+
+4. Downlaod the datasets (instructions below in ## Datasets)
+
+5. Run the files in FAST-master
+Instructions in the repo!
+e.g. To train or test fusion model, run `model/fusion/main_fusion_pdbbind.py`
+but really read the repo :)
+
 
 ## Dataset
 
