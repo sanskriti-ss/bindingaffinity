@@ -20,6 +20,7 @@ from qiskit_machine_learning.connectors import TorchConnector
 from tqdm import tqdm
 import sys
 import os
+from datetime import datetime
 
 # Handle both relative and direct imports
 try:
@@ -236,20 +237,73 @@ def run_circuits_and_evaluate(circuits, train_dataset, val_dataset, n_qubits=4):
 # 3. Select top 5 circuits and save results
 
 def save_and_plot_results(results):
+    # Generate timestamp
+    timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+    output_dir = f'plots_{timestamp}'
+    
+    # Create output directory
+    os.makedirs(output_dir, exist_ok=True)
+    
     # Sort by RMSE (lowest is best)
     results_sorted = sorted(results, key=lambda x: x['rmse'])[:5]
+    
+    # Create dataframe with timestamp
     df = pd.DataFrame(results_sorted)
-    df.to_csv('top5_random_unitary_results.csv', index=False)
-    # Plot loss curves
-    plt.figure(figsize=(10,6))
+    csv_filename = os.path.join(output_dir, 'top5_random_unitary_results.csv')
+    
+    # Add metadata row with timestamp
+    print(f"\n{'='*60}")
+    print(f"Unitary Testing Results - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"{'='*60}")
+    print(f"Output directory: {output_dir}/")
+    print(f"Results saved to: {csv_filename}")
+    
+    df.to_csv(csv_filename, index=False)
+    
+    # Plot loss curves with timestamp
+    fig1, ax1 = plt.subplots(figsize=(12, 6))
     for i, res in enumerate(results_sorted):
-        plt.plot(res['train_losses'], label=f'Train Circuit {res["circuit_idx"]}')
-        plt.plot(res['val_losses'], label=f'Val Circuit {res["circuit_idx"]}', linestyle='--')
-    plt.xlabel('Epoch')
-    plt.ylabel('Loss')
-    plt.title('Loss Curves for Top 5 Random Unitary Circuits')
-    plt.legend()
-    plt.savefig('top5_loss_curves.png')
+        ax1.plot(res['train_losses'], label=f'Train Circuit {res["circuit_idx"]}', linewidth=2)
+        ax1.plot(res['val_losses'], label=f'Val Circuit {res["circuit_idx"]}', linestyle='--', linewidth=2)
+    ax1.set_xlabel('Epoch', fontsize=12)
+    ax1.set_ylabel('Loss', fontsize=12)
+    ax1.set_title(f'Loss Curves for Top 5 Random Unitary Circuits\nRun: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}', fontsize=13)
+    ax1.legend(loc='best')
+    ax1.grid(True, alpha=0.3)
+    loss_filename = os.path.join(output_dir, 'top5_loss_curves.png')
+    fig1.savefig(loss_filename, dpi=300, bbox_inches='tight')
+    print(f"Loss plot saved to: {loss_filename}")
+    
+    # Plot R² scores with timestamp
+    fig2, ax2 = plt.subplots(figsize=(10, 6))
+    circuit_indices = [res['circuit_idx'] for res in results_sorted]
+    r2_scores = [res['r2'] for res in results_sorted]
+    rmse_scores = [res['rmse'] for res in results_sorted]
+    
+    bars = ax2.bar(range(len(circuit_indices)), r2_scores, color='steelblue', alpha=0.8, edgecolor='black')
+    ax2.set_xlabel('Top Unitary Rank', fontsize=12)
+    ax2.set_ylabel('R² Score', fontsize=12)
+    ax2.set_title(f'R² Scores for Top 5 Random Unitary Circuits\nRun: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}', fontsize=13)
+    ax2.set_xticks(range(len(circuit_indices)))
+    ax2.set_xticklabels([f'Circuit {idx}' for idx in circuit_indices])
+    ax2.grid(True, alpha=0.3, axis='y')
+    
+    # Add value labels on bars
+    for i, (bar, r2, rmse) in enumerate(zip(bars, r2_scores, rmse_scores)):
+        height = bar.get_height()
+        ax2.text(bar.get_x() + bar.get_width()/2., height,
+                f'R²={r2:.3f}\nRMSE={rmse:.3f}',
+                ha='center', va='bottom', fontsize=10)
+    
+    r2_filename = os.path.join(output_dir, 'top5_r2_scores.png')
+    fig2.savefig(r2_filename, dpi=300, bbox_inches='tight')
+    print(f"R² plot saved to: {r2_filename}")
+    
+    # Print summary table
+    print(f"\nTop 5 Unitaries Summary:")
+    print(df[['circuit_idx', 'rmse', 'mae', 'r2', 'pearson', 'spearman']].to_string(index=False))
+    print(f"{'='*60}\n")
+    
     plt.show()
 
 if __name__ == "__main__":
