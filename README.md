@@ -84,8 +84,12 @@ pip install -r requirements.txt (and other requirements.txt if needed)
 # Molecular preprocessing with ChimeraX
 python batch_process_chimerax.py
 ```
+#### Run the files in FAST-master
+Instructions in the repo!
+e.g. To train or test fusion model, run `model/fusion/main_fusion_pdbbind.py`
+but really read the repo :)
 
-#### Analysis Notebooks
+#### (NOT the code, just for demos)
 
 ```bash
 jupyter notebook step4_spatial_representation_3d.ipynb
@@ -94,7 +98,7 @@ jupyter notebook step5_basicML.ipynb
 
 ## Dataset
 
-The project uses 279 protein-ligand complexes with binding affinity data (ΔG) processed into multiple formats:
+The project uses 5316 protein-ligand complexes with binding affinity data (ΔG) processed into multiple formats:
 
 **CSV Data (pdbbind_with_dG.csv):**
 - Binding constants (Ki, Kd) with automatic unit conversion to nM
@@ -114,6 +118,11 @@ The project uses 279 protein-ligand complexes with binding affinity data (ΔG) p
 - MOL2 format with binding pocket definitions
 - Quality-controlled molecular structures
 
+### To download the data:
+1) Go to https://www.pdbbind-plus.org.cn/
+2) Click 'Download' in the upper tabs. Log in! Make an account if you haven't already.
+3) Download "Protein-ligand complexes: The refined set" with 5316 protein-ligand complexes. It is 658MB so it might take a bit.
+4) Make sure you 
 
 ## Technical Details
 
