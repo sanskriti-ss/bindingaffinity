@@ -29,12 +29,61 @@ except ImportError:
     # If running as script directly from quantum_fusion directory
     from main_train import ModelHybridFC, FusionDataset, evaluate_model
 
-# 1. Generate 10 random unitary circuits
-def generate_random_circuits(n_qubits, depth, num_circuits=4):
+# 1. Generate random circuits from G3 gate family {CNOT, H, T}
+def generate_g3_random_circuits(n_qubits, depth, num_circuits=10):
+    """
+    Generate random unitary circuits sampled from the G3 gate family.
+    G3 gates: {CNOT, H, T} with uniform random selection (1/3 each in expectation).
+    
+    Follows the methodology from Domingo et al. (2022): "Optimal quantum reservoir 
+    computing for the NISQ era" - circuits are constructed by adding random quantum 
+    gates from the G3 family with uniform probability distribution.
+    
+    Args:
+        n_qubits: Number of qubits
+        depth: Circuit depth (number of layers)
+        num_circuits: Number of circuits to generate
+    
+    Returns:
+        List of QuantumCircuit objects
+    """
+    from qiskit.circuit import QuantumCircuit, ParameterVector
+    import random
+    
     circuits = []
+    
     for _ in range(num_circuits):
-        qc = random_circuit(n_qubits, depth, max_operands=2, measure=False)
+        qc = QuantumCircuit(n_qubits)
+        
+        # Add random gates: each gate (H, T, CNOT) chosen uniformly with 1/3 probability each
+        for layer in range(depth):
+            # Generate random gates for this layer
+            # Total gates per layer: aim for ~n_qubits gates (mix of single and two-qubit)
+            for _ in range(n_qubits):
+                # Choose gate type uniformly from {H, T, CNOT}
+                gate_type = random.choices(['h', 't', 'cnot'], weights=[1, 1, 1], k=1)[0]
+                
+                if gate_type == 'h':
+                    # Apply H to random qubit
+                    qubit = random.randint(0, n_qubits - 1)
+                    qc.h(qubit)
+                    
+                elif gate_type == 't':
+                    # Apply T to random qubit
+                    qubit = random.randint(0, n_qubits - 1)
+                    qc.t(qubit)
+                    
+                else:  # cnot
+                    # Apply CNOT between two random qubits (control != target)
+                    control = random.randint(0, n_qubits - 1)
+                    target = random.randint(0, n_qubits - 1)
+                    # Ensure control and target are different
+                    while target == control:
+                        target = random.randint(0, n_qubits - 1)
+                    qc.cx(control, target)
+        
         circuits.append(qc)
+    
     return circuits
 
 def load_preprocessed_data():
@@ -307,9 +356,9 @@ def save_and_plot_results(results):
     plt.show()
 
 if __name__ == "__main__":
-    n_qubits = 4  # Reduced for faster testing
-    depth = 2     # Reduced depth for faster generation
-    circuits = generate_random_circuits(n_qubits, depth, num_circuits=10)
+    n_qubits = 4  # Number of qubits
+    depth = 2     # Circuit depth (layers of gates)
+    circuits = generate_g3_random_circuits(n_qubits, depth, num_circuits=10)
     train_dataset, val_dataset = load_preprocessed_data()
     results = run_circuits_and_evaluate(circuits, train_dataset, val_dataset, n_qubits)
     save_and_plot_results(results)
