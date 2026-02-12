@@ -77,6 +77,7 @@ def load_sample_data():
     
     print(f"Creating dummy features for {n_complexes} complexes with {feature_dim} features each")
     
+    ### PLEASE UPDATE SO Not using DUMMY FEATURES
     # Generate dummy features (in practice, these would come from molecular preprocessing)
     np.random.seed(42)  # For reproducible results
     sgcnn_features = np.random.randn(n_complexes, feature_dim).astype(np.float32)
@@ -156,6 +157,175 @@ class ModelHybridFC(nn.Module):
 
         # → Final regression/classification head
         return self.fc_out(q_sum)
+
+
+# ============================================================================
+# Option 1: Quantum Reservoir Model (Fixed Circuit - matches Domingo et al.)
+# ============================================================================
+class ModelHybridFC_Reservoir(nn.Module):
+    """
+    Quantum Reservoir Computing model following Domingo et al. (2022).
+    
+    The G3 circuit (CNOT, H, T) is FIXED and non-trainable.
+    Only the classical layers are trained.
+    The quantum circuit acts as a feature extractor/reservoir.
+    """
+    def __init__(self,
+                 in_features: int,
+                 out_features: int,
+                 qiskit_circuit,  # Qiskit QuantumCircuit from G3 family
+                 n_qubits: int = 4,
+                 backend: str = 'default.qubit'
+                ):
+        super().__init__()
+        self.n_qubits = n_qubits
+        
+        # 1) Classical compressor → n_qubits dims for encoding
+        self.fc1 = nn.Linear(in_features, 2 * n_qubits)
+        self.fc2 = nn.Linear(2 * n_qubits, n_qubits)
+        
+        # 2) Convert Qiskit circuit to PennyLane and create fixed quantum layer
+        self.dev = qml.device(backend, wires=n_qubits)
+        self.qiskit_circuit = qiskit_circuit
+        
+        # Create the quantum node (fixed, no trainable params)
+        @qml.qnode(self.dev, interface='torch')
+        def quantum_reservoir(inputs):
+            # Encode classical data via angle encoding
+            for i in range(n_qubits):
+                qml.RY(inputs[i], wires=i)
+            
+            # Apply the fixed G3 circuit
+            # Convert Qiskit gates to PennyLane
+            for instruction in qiskit_circuit.data:
+                gate = instruction.operation
+                qubits = [q._index for q in instruction.qubits]
+                
+                if gate.name == 'h':
+                    qml.Hadamard(wires=qubits[0])
+                elif gate.name == 't':
+                    qml.T(wires=qubits[0])
+                elif gate.name == 'cx':
+                    qml.CNOT(wires=qubits)
+            
+            # Measure all qubits in Z basis
+            return [qml.expval(qml.PauliZ(i)) for i in range(n_qubits)]
+        
+        self.quantum_reservoir = quantum_reservoir
+        
+        # 3) Classical head for final prediction
+        self.fc_out = nn.Linear(n_qubits, out_features)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        batch_size = x.shape[0]
+        
+        # Classical preprocessing
+        x = torch.relu(self.fc1(x))
+        x = torch.tanh(self.fc2(x)) * math.pi  # Scale to [-π, π]
+        
+        # Apply quantum reservoir to each sample (fixed circuit, no gradients through it)
+        q_outputs = []
+        for i in range(batch_size):
+            q_out = self.quantum_reservoir(x[i])
+            q_outputs.append(torch.stack(q_out))
+        
+        q_out = torch.stack(q_outputs)  # [batch, n_qubits]
+        
+        # Final regression head
+        return self.fc_out(q_out)
+
+
+# ============================================================================
+# Option 2: Variational Quantum Circuit Model (Trainable Parameters)
+# ============================================================================
+class ModelHybridFC_VQC(nn.Module):
+    """
+    Variational Quantum Circuit model with trainable parameters.
+    
+    Uses G3 circuit STRUCTURE but replaces fixed gates with trainable rotations:
+    - H gate positions → RY(θ) rotations (trainable)
+    - T gate positions → RZ(φ) rotations (trainable)
+    - CNOT positions → CNOT gates (fixed, but preceded by trainable rotations)
+    """
+    def __init__(self,
+                 in_features: int,
+                 out_features: int,
+                 qiskit_circuit,  # Qiskit QuantumCircuit to extract structure from
+                 n_qubits: int = 4,
+                 backend: str = 'default.qubit'
+                ):
+        super().__init__()
+        self.n_qubits = n_qubits
+        
+        # 1) Classical compressor
+        self.fc1 = nn.Linear(in_features, 2 * n_qubits)
+        self.fc2 = nn.Linear(2 * n_qubits, n_qubits)
+        
+        # 2) Extract circuit structure and count trainable parameters
+        self.gate_structure = []
+        n_params = 0
+        for instruction in qiskit_circuit.data:
+            gate = instruction.operation
+            qubits = [q._index for q in instruction.qubits]
+            
+            if gate.name == 'h':
+                self.gate_structure.append(('ry', qubits[0], n_params))
+                n_params += 1
+            elif gate.name == 't':
+                self.gate_structure.append(('rz', qubits[0], n_params))
+                n_params += 1
+            elif gate.name == 'cx':
+                self.gate_structure.append(('cnot', qubits, None))
+        
+        # 3) Trainable quantum parameters
+        self.quantum_params = nn.Parameter(torch.randn(n_params) * 0.1)
+        
+        # 4) Create quantum device and circuit
+        self.dev = qml.device(backend, wires=n_qubits)
+        
+        @qml.qnode(self.dev, interface='torch', diff_method='backprop')
+        def variational_circuit(inputs, params, gate_structure, n_qubits):
+            # Encode classical data
+            for i in range(n_qubits):
+                qml.RY(inputs[i], wires=i)
+            
+            # Apply variational gates following G3 structure
+            for gate_type, qubit_info, param_idx in gate_structure:
+                if gate_type == 'ry':
+                    qml.RY(params[param_idx], wires=qubit_info)
+                elif gate_type == 'rz':
+                    qml.RZ(params[param_idx], wires=qubit_info)
+                elif gate_type == 'cnot':
+                    qml.CNOT(wires=qubit_info)
+            
+            return [qml.expval(qml.PauliZ(i)) for i in range(n_qubits)]
+        
+        self.variational_circuit = variational_circuit
+        
+        # 5) Classical head
+        self.fc_out = nn.Linear(n_qubits, out_features)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        batch_size = x.shape[0]
+        
+        # Classical preprocessing
+        x = torch.relu(self.fc1(x))
+        x = torch.tanh(self.fc2(x)) * math.pi
+        
+        # Apply variational quantum circuit
+        q_outputs = []
+        for i in range(batch_size):
+            q_out = self.variational_circuit(
+                x[i], 
+                self.quantum_params, 
+                self.gate_structure, 
+                self.n_qubits
+            )
+            q_outputs.append(torch.stack(q_out))
+        
+        q_out = torch.stack(q_outputs)
+        
+        return self.fc_out(q_out)
 
 
 # ------------ Hyperparameters ------------------------
