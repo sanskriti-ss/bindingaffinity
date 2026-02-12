@@ -226,10 +226,10 @@ class ModelHybridFC_Reservoir(nn.Module):
         # Apply quantum reservoir to each sample (fixed circuit, no gradients through it)
         q_outputs = []
         for i in range(batch_size):
-            q_out = self.quantum_reservoir(x[i])
+            q_out = self.quantum_reservoir(x[i].double())  # PennyLane expects double
             q_outputs.append(torch.stack(q_out))
         
-        q_out = torch.stack(q_outputs)  # [batch, n_qubits]
+        q_out = torch.stack(q_outputs).float()  # [batch, n_qubits], convert back to float32
         
         # Final regression head
         return self.fc_out(q_out)
@@ -316,14 +316,14 @@ class ModelHybridFC_VQC(nn.Module):
         q_outputs = []
         for i in range(batch_size):
             q_out = self.variational_circuit(
-                x[i], 
-                self.quantum_params, 
+                x[i].double(),  # PennyLane expects double
+                self.quantum_params.double(), 
                 self.gate_structure, 
                 self.n_qubits
             )
             q_outputs.append(torch.stack(q_out))
         
-        q_out = torch.stack(q_outputs)
+        q_out = torch.stack(q_outputs).float()  # Convert back to float32
         
         return self.fc_out(q_out)
 

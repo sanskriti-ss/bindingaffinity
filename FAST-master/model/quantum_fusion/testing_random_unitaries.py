@@ -10,6 +10,8 @@ cd FAST-master/model/quantum_fusion/
 python testing_random_unitaries.py
 """
 
+## note to clyde: I used this to test it: source /Users/sanskriti/Documents/GitHub/bindingaffinity/.venv/bin/activate && python -m quantum_fusion.testing_random_unitaries --n_qubits 4 --depth 2 --num_circuits 3 --epochs 2 2>&1
+
 import numpy as np
 import torch
 import pandas as pd
@@ -378,7 +380,8 @@ def save_and_plot_results(results_reservoir, results_vqc, n_qubits, depth):
     axes[1].legend(loc='best', fontsize=8)
     axes[1].grid(True, alpha=0.3)
     
-    fig1.suptitle(f'Loss Curves: Top 5 Circuits per Approach\n{timestamp}', fontsize=14, fontweight='bold')
+    num_to_plot = len(reservoir_sorted)
+    fig1.suptitle(f'Loss Curves: Top {num_to_plot} Circuits per Approach\n{timestamp}', fontsize=14, fontweight='bold')
     plt.tight_layout()
     
     loss_filename = os.path.join(output_dir, 'loss_curves_comparison.png')
@@ -388,7 +391,7 @@ def save_and_plot_results(results_reservoir, results_vqc, n_qubits, depth):
     # ============ Plot 2: R² comparison bar chart ============
     fig2, ax2 = plt.subplots(figsize=(12, 6))
     
-    x = np.arange(5)
+    x = np.arange(num_to_plot)
     width = 0.35
     
     r2_reservoir = [res['r2'] for res in reservoir_sorted]
@@ -401,7 +404,7 @@ def save_and_plot_results(results_reservoir, results_vqc, n_qubits, depth):
     ax2.set_ylabel('R² Score', fontsize=12)
     ax2.set_title(f'R² Score Comparison: Quantum Reservoir vs VQC\n{timestamp}', fontsize=13)
     ax2.set_xticks(x)
-    ax2.set_xticklabels([f'#{i+1}' for i in range(5)])
+    ax2.set_xticklabels([f'#{i+1}' for i in range(num_to_plot)])
     ax2.legend(loc='best')
     ax2.grid(True, alpha=0.3, axis='y')
     
@@ -429,7 +432,7 @@ def save_and_plot_results(results_reservoir, results_vqc, n_qubits, depth):
     ax3.set_ylabel('RMSE', fontsize=12)
     ax3.set_title(f'RMSE Comparison: Quantum Reservoir vs VQC\n{timestamp}', fontsize=13)
     ax3.set_xticks(x)
-    ax3.set_xticklabels([f'#{i+1}' for i in range(5)])
+    ax3.set_xticklabels([f'#{i+1}' for i in range(num_to_plot)])
     ax3.legend(loc='best')
     ax3.grid(True, alpha=0.3, axis='y')
     
