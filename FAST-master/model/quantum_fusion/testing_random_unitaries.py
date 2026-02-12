@@ -24,10 +24,12 @@ from datetime import datetime
 
 # Handle both relative and direct imports
 try:
-    from .main_train import ModelHybridFC, FusionDataset, evaluate_model
+    from .main_train import (ModelHybridFC, FusionDataset, evaluate_model,
+                              ModelHybridFC_Reservoir, ModelHybridFC_VQC)
 except ImportError:
     # If running as script directly from quantum_fusion directory
-    from main_train import ModelHybridFC, FusionDataset, evaluate_model
+    from main_train import (ModelHybridFC, FusionDataset, evaluate_model,
+                            ModelHybridFC_Reservoir, ModelHybridFC_VQC)
 
 # 1. Generate random circuits from G3 gate family {CNOT, H, T}
 def generate_g3_random_circuits(n_qubits, depth, num_circuits=10):
@@ -204,30 +206,59 @@ def load_preprocessed_data():
 
 # 2. Run each circuit and record performance
 
-def run_circuits_and_evaluate(circuits, train_dataset, val_dataset, n_qubits=4):
+def run_circuits_and_evaluate(circuits, train_dataset, val_dataset, n_qubits=4, 
+                               model_type='reservoir', num_epochs=5):
+    """
+    Test circuits with specified model type.
+    
+    Args:
+        circuits: List of Qiskit QuantumCircuit objects (G3 family)
+        train_dataset: Training FusionDataset
+        val_dataset: Validation FusionDataset
+        n_qubits: Number of qubits
+        model_type: 'reservoir' (fixed circuit) or 'vqc' (trainable parameters)
+        num_epochs: Number of training epochs
+    
+    Returns:
+        List of result dictionaries
+    """
     results = []
     sgcnn_dim = train_dataset.sgcnn_features.shape[1]
     cnn3d_dim = train_dataset.cnn3d_features.shape[1]
     total_dim = sgcnn_dim + cnn3d_dim
     
+    model_desc = "Reservoir (fixed)" if model_type == 'reservoir' else "VQC (trainable)"
+    
     # Progress bar for circuits
-    circuit_progress = tqdm(enumerate(circuits), total=len(circuits), desc="Testing Unitaries", position=0)
+    circuit_progress = tqdm(enumerate(circuits), total=len(circuits), 
+                           desc=f"Testing {model_desc}", position=0)
     
     for idx, qc in circuit_progress:
-        circuit_progress.set_description(f"Testing Unitary {idx + 1}/{len(circuits)}")
+        circuit_progress.set_description(f"Testing Unitary {idx + 1}/{len(circuits)} [{model_desc}]")
         
-        # Create a quantum model
-        model = ModelHybridFC(
-            in_features=total_dim,
-            out_features=1,
-            qc_input_size=n_qubits,
-            qc_n_layers=10,
-            qc_encoding='amplitude',
-            qc_ansatz=1,
-            backend='default.qubit'
-        )
+        # Create model based on type
+        if model_type == 'reservoir':
+            # Option 1: Quantum Reservoir (fixed circuit - Domingo et al.)
+            model = ModelHybridFC_Reservoir(
+                in_features=total_dim,
+                out_features=1,
+                qiskit_circuit=qc,
+                n_qubits=n_qubits,
+                backend='default.qubit'
+            )
+        elif model_type == 'vqc':
+            # Option 2: Variational Quantum Circuit (trainable params)
+            model = ModelHybridFC_VQC(
+                in_features=total_dim,
+                out_features=1,
+                qiskit_circuit=qc,
+                n_qubits=n_qubits,
+                backend='default.qubit'
+            )
+        else:
+            raise ValueError(f"Unknown model_type: {model_type}. Use 'reservoir' or 'vqc'")
         
-        # Train for a few epochs
+        # Train for specified epochs
         train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=8, shuffle=True)
         val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=8, shuffle=False)
         optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
@@ -235,7 +266,7 @@ def run_circuits_and_evaluate(circuits, train_dataset, val_dataset, n_qubits=4):
         train_losses, val_losses = [], []
         
         # Progress bar for epochs
-        epoch_progress = tqdm(range(5), desc=f"  Training Unitary {idx + 1}", position=1, leave=False)
+        epoch_progress = tqdm(range(num_epochs), desc=f"  Training Unitary {idx + 1}", position=1, leave=False)
         
         for epoch in epoch_progress:
             model.train()
@@ -270,6 +301,7 @@ def run_circuits_and_evaluate(circuits, train_dataset, val_dataset, n_qubits=4):
         
         results.append({
             'circuit_idx': idx,
+            'model_type': model_type,
             'train_losses': train_losses,
             'val_losses': val_losses,
             'rmse': rmse,
@@ -285,7 +317,16 @@ def run_circuits_and_evaluate(circuits, train_dataset, val_dataset, n_qubits=4):
 
 # 3. Select top 5 circuits and save results
 
-def save_and_plot_results(results):
+def save_and_plot_results(results_reservoir, results_vqc, n_qubits, depth):
+    """
+    Save and plot comparison results for both model types.
+    
+    Args:
+        results_reservoir: Results from Quantum Reservoir model (fixed circuits)
+        results_vqc: Results from VQC model (trainable parameters)
+        n_qubits: Number of qubits used
+        depth: Circuit depth used
+    """
     # Generate timestamp
     timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     output_dir = f'plots_{timestamp}'
@@ -293,72 +334,202 @@ def save_and_plot_results(results):
     # Create output directory
     os.makedirs(output_dir, exist_ok=True)
     
-    # Sort by RMSE (lowest is best)
-    results_sorted = sorted(results, key=lambda x: x['rmse'])[:5]
-    
-    # Create dataframe with timestamp
-    df = pd.DataFrame(results_sorted)
-    csv_filename = os.path.join(output_dir, 'top5_random_unitary_results.csv')
-    
-    # Add metadata row with timestamp
-    print(f"\n{'='*60}")
-    print(f"Unitary Testing Results - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"{'='*60}")
+    print(f"\n{'='*70}")
+    print(f"Quantum Circuit Testing Results - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"{'='*70}")
+    print(f"Configuration: {n_qubits} qubits, depth {depth}, G3 gate family {{CNOT, H, T}}")
     print(f"Output directory: {output_dir}/")
+    
+    # Sort by RMSE and get top 5 for each
+    reservoir_sorted = sorted(results_reservoir, key=lambda x: x['rmse'])[:5]
+    vqc_sorted = sorted(results_vqc, key=lambda x: x['rmse'])[:5]
+    
+    # Save combined CSV
+    df_reservoir = pd.DataFrame(reservoir_sorted)
+    df_reservoir['model_type'] = 'reservoir'
+    df_vqc = pd.DataFrame(vqc_sorted)
+    df_vqc['model_type'] = 'vqc'
+    df_combined = pd.concat([df_reservoir, df_vqc], ignore_index=True)
+    
+    csv_filename = os.path.join(output_dir, 'comparison_results.csv')
+    df_combined.to_csv(csv_filename, index=False)
     print(f"Results saved to: {csv_filename}")
     
-    df.to_csv(csv_filename, index=False)
+    # ============ Plot 1: Loss curves comparison ============
+    fig1, axes = plt.subplots(1, 2, figsize=(16, 6))
     
-    # Plot loss curves with timestamp
-    fig1, ax1 = plt.subplots(figsize=(12, 6))
-    for i, res in enumerate(results_sorted):
-        ax1.plot(res['train_losses'], label=f'Train Circuit {res["circuit_idx"]}', linewidth=2)
-        ax1.plot(res['val_losses'], label=f'Val Circuit {res["circuit_idx"]}', linestyle='--', linewidth=2)
-    ax1.set_xlabel('Epoch', fontsize=12)
-    ax1.set_ylabel('Loss', fontsize=12)
-    ax1.set_title(f'Loss Curves for Top 5 Random Unitary Circuits\nRun: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}', fontsize=13)
-    ax1.legend(loc='best')
-    ax1.grid(True, alpha=0.3)
-    loss_filename = os.path.join(output_dir, 'top5_loss_curves.png')
+    # Reservoir loss curves
+    for i, res in enumerate(reservoir_sorted):
+        axes[0].plot(res['train_losses'], label=f'Train C{res["circuit_idx"]}', linewidth=2)
+        axes[0].plot(res['val_losses'], label=f'Val C{res["circuit_idx"]}', linestyle='--', linewidth=2)
+    axes[0].set_xlabel('Epoch', fontsize=12)
+    axes[0].set_ylabel('Loss', fontsize=12)
+    axes[0].set_title('Quantum Reservoir (Fixed Circuit)\nDomingo et al. approach', fontsize=12)
+    axes[0].legend(loc='best', fontsize=8)
+    axes[0].grid(True, alpha=0.3)
+    
+    # VQC loss curves
+    for i, res in enumerate(vqc_sorted):
+        axes[1].plot(res['train_losses'], label=f'Train C{res["circuit_idx"]}', linewidth=2)
+        axes[1].plot(res['val_losses'], label=f'Val C{res["circuit_idx"]}', linestyle='--', linewidth=2)
+    axes[1].set_xlabel('Epoch', fontsize=12)
+    axes[1].set_ylabel('Loss', fontsize=12)
+    axes[1].set_title('Variational Quantum Circuit (Trainable)\nParameterized rotations', fontsize=12)
+    axes[1].legend(loc='best', fontsize=8)
+    axes[1].grid(True, alpha=0.3)
+    
+    fig1.suptitle(f'Loss Curves: Top 5 Circuits per Approach\n{timestamp}', fontsize=14, fontweight='bold')
+    plt.tight_layout()
+    
+    loss_filename = os.path.join(output_dir, 'loss_curves_comparison.png')
     fig1.savefig(loss_filename, dpi=300, bbox_inches='tight')
-    print(f"Loss plot saved to: {loss_filename}")
+    print(f"Loss comparison saved to: {loss_filename}")
     
-    # Plot R² scores with timestamp
-    fig2, ax2 = plt.subplots(figsize=(10, 6))
-    circuit_indices = [res['circuit_idx'] for res in results_sorted]
-    r2_scores = [res['r2'] for res in results_sorted]
-    rmse_scores = [res['rmse'] for res in results_sorted]
+    # ============ Plot 2: R² comparison bar chart ============
+    fig2, ax2 = plt.subplots(figsize=(12, 6))
     
-    bars = ax2.bar(range(len(circuit_indices)), r2_scores, color='steelblue', alpha=0.8, edgecolor='black')
-    ax2.set_xlabel('Top Unitary Rank', fontsize=12)
+    x = np.arange(5)
+    width = 0.35
+    
+    r2_reservoir = [res['r2'] for res in reservoir_sorted]
+    r2_vqc = [res['r2'] for res in vqc_sorted]
+    
+    bars1 = ax2.bar(x - width/2, r2_reservoir, width, label='Reservoir (Fixed)', color='steelblue', alpha=0.8)
+    bars2 = ax2.bar(x + width/2, r2_vqc, width, label='VQC (Trainable)', color='coral', alpha=0.8)
+    
+    ax2.set_xlabel('Top Circuit Rank', fontsize=12)
     ax2.set_ylabel('R² Score', fontsize=12)
-    ax2.set_title(f'R² Scores for Top 5 Random Unitary Circuits\nRun: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}', fontsize=13)
-    ax2.set_xticks(range(len(circuit_indices)))
-    ax2.set_xticklabels([f'Circuit {idx}' for idx in circuit_indices])
+    ax2.set_title(f'R² Score Comparison: Quantum Reservoir vs VQC\n{timestamp}', fontsize=13)
+    ax2.set_xticks(x)
+    ax2.set_xticklabels([f'#{i+1}' for i in range(5)])
+    ax2.legend(loc='best')
     ax2.grid(True, alpha=0.3, axis='y')
     
-    # Add value labels on bars
-    for i, (bar, r2, rmse) in enumerate(zip(bars, r2_scores, rmse_scores)):
-        height = bar.get_height()
-        ax2.text(bar.get_x() + bar.get_width()/2., height,
-                f'R²={r2:.3f}\nRMSE={rmse:.3f}',
-                ha='center', va='bottom', fontsize=10)
+    # Add value labels
+    for bars in [bars1, bars2]:
+        for bar in bars:
+            height = bar.get_height()
+            ax2.text(bar.get_x() + bar.get_width()/2., height,
+                    f'{height:.3f}', ha='center', va='bottom', fontsize=9)
     
-    r2_filename = os.path.join(output_dir, 'top5_r2_scores.png')
+    r2_filename = os.path.join(output_dir, 'r2_comparison.png')
     fig2.savefig(r2_filename, dpi=300, bbox_inches='tight')
-    print(f"R² plot saved to: {r2_filename}")
+    print(f"R² comparison saved to: {r2_filename}")
     
-    # Print summary table
-    print(f"\nTop 5 Unitaries Summary:")
-    print(df[['circuit_idx', 'rmse', 'mae', 'r2', 'pearson', 'spearman']].to_string(index=False))
-    print(f"{'='*60}\n")
+    # ============ Plot 3: RMSE comparison ============
+    fig3, ax3 = plt.subplots(figsize=(12, 6))
+    
+    rmse_reservoir = [res['rmse'] for res in reservoir_sorted]
+    rmse_vqc = [res['rmse'] for res in vqc_sorted]
+    
+    bars1 = ax3.bar(x - width/2, rmse_reservoir, width, label='Reservoir (Fixed)', color='steelblue', alpha=0.8)
+    bars2 = ax3.bar(x + width/2, rmse_vqc, width, label='VQC (Trainable)', color='coral', alpha=0.8)
+    
+    ax3.set_xlabel('Top Circuit Rank', fontsize=12)
+    ax3.set_ylabel('RMSE', fontsize=12)
+    ax3.set_title(f'RMSE Comparison: Quantum Reservoir vs VQC\n{timestamp}', fontsize=13)
+    ax3.set_xticks(x)
+    ax3.set_xticklabels([f'#{i+1}' for i in range(5)])
+    ax3.legend(loc='best')
+    ax3.grid(True, alpha=0.3, axis='y')
+    
+    for bars in [bars1, bars2]:
+        for bar in bars:
+            height = bar.get_height()
+            ax3.text(bar.get_x() + bar.get_width()/2., height,
+                    f'{height:.3f}', ha='center', va='bottom', fontsize=9)
+    
+    rmse_filename = os.path.join(output_dir, 'rmse_comparison.png')
+    fig3.savefig(rmse_filename, dpi=300, bbox_inches='tight')
+    print(f"RMSE comparison saved to: {rmse_filename}")
+    
+    # Print summary tables
+    print(f"\n{'='*70}")
+    print("QUANTUM RESERVOIR (Fixed Circuit - Domingo et al.)")
+    print("="*70)
+    print(df_reservoir[['circuit_idx', 'rmse', 'mae', 'r2', 'pearson', 'spearman']].to_string(index=False))
+    
+    print(f"\n{'='*70}")
+    print("VARIATIONAL QUANTUM CIRCUIT (Trainable Parameters)")
+    print("="*70)
+    print(df_vqc[['circuit_idx', 'rmse', 'mae', 'r2', 'pearson', 'spearman']].to_string(index=False))
+    
+    # Summary comparison
+    best_reservoir = reservoir_sorted[0]
+    best_vqc = vqc_sorted[0]
+    
+    print(f"\n{'='*70}")
+    print("SUMMARY COMPARISON")
+    print("="*70)
+    print(f"Best Reservoir (Circuit {best_reservoir['circuit_idx']}): RMSE={best_reservoir['rmse']:.4f}, R²={best_reservoir['r2']:.4f}")
+    print(f"Best VQC (Circuit {best_vqc['circuit_idx']}): RMSE={best_vqc['rmse']:.4f}, R²={best_vqc['r2']:.4f}")
+    
+    if best_reservoir['rmse'] < best_vqc['rmse']:
+        print(f"\n→ Reservoir approach achieved lower RMSE by {best_vqc['rmse'] - best_reservoir['rmse']:.4f}")
+    else:
+        print(f"\n→ VQC approach achieved lower RMSE by {best_reservoir['rmse'] - best_vqc['rmse']:.4f}")
+    
+    print(f"{'='*70}\n")
     
     plt.show()
+    
+    return output_dir
+
 
 if __name__ == "__main__":
-    n_qubits = 4  # Number of qubits
-    depth = 2     # Circuit depth (layers of gates)
-    circuits = generate_g3_random_circuits(n_qubits, depth, num_circuits=10)
+    import argparse
+    
+    parser = argparse.ArgumentParser(description='Test G3 quantum circuits with both model approaches')
+    parser.add_argument('--n_qubits', type=int, default=4, help='Number of qubits')
+    parser.add_argument('--depth', type=int, default=3, help='Circuit depth (layers)')
+    parser.add_argument('--num_circuits', type=int, default=10, help='Number of circuits to test')
+    parser.add_argument('--epochs', type=int, default=5, help='Training epochs per circuit')
+    args = parser.parse_args()
+    
+    print(f"\n{'='*70}")
+    print("G3 RANDOM QUANTUM CIRCUIT TESTING")
+    print(f"{'='*70}")
+    print(f"Configuration:")
+    print(f"  - Qubits: {args.n_qubits}")
+    print(f"  - Circuit depth: {args.depth}")
+    print(f"  - Circuits to test: {args.num_circuits}")
+    print(f"  - Epochs per circuit: {args.epochs}")
+    print(f"  - Gate family: G3 = {{CNOT, H, T}} with uniform 1/3 probability")
+    print(f"{'='*70}\n")
+    
+    # Generate G3 circuits
+    print("Generating G3 random circuits...")
+    circuits = generate_g3_random_circuits(args.n_qubits, args.depth, num_circuits=args.num_circuits)
+    print(f"Generated {len(circuits)} circuits\n")
+    
+    # Load data
+    print("Loading preprocessed data...")
     train_dataset, val_dataset = load_preprocessed_data()
-    results = run_circuits_and_evaluate(circuits, train_dataset, val_dataset, n_qubits)
-    save_and_plot_results(results)
+    
+    # Test with Quantum Reservoir (Option 1 - matches Domingo et al.)
+    print(f"\n{'='*70}")
+    print("OPTION 1: QUANTUM RESERVOIR (Fixed Circuit)")
+    print("Following Domingo et al. 'Optimal quantum reservoir computing'")
+    print(f"{'='*70}")
+    results_reservoir = run_circuits_and_evaluate(
+        circuits, train_dataset, val_dataset, 
+        n_qubits=args.n_qubits, 
+        model_type='reservoir',
+        num_epochs=args.epochs
+    )
+    
+    # Test with VQC (Option 2 - trainable parameters)
+    print(f"\n{'='*70}")
+    print("OPTION 2: VARIATIONAL QUANTUM CIRCUIT (Trainable)")
+    print("G3 structure with parameterized rotations")
+    print(f"{'='*70}")
+    results_vqc = run_circuits_and_evaluate(
+        circuits, train_dataset, val_dataset,
+        n_qubits=args.n_qubits,
+        model_type='vqc',
+        num_epochs=args.epochs
+    )
+    
+    # Save and compare results
+    output_dir = save_and_plot_results(results_reservoir, results_vqc, args.n_qubits, args.depth)
+    print(f"All outputs saved to: {output_dir}/")
