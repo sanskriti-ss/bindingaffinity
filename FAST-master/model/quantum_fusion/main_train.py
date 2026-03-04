@@ -165,74 +165,89 @@ class ModelHybridFC(nn.Module):
 class ModelHybridFC_Reservoir(nn.Module):
     """
     Quantum Reservoir Computing model following Domingo et al. (2022).
-    
-    The G3 circuit (CNOT, H, T) is FIXED and non-trainable.
+
+    - Measures X, Y, Z on every qubit --> 3*n_qubits features (vs just Z before)
+    - Skip connection: pre-quantum encoding concatenated with quantum output so
+      gradients flow even when the reservoir adds no information for a particular
+      circuit.
+    - MLP head with BatchNorm + Dropout replaces a single Linear layer
+    - Less aggressive compression: in_features -> 4*n_qubits -> n_qubits
+
+    The G3 circuit (CNOT, H, T) is fixed and non-trainable.
     Only the classical layers are trained.
-    The quantum circuit acts as a feature extractor/reservoir.
     """
     def __init__(self,
                  in_features: int,
                  out_features: int,
                  qiskit_circuit,  # Qiskit QuantumCircuit from G3 family
                  n_qubits: int = 4,
-                 backend: str = 'default.qubit'
+                 backend: str = 'lightning.qubit'
                 ):
         super().__init__()
         self.n_qubits = n_qubits
-        
-        # 1) Classical compressor → n_qubits dims for encoding
-        self.fc1 = nn.Linear(in_features, 2 * n_qubits)
-        self.fc2 = nn.Linear(2 * n_qubits, n_qubits)
-        
-        # 2) Convert Qiskit circuit to PennyLane and create fixed quantum layer
+
+        # 1) Classical compressor: less aggressive squeeze (4x to 1x instead of 2x to 1x)
+        self.fc1 = nn.Linear(in_features, 4 * n_qubits)
+        self.bn1 = nn.BatchNorm1d(4 * n_qubits)
+        self.fc2 = nn.Linear(4 * n_qubits, n_qubits)
+
+        # 2) Fixed quantum reservoir (no trainable params)
         self.dev = qml.device(backend, wires=n_qubits)
         self.qiskit_circuit = qiskit_circuit
-        
-        # Create the quantum node (fixed, no trainable params)
+
         @qml.qnode(self.dev, interface='torch')
         def quantum_reservoir(inputs):
-            # Encode classical data via angle encoding
             for i in range(n_qubits):
                 qml.RY(inputs[i], wires=i)
-            
-            # Apply the fixed G3 circuit
-            # Convert Qiskit gates to PennyLane
             for instruction in qiskit_circuit.data:
-                gate = instruction.operation
-                qubits = [q._index for q in instruction.qubits]
-                
+                gate   = instruction.operation
+                qubits = [qiskit_circuit.find_bit(q).index for q in instruction.qubits]
                 if gate.name == 'h':
                     qml.Hadamard(wires=qubits[0])
                 elif gate.name == 't':
                     qml.T(wires=qubits[0])
                 elif gate.name == 'cx':
                     qml.CNOT(wires=qubits)
-            
-            # Measure all qubits in Z basis
-            return [qml.expval(qml.PauliZ(i)) for i in range(n_qubits)]
-        
+            # X, Y, Z measurements --> 3*n_qubits features instead of just Z
+            return (
+                [qml.expval(qml.PauliX(i)) for i in range(n_qubits)] +
+                [qml.expval(qml.PauliY(i)) for i in range(n_qubits)] +
+                [qml.expval(qml.PauliZ(i)) for i in range(n_qubits)]
+            )
+
         self.quantum_reservoir = quantum_reservoir
-        
-        # 3) Classical head for final prediction
-        self.fc_out = nn.Linear(n_qubits, out_features)
+
+        # 3) MLP head: (3*n_qubits quantum features + n_qubits skip) --> out_features
+        q_features   = 3 * n_qubits
+        combined_dim = q_features + n_qubits   # quantum + skip connection
+        self.head = nn.Sequential(
+            nn.Linear(combined_dim, 64),
+            nn.BatchNorm1d(64),
+            nn.ReLU(),
+            nn.Dropout(0.2),
+            nn.Linear(64, 32),
+            nn.ReLU(),
+            nn.Linear(32, out_features),
+        )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         batch_size = x.shape[0]
-        
+
         # Classical preprocessing
-        x = torch.relu(self.fc1(x))
-        x = torch.tanh(self.fc2(x)) * math.pi  # Scale to [-π, π]
-        
-        # Apply quantum reservoir to each sample (fixed circuit, no gradients through it)
+        x     = torch.relu(self.bn1(self.fc1(x)))
+        x_enc = torch.tanh(self.fc2(x)) * math.pi   # [batch, n_qubits]
+
+        # Quantum reservoir (fixed, no grads through it)
         q_outputs = []
         for i in range(batch_size):
-            q_out = self.quantum_reservoir(x[i])
+            q_out = self.quantum_reservoir(x_enc[i])
             q_outputs.append(torch.stack(q_out))
-        
-        q_out = torch.stack(q_outputs)  # [batch, n_qubits]
-        
-        # Final regression head
-        return self.fc_out(q_out)
+        q_out = torch.stack(q_outputs).float()   # [batch, 3*n_qubits]
+
+        # Skip connection: append pre-quantum encoding
+        combined = torch.cat([q_out, x_enc], dim=1)  # [batch, 3*n+n = 4*n]
+
+        return self.head(combined)
 
 
 # ============================================================================
@@ -266,7 +281,7 @@ class ModelHybridFC_VQC(nn.Module):
         n_params = 0
         for instruction in qiskit_circuit.data:
             gate = instruction.operation
-            qubits = [q._index for q in instruction.qubits]
+            qubits = [qiskit_circuit.find_bit(q).index for q in instruction.qubits]
             
             if gate.name == 'h':
                 self.gate_structure.append(('ry', qubits[0], n_params))
@@ -323,126 +338,127 @@ class ModelHybridFC_VQC(nn.Module):
             )
             q_outputs.append(torch.stack(q_out))
         
-        q_out = torch.stack(q_outputs)
+        q_out = torch.stack(q_outputs).float()
         
         return self.fc_out(q_out)
 
 
-# ------------ Hyperparameters ------------------------
+if __name__ == "__main__":
+    # ------------ Hyperparameters ------------------------
 
-epochs = 100
-batch_size = 32
-lr = 0.001
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    epochs = 100
+    batch_size = 32
+    lr = 0.001
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-# ---------------- Load & Prepare Data ----------------
-# Load sample data
-sgcnn_features, cnn3d_features, labels, complex_ids = load_sample_data()
+    # ---------------- Load & Prepare Data ----------------
+    # Load sample data
+    sgcnn_features, cnn3d_features, labels, complex_ids = load_sample_data()
 
-# Split into train/val/test sets
-n_samples = len(labels)
-n_train = min(100, int(0.7 * n_samples))
-n_val = min(20, int(0.15 * n_samples))
-n_test = min(20, n_samples - n_train - n_val)
+    # Split into train/val/test sets
+    n_samples = len(labels)
+    n_train = min(100, int(0.7 * n_samples))
+    n_val = min(20, int(0.15 * n_samples))
+    n_test = min(20, n_samples - n_train - n_val)
 
-print(f"Splitting data: {n_train} train, {n_val} val, {n_test} test")
+    print(f"Splitting data: {n_train} train, {n_val} val, {n_test} test")
 
-# Create indices for splits
-train_idx = np.arange(0, n_train)
-val_idx = np.arange(n_train, n_train + n_val)
-test_idx = np.arange(n_train + n_val, n_train + n_val + n_test)
+    # Create indices for splits
+    train_idx = np.arange(0, n_train)
+    val_idx = np.arange(n_train, n_train + n_val)
+    test_idx = np.arange(n_train + n_val, n_train + n_val + n_test)
 
-# Create datasets dictionary
-datasets = {
-    'train': {
-        'sg': sgcnn_features[train_idx],
-        'c3': cnn3d_features[train_idx],
-        'y': labels[train_idx],
-        'ids': complex_ids[train_idx]
-    },
-    'val': {
-        'sg': sgcnn_features[val_idx],
-        'c3': cnn3d_features[val_idx],
-        'y': labels[val_idx],
-        'ids': complex_ids[val_idx]
-    },
-    'test': {
-        'sg': sgcnn_features[test_idx],
-        'c3': cnn3d_features[test_idx],
-        'y': labels[test_idx],
-        'ids': complex_ids[test_idx]
+    # Create datasets dictionary
+    datasets = {
+        'train': {
+            'sg': sgcnn_features[train_idx],
+            'c3': cnn3d_features[train_idx],
+            'y': labels[train_idx],
+            'ids': complex_ids[train_idx]
+        },
+        'val': {
+            'sg': sgcnn_features[val_idx],
+            'c3': cnn3d_features[val_idx],
+            'y': labels[val_idx],
+            'ids': complex_ids[val_idx]
+        },
+        'test': {
+            'sg': sgcnn_features[test_idx],
+            'c3': cnn3d_features[test_idx],
+            'y': labels[test_idx],
+            'ids': complex_ids[test_idx]
+        }
     }
-}
 
-for split in ['train', 'val', 'test']:
-    print(f"Loaded {split}: {len(datasets[split]['y'])} samples")
+    for split in ['train', 'val', 'test']:
+        print(f"Loaded {split}: {len(datasets[split]['y'])} samples")
 
-# DataLoaders
-loaders = {}
-dims = datasets['train']['sg'].shape[1] + datasets['train']['c3'].shape[1]
-for split in ['train','val','test']:
-    ds = FusionDataset(
-        datasets[split]['sg'], datasets[split]['c3'],
-        datasets[split]['y']
+    # DataLoaders
+    loaders = {}
+    dims = datasets['train']['sg'].shape[1] + datasets['train']['c3'].shape[1]
+    for split in ['train','val','test']:
+        ds = FusionDataset(
+            datasets[split]['sg'], datasets[split]['c3'],
+            datasets[split]['y']
+        )
+        shuffle = (split=='train')
+        loaders[split] = DataLoader(ds, batch_size=batch_size, shuffle=shuffle)
+
+    # ---------------- Instantiate & Train ----------------
+    # Number of qubits = ceil(log2(16)) = 4
+    qc_input_size = 4
+    # Use Circuit 1
+    qc_ansatz     = 1
+    # Use amplitude encoding
+    qc_encoding   = 'amplitude'
+    # Depth L = 10
+    qc_n_layers   = 10
+
+    model = ModelHybridFC(
+        in_features=dims,
+        out_features=1,
+        qc_input_size=qc_input_size,
+        qc_n_layers=qc_n_layers,
+        qc_encoding=qc_encoding,
+        qc_ansatz=qc_ansatz,
+        backend='lightning.qubit',             # or another PennyLane device
     )
-    shuffle = (split=='train')
-    loaders[split] = DataLoader(ds, batch_size=batch_size, shuffle=shuffle)
+    model.to(device)
 
-# ---------------- Instantiate & Train ----------------
-# Number of qubits = ceil(log2(16)) = 4
-qc_input_size = 4
-# Use Circuit 1
-qc_ansatz     = 1
-# Use amplitude encoding
-qc_encoding   = 'amplitude'
-# Depth L = 10
-qc_n_layers   = 10
+    optimizer = optim.Adam(model.parameters(), lr=lr)
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=10, factor=0.5)
+    criterion = nn.MSELoss()
 
-model = ModelHybridFC(
-    in_features=dims,
-    out_features=1,
-    qc_input_size=qc_input_size,
-    qc_n_layers=qc_n_layers,
-    qc_encoding=qc_encoding,
-    qc_ansatz=qc_ansatz,
-    backend='default.qubit',             # or another PennyLane device
-)
-model.to(device)
+    # Training
+    best_val = float('inf')
+    for epoch in range(1, epochs+1):
+        model.train()
+        train_loss = 0.0
+        for sg, c3, y in tqdm(loaders['train']):
+            x = torch.cat([sg, c3], dim=1).to(device)
+            y = y.to(device)
+            optimizer.zero_grad()
+            out = model(x)
+            loss = criterion(out, y)
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+            optimizer.step()
+            train_loss += loss.item()
+        train_loss /= len(loaders['train'])
 
-optimizer = optim.Adam(model.parameters(), lr=lr)
-scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=10, factor=0.5)
-criterion = nn.MSELoss()
+        rmse, mae, r2, pearson, spearman = evaluate_model(model, loaders['val'])
+        scheduler.step(rmse)
 
-# Training
-best_val = float('inf')
-for epoch in range(1, epochs+1):
-    model.train()
-    train_loss = 0.0
-    for sg, c3, y in tqdm(loaders['train']):
-        x = torch.cat([sg, c3], dim=1).to(device)
-        y = y.to(device)
-        optimizer.zero_grad()
-        out = model(x)
-        loss = criterion(out, y)
-        loss.backward()
-        torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
-        optimizer.step()
-        train_loss += loss.item()
-    train_loss /= len(loaders['train'])
+        print(f"Epoch {epoch}: Train RMSE={math.sqrt(train_loss):.4f}, Val RMSE={rmse:.4f}")
+        if rmse < best_val:
+            best_val = rmse
+            torch.save(model.state_dict(), os.path.join(output_dir, 'best_model.pth'))
 
-    rmse, mae, r2, pearson, spearman = evaluate_model(model, loaders['val'])
-    scheduler.step(rmse)
+    # Final evaluation on test set
+    if os.path.exists(os.path.join(output_dir, 'best_model.pth')):
+        model.load_state_dict(torch.load(os.path.join(output_dir, 'best_model.pth')))
+        print("Test metrics:", evaluate_model(model, loaders['test']))
+    else:
+        print("No saved model found, skipping test evaluation")
 
-    print(f"Epoch {epoch}: Train RMSE={math.sqrt(train_loss):.4f}, Val RMSE={rmse:.4f}")
-    if rmse < best_val:
-        best_val = rmse
-        torch.save(model.state_dict(), os.path.join(output_dir, 'best_model.pth'))
-
-# Final evaluation on test set
-if os.path.exists(os.path.join(output_dir, 'best_model.pth')):
-    model.load_state_dict(torch.load(os.path.join(output_dir, 'best_model.pth')))
-    print("Test metrics:", evaluate_model(model, loaders['test']))
-else:
-    print("No saved model found, skipping test evaluation")
-    
-print("Training completed!")
+    print("Training completed!")
