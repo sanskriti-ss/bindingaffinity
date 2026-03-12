@@ -23,7 +23,7 @@ from torch.utils.data import Dataset, DataLoader, Subset
 
 from model import Model_3DCNN, strip_prefix_if_present
 from data_reader import Dataset_MLHDF
-from img_util import GaussianFilter, Voxelizer3D
+from img_util import GaussianFilter, Voxelizer3D, voxelize_batch
 
 from tqdm import tqdm
 
@@ -78,6 +78,7 @@ cuda_count = torch.cuda.device_count()
 if use_cuda:
     device = torch.device(args.device_name)
     torch.cuda.set_device(int(args.device_name.split(':')[1]))
+    torch.backends.cudnn.benchmark = True
 else:
     device = torch.device("cpu")
 print(f"Use cuda: {use_cuda}, count: {cuda_count}, device: {device}") 
@@ -134,6 +135,7 @@ def train():
     if args.multi_gpus and cuda_count > 1:
         model = nn.DataParallel(model)
     model.to(device)
+    scaler = torch.amp.GradScaler('cuda')
     
     if isinstance(model, (DistributedDataParallel, DataParallel)):
         model_to_save = model.module
@@ -158,8 +160,10 @@ def train():
         strip_prefix_if_present(model_state_dict, "module.")
         model_to_save.load_state_dict(model_state_dict, strict=False)
         optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
-        epoch_start = checkpoint["epoch"]
-        loss = checkpoint["loss"]
+        import re as _re
+        _m = _re.match(r"model-epoch-(\d+)\.pth", os.path.basename(args.model_path))
+        epoch_start = int(_m.group(1)) + 1 if _m else checkpoint.get("epoch", 0)
+        loss = checkpoint.get("loss", checkpoint.get("train_dict", {}).get("loss", 0.0))
         print("checkpoint loaded: %s" % args.model_path)
 
     if not os.path.exists(os.path.dirname(args.model_path)):
@@ -173,7 +177,6 @@ def train():
     best_checkpoint_r2 = -9e9
 
     for epoch_ind in range(epoch_start, args.epoch_count):
-        vol_batch = torch.zeros((args.batch_size,19,48,48,48)).float().to(device)
         losses = []
         model.train()
 
@@ -189,23 +192,21 @@ def train():
             else:
                 pdb_id_batch, x_batch_cpu, y_batch_cpu = batch
             x_batch, y_batch = x_batch_cpu.to(device), y_batch_cpu.to(device)
-            print(f"TRAIN:x_batch shape: {x_batch.shape}, y_batch shape: {y_batch.shape}")
-            
-            # voxelize into 3d volume
-            bsize = x_batch.shape[0]
-            for i in range(x_batch.shape[0]):
-                xyz, feat = x_batch[i,:,:3], x_batch[i,:,3:]
-                vol_batch[i,:,:,:,:] = voxelizer(xyz, feat)
-            vol_batch = gaussian_filter(vol_batch)
-            
-            # forward training
-            ypred_batch, _ = model(vol_batch[:x_batch.shape[0]])
 
-            # compute loss
-            if args.rmsd_weight == True:
-                loss = loss_fn(ypred_batch.cpu().float(), y_batch_cpu.float(), w_batch_cpu.float())
-            else:
-                loss = loss_fn(ypred_batch.cpu().float(), y_batch_cpu.float())
+            # voxelize into 3d volume (vectorized batch op)
+            bsize = x_batch.shape[0]
+            with torch.autocast(device_type='cuda'):
+                vol_batch = voxelize_batch(x_batch[:, :, :3], x_batch[:, :, 3:])
+                vol_batch = gaussian_filter(vol_batch)
+                
+                # forward training
+                ypred_batch, _ = model(vol_batch[:x_batch.shape[0]])
+
+                # compute loss
+                if args.rmsd_weight == True:
+                    loss = loss_fn(ypred_batch.cpu().float(), y_batch_cpu.float(), w_batch_cpu.float())
+                else:
+                    loss = loss_fn(ypred_batch.cpu().float(), y_batch_cpu.float())
                 
             print("[%d/%d-%d/%d] training, loss: %.3f, lr: %.7f" % (epoch_ind+1, args.epoch_count, batch_ind+1, batch_count, loss.cpu().data.item(), optimizer.param_groups[0]['lr']))
             
@@ -215,11 +216,12 @@ def train():
             y_pred_arr[batch_ind*args.batch_size : batch_ind*args.batch_size+bsize] = ypred
             
             step += 1
-
-            losses.append(loss.cpu().data.item())
+            
+            losses.append(loss.item())
             optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
+            scaler.scale(loss).backward()
+            scaler.step(optimizer)
+            scaler.update()
             scheduler.step()
 
         print("[%d/%d] training, epoch loss: %.3f" % (epoch_ind+1, args.epoch_count, np.mean(losses)))
@@ -298,6 +300,7 @@ def validate(model, val_dataloader, epoch_ind):
     y_pred_arr = np.zeros((len(val_dataloader.dataset),), dtype=np.float32)
 
 
+    val_gaussian = GaussianFilter(dim=3, channels=19, kernel_size=11, sigma=1, use_cuda=use_cuda)
     for batch_ind,batch in enumerate(val_dataloader):
         # transfer to GPU
         if args.rmsd_weight == True:
@@ -306,21 +309,15 @@ def validate(model, val_dataloader, epoch_ind):
             pdb_id_batch, x_batch_cpu, y_batch_cpu = batch
         
         x_batch, y_batch = x_batch_cpu.to(device), y_batch_cpu.to(device)
-        print(f"VAL: x_batch shape: {x_batch.shape}, y_batch shape: {y_batch.shape}")
 
-        voxelizer = Voxelizer3D(use_cuda=use_cuda, verbose=args.verbose)
-        gaussian_filter = GaussianFilter(dim=3, channels=19, kernel_size=11, sigma=1, use_cuda=use_cuda)
-        
-        vol_batch = torch.zeros((args.batch_size,19,48,48,48)).float().to(device)
-        # voxelize into 3d volume
-        for i in range(x_batch.shape[0]):
-            xyz, feat = x_batch[i,:,:3], x_batch[i,:,3:]
-            vol_batch[i,:,:,:,:] = voxelizer(xyz, feat)
-        vol_batch = gaussian_filter(vol_batch)
-        
-        # forward training
-        bsize = x_batch.shape[0]
-        ypred_batch, _ = model(vol_batch[:x_batch.shape[0]])
+        # voxelize into 3d volume (vectorized batch op)
+        with torch.autocast(device_type='cuda'):
+            vol_batch = voxelize_batch(x_batch[:, :, :3], x_batch[:, :, 3:])
+            vol_batch = val_gaussian(vol_batch)
+            
+            # forward training
+            bsize = x_batch.shape[0]
+            ypred_batch, _ = model(vol_batch[:x_batch.shape[0]])
 
         if args.rmsd_weight == True:
             loss_fn = WeightedMSELoss().float()

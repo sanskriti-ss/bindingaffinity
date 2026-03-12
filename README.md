@@ -1,53 +1,79 @@
 # Protein-Ligand Binding Affinity Prediction
 
-A binding affinity prediction project demonstrating that traditional machine learning with proper feature engineering dramatically outperforms deep learning approaches on molecular datasets. This project provides a complete comparison framework across hybrid CNNs SGCNNs, QMLs, and advanced deep learning techniques, with practical insights for molecular property prediction in drug discovery, in order to speet up and provide a proof-of-concept to other similar research papers
+A binding affinity prediction project exploring the frontier of quantum-classical hybrid machine learning for molecular property prediction. This project implements and compares 3D CNN, Spatial Graph CNN (SGCNN/PotentialNet), and a novel **Quantum Fusion** architecture: a quantum reservoir computing model that fuses deep learning embeddings with fixed G3 random circuits. Built as a proof-of-concept and research framework for drug discovery applications.
 
 
 ## Project Overview
 
 This project implements and compares multiple approaches for protein-ligand binding affinity prediction:
 
-
 **Pipeline:**
 - Processing protein and ligand structures from PDB files
-- Converting molecular data to MOL2 format with charges and hydrogens  
+- Converting molecular data to MOL2 format with charges and hydrogens
 - Creating 3D voxel representations of protein-ligand binding sites
-- Extracting statistical features from molecular grids
-- Training and comparing traditional ML, hybrid, and deep learning models
-- Analysis and performance benchmarking
+- Extracting 3DCNN (fc1, 10-dim) and SGCNN (hidden, 54-dim) deep feature embeddings
+- Fusing embeddings with RDKit pocket/ligand features into a 153-dim vector
+- Training a quantum reservoir computing model using G3 random circuits (H, T, CNOT)
+- Circuit selection via Reservoir Feature Diversity (RFD) expressibility scoring
+- Analysis and performance benchmarking across all model families
 
 **Research Insights:**
-- Demonstrates that traditional ML dramatically outperforms deep learning on small molecular datasets
-- Shows the critical importance of feature engineering over model complexity
-- Provides guidance on when to use different approaches based on dataset size
-- Offers a complete framework for molecular property prediction research NPY Files
+- Quantum reservoir computing (fixed G3 circuits + classical MLP head) achieves **R² ≈ 0.86** on the full PDBbind refined set (4641 complexes)
+- Fusing 3DCNN and SGCNN embeddings with RDKit features into a 153-dim input is critical — RDKit-only features give R² ≈ 0.10
+- Circuit expressibility pre-selection (RFD) consistently identifies circuits that generalise better
+- Demonstrates a viable NISQ-era approach: the quantum reservoir is fixed and non-trainable; only classical layers are optimised
 
 ## Project Structure
 
+```
+FAST-master/model/
+├── 3dcnn/              # 3D CNN (PyTorch) voxel grid 10-dim fc1 embedding
+├── sgcnn/              # Spatial Graph CNN (PotentialNet) atom graph 54-dim embedding
+├── quantum_fusion/     # Quantum Fusion: fused features --> G3 reservoir --> MLP head
+│   ├── main_train.py            # Model definitions & data loading
+│   ├── testing_random_unitaries.py  # G3 circuit generation & RFD selection
+│   ├── evaluate_top5.py         # 100-circuit sweep, top-25 by RFD, top-5 results
+│   ├── extract_3dcnn_features.py
+│   ├── extract_sgcnn_features.py
+│   ├── top5_unitary_results.csv # latest benchmark results
+│   ├── scatter_best.png         # predicted vs actual for best circuit
+│   └── top5_r2_bar.png          # R² bar chart for top-5 circuits
+└── fusion_tf/          # TF fusion baseline
+```
 
 ## Recent Developments
 
-### Comprehensive Model Comparison
+### Quantum Fusion Architecture
 
-We've implemented and evaluated multiple approaches for binding affinity prediction:
+The quantum fusion model (`ModelHybridFC_Reservoir`) follows the Quantum Reservoir Computing paradigm of Domingo et al. (2022):
 
-**Key Insights:**
-- Small datasets strongly favor traditional ML over deep learning
-- Feature engineering with molecular descriptors is crucial for performance
-- 3D CNN approaches require significantly more data to be effective
-- Hybrid approaches don't improve over pure traditional ML but provide research value
+1. **Feature fusion** — pocket AA-composition + physicochemical (25-dim), ligand ECFP4+descriptor PCA (64-dim), 3DCNN fc1 embedding (10-dim), SGCNN hidden embedding (54-dim) → **153-dim** total input
+2. **Classical compressor** — FC(153→24) with BatchNorm, FC(24 --> 6), tanh·π encoding
+3. **Fixed quantum reservoir** — 6-qubit G3 circuit (H, T, CNOT gates); X/Y/Z Pauli measurements yield **18 quantum features**; skip-connect appends the 6-dim encoding → **24-dim combined**
+4. **MLP regression head** — Linear(24→64) → BN → ReLU → Dropout(0.2) → Linear(64→32) → ReLU → Linear(32→1)
 
-### Performance Results
+**Circuit selection:** 100 G3 circuits are generated, scored by Reservoir Feature Diversity (RFD) expressibility, and the top-25 are fully trained (50 epochs, Adam, LR=3×10⁻⁴). The best 5 are reported below.
 
-| Model | Test R² | Test MAE | RMSE | Status |
-|-------|---------|----------|------|--------|
+### Performance Results — Top-5 Quantum Reservoir Circuits (Note that whenever you run main_train in quantum fusion, you get different circuits everytime hence random unitary circuits!)
 
+Evaluated on 697-sample held-out test set (PDBbind 2020 refined set, 4641 complexes total, 3248/696/697 train/val/test split, label mean=6.42, std=1.976 pKi):
+
+| Rank | Circuit | Test R² | Adj R² | Pearson r | Spearman ρ | RMSE (pKi) | MAE (pKi) |
+|------|---------|---------|--------|-----------|------------|-----------|----------|
+| 1 | #12 | **0.8603** | 0.821 | **0.9281** | **0.920** | **0.6638** | 0.4948 |
+| 2 | #15 | 0.8548 | 0.814 | 0.9246 | 0.916 | 0.6768 | 0.4886 |
+| 3 | #10 | 0.8558 | 0.815 | 0.9268 | 0.920 | 0.6744 | 0.4908 |
+| 4 | #2  | 0.8480 | 0.805 | 0.9213 | 0.914 | 0.6925 | 0.4838 |
+| 5 | #8  | 0.8586 | 0.819 | 0.9272 | 0.918 | 0.6679 | **0.4686** |
+
+Scatter plot (predicted vs actual, best circuit): `FAST-master/model/quantum_fusion/scatter_best.png`
+R² comparison bar chart: `FAST-master/model/quantum_fusion/top5_r2_bar.png`
 
 **Key Findings:**
-- Traditional ML dramatically outperforms deep learning approaches on this dataset
-- Feature engineering with statistical descriptors achieves near-perfect performance
-- Hybrid approaches provide good results but don't improve over pure traditional ML
-- Small dataset size favors traditional ML over deep learning
+- All top-5 circuits achieve R² > 0.848 and Pearson r > 0.92, indicating strong predictive correlation
+- Top circuit (#12) achieves RMSE ≈ 0.66 pKi — competitive with classical deep learning baselines on PDBbind
+- Variance across top-5 is small (ΔR² < 0.013), suggesting stable learning regardless of circuit topology
+- The quantum reservoir adds complementary non-linear projections that consistently benefit the MLP head when the input feature space is rich (153-dim fused)
 
 
 ## Getting Started

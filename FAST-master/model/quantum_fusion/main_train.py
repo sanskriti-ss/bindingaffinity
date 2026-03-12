@@ -196,6 +196,73 @@ def load_sample_data(max_samples: int = 2000):
     return poc_scaled, lig_pca, lab_arr, ids_arr
 
 
+def load_with_model_features(
+    max_samples: int = 2000,
+    dcnn_npz: str = None,   # path to refined_3dcnn_features.npz  (N, 10)
+    sgcnn_npz: str = None,  # path to refined_sgcnn_features.npz  (N, 54)
+):
+    """
+    Extends load_sample_data() with optional precomputed 3D-model features.
+
+    Returns the same 4-tuple as load_sample_data(), but with all features
+    packed into the first array and an empty (N, 0) placeholder for the
+    second so the rest of the pipeline (FusionDataset, dims, model) is
+    unchanged.
+
+    Feature layout:
+        pocket RDKit (25-dim)
+      + ligand PCA  (64-dim)
+      [+ 3DCNN fc1  (10-dim)  — when dcnn_npz is provided and exists]
+      [+ SGCNN hid  (54-dim)  — when sgcnn_npz is provided and exists]
+    """
+    from sklearn.preprocessing import StandardScaler
+    poc_scaled, lig_pca, lab_arr, ids_arr = load_sample_data(max_samples)
+    rdkit_feats = np.hstack([poc_scaled, lig_pca]).astype(np.float32)  # (N, 89)
+
+    parts = [rdkit_feats]
+
+    if dcnn_npz and os.path.exists(dcnn_npz):
+        npz = np.load(dcnn_npz, allow_pickle=False)
+        dim = 10
+        buf = np.zeros((len(ids_arr), dim), dtype=np.float32)
+        hits = 0
+        for i, pid in enumerate(ids_arr):
+            if pid in npz:
+                buf[i] = npz[pid]
+                hits += 1
+        buf = StandardScaler().fit_transform(buf).astype(np.float32)
+        parts.append(buf)
+        print(f"[load_with_model_features] 3DCNN features ({dim}-dim) "
+              f"loaded for {hits}/{len(ids_arr)} complexes")
+    else:
+        if dcnn_npz:
+            print(f"[load_with_model_features] 3DCNN NPZ not found: {dcnn_npz}")
+
+    if sgcnn_npz and os.path.exists(sgcnn_npz):
+        npz2 = np.load(sgcnn_npz, allow_pickle=False)
+        # detect dim from first available entry (cov+noncov+pool+fc dims vary with arch)
+        _sample2 = next(iter(npz2.values())) if len(npz2) > 0 else np.zeros(52)
+        dim2 = int(_sample2.shape[0])
+        buf2 = np.zeros((len(ids_arr), dim2), dtype=np.float32)
+        hits2 = 0
+        for i, pid in enumerate(ids_arr):
+            if pid in npz2:
+                buf2[i] = npz2[pid]
+                hits2 += 1
+        buf2 = StandardScaler().fit_transform(buf2).astype(np.float32)
+        parts.append(buf2)
+        print(f"[load_with_model_features] SGCNN features ({dim2}-dim) "
+              f"loaded for {hits2}/{len(ids_arr)} complexes")
+    else:
+        if sgcnn_npz:
+            print(f"[load_with_model_features] SGCNN NPZ not found: {sgcnn_npz}")
+
+    combined = np.hstack(parts).astype(np.float32)
+    empty    = np.zeros((combined.shape[0], 0), dtype=np.float32)
+    print(f"[load_with_model_features] Final feature dim: {combined.shape[1]}")
+    return combined, empty, lab_arr, ids_arr
+
+
 def evaluate_model(model, loader):
     model.eval()
     dev   = next(model.parameters()).device
@@ -448,7 +515,7 @@ class ModelHybridFC_VQC(nn.Module):
 
 
 if __name__ == "__main__":
-    # ---- Previous ModelHybridFC results (for reference) ----
+    # ---- Previous ModelHybridFC results without the 3dcnn and sgcnn (for reference) ----
     # 100 samples:  R²=0.36  Pearson r=0.71  (tiny test set, overfit)
     # 2000 samples: R²=0.10  Pearson r=0.38  (architecture bottleneck)
 
@@ -467,7 +534,7 @@ if __name__ == "__main__":
     # ---- Hyperparameters ------------------------------------------------
     N_QUBITS   = 6
     DEPTH      = 10
-    epochs     = 200
+    epochs     = 50 # 200 is way more than needed for 100 samples, but with 2000+ samples and a deeper MLP head it helps to train longer and use a scheduler to reduce LR on plateaus
     batch_size = 64
     lr         = 3e-4   # lower LR suits the deeper MLP head
     device     = torch.device('cpu')   # PennyLane simulators are CPU-only
@@ -480,7 +547,22 @@ if __name__ == "__main__":
     print(f"Selected circuit #{indexed[0][0]}")
 
     # ---- Load real molecular features from PDBbind refined-set ----------
-    sgcnn_features, cnn3d_features, labels, complex_ids = load_sample_data(max_samples=2000)
+    # Auto-detect precomputed 3DCNN / SGCNN NPZ files sitting next to this script.
+    _qf_dir    = os.path.dirname(os.path.abspath(__file__))
+    _dcnn_npz  = os.path.join(_qf_dir, 'refined_3dcnn_features.npz')
+    _sgcnn_npz = os.path.join(_qf_dir, 'refined_sgcnn_features.npz')
+
+    _use_model_feats = os.path.exists(_dcnn_npz) or os.path.exists(_sgcnn_npz)
+    if _use_model_feats:
+        print("Pre-computed model NPZ file(s) detected — using load_with_model_features()")
+        sgcnn_features, cnn3d_features, labels, complex_ids = load_with_model_features(
+            max_samples=6000,
+            dcnn_npz=_dcnn_npz  if os.path.exists(_dcnn_npz)  else None,
+            sgcnn_npz=_sgcnn_npz if os.path.exists(_sgcnn_npz) else None,
+        )
+    else:
+        print("No pre-computed NPZ files found — using RDKit-only features (load_sample_data)")
+        sgcnn_features, cnn3d_features, labels, complex_ids = load_sample_data(max_samples=2000)
 
     n_samples = len(labels)
     n_train   = int(0.70 * n_samples)
@@ -586,6 +668,8 @@ if __name__ == "__main__":
 
     print("\nTraining completed!")
 
+
+    # WITHOUT 3dCNN AND SGCNN FEATURES (for reference):
     # epochs = 100
     # batch_size = 32
     # lr = 0.001

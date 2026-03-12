@@ -57,7 +57,11 @@ from torch.nn import init
 
 
 # from torch_geometric.utils.num_nodes import maybe_num_nodes
-from torch_sparse import coalesce
+from torch_geometric.utils import coalesce as _pyg_coalesce
+
+def coalesce(edge_index, edge_attr, m, n):
+    """Thin shim replacing torch_sparse.coalesce with torch_geometric equivalent."""
+    return _pyg_coalesce(edge_index, edge_attr, num_nodes=max(m, n))
 
 # NOTE: need to change this to add pool
 from torch_geometric.nn.pool import avg_pool_x
@@ -281,18 +285,16 @@ class PotentialNetParallel(torch.nn.Module):
 
     def forward(self, data, return_hidden_feature=False):
 
-        #import pdb
-        #pdb.set_trace()
+        # Convert list of Data objects (from DataListLoader) to a single Batch first
+        from torch_geometric.data import Batch
+        if isinstance(data, list):
+            data = Batch.from_data_list(data)
+
         if torch.cuda.is_available():
             data.x = data.x.cuda()
             data.edge_attr = data.edge_attr.cuda()
             data.edge_index = data.edge_index.cuda()
             data.batch = data.batch.cuda()
-
-        # MANVI: new code
-        from torch_geometric.data import Batch
-        data = Batch.from_data_list(data)
-        ## MANVI: END of new code
 
         # make sure that we have undirected graph
         if not is_undirected(data.edge_index):

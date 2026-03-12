@@ -10,3 +10,7 @@ v2013-core
 best_*_model.pth
 *model.pth
 *.h5
+
+P-L
+new_processed_2022
+data
