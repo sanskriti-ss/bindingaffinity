@@ -14,3 +14,6 @@ best_*_model.pth
 P-L
 new_processed_2022
 data
+# Large installer files
+*.exe
+ChimeraX-1.9.exe
