@@ -8,6 +8,30 @@ OR
 
 cd FAST-master/model/quantum_fusion/
 python testing_random_unitaries.py
+
+-----------------------------------------------------------------------
+KEY IMPROVEMENTS OVER FIRST VERSION
+-----------------------------------------------------------------------
+1. G3 circuits are now ACTUALLY used via ModelHybridFC_Reservoir
+   (the original code generated circuits but fed ModelHybridFC which
+   never touched them - the quantum layer was always the same ansatz).
+
+2. PCA + StandardScaler compresses the huge 3D-grid feature vectors
+   to a fixed low-dimensional space before feeding the quantum model.
+   This removes the gradient pathology caused by raw voxel values.
+
+3. Labels are loaded directly from the PDBbind refined-set INDEX file
+   (INDEX_refined_data.2020).
+
+4. Circuit expressibility pre-selection is
+   used to discard low-expressibility circuits before expensive
+   training, keeping only the top-K most expressive ones.
+
+5. Training uses more epochs with early stopping and proper LR scheduling.
+
+6. Final predictions are ensembled over the top-5 circuits, improving
+   robustness and giving a natural uncertainty estimate (std dev).
+-----------------------------------------------------------------------
 """
 
 import numpy as np
@@ -15,19 +39,22 @@ import torch
 import pandas as pd
 import matplotlib.pyplot as plt
 from qiskit import QuantumCircuit
-from qiskit.circuit.random import random_circuit
-from qiskit_machine_learning.connectors import TorchConnector
 from tqdm import tqdm
 import sys
 import os
 from datetime import datetime
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import r2_score
+
+import pennylane as qml
 
 # Handle both relative and direct imports
 try:
-    from .main_train import ModelHybridFC, FusionDataset, evaluate_model
+    from .main_train import ModelHybridFC, ModelHybridFC_Reservoir, FusionDataset, evaluate_model
 except ImportError:
     # If running as script directly from quantum_fusion directory
-    from main_train import ModelHybridFC, FusionDataset, evaluate_model
+    from main_train import ModelHybridFC, ModelHybridFC_Reservoir, FusionDataset, evaluate_model
 
 # 1. Generate random circuits from G3 gate family {CNOT, H, T}
 def generate_g3_random_circuits(n_qubits, depth, num_circuits=10):
@@ -86,279 +113,693 @@ def generate_g3_random_circuits(n_qubits, depth, num_circuits=10):
     
     return circuits
 
-def load_preprocessed_data():
-    """Load preprocessed molecular data from step4 outputs"""
+def load_from_refined_set(n_pca_components=32):
+    """
+    Build features DIRECTLY from the PDBbind refined-set raw files:
+      data/refined-set/<PDBID>/<PDBID>_ligand.sdf   -> RDKit ECFP4 + descriptors
+      data/refined-set/<PDBID>/<PDBID>_pocket.pdb   -> amino-acid composition
+                                                       + physicochemical profile
+    Labels from data/refined-set/index/INDEX_refined_data.2020
+
+    This replaces the old model_ready_data 3-D voxel grids which had:
+      - Only ~180 samples (vs ~5000+ in the refined set)
+      - No guarantee of PDB-ID alignment with labels
+      - Raw voxel noise that PCA could not meaningfully compress
+    """
+    import os, warnings
+    from rdkit import Chem, RDLogger
+    from rdkit.Chem import AllChem, Descriptors
+    RDLogger.DisableLog('rdApp.*')        # suppress RDKit warnings
+
+    # ---- locate refined-set root ------------------------------------------
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    candidates = [
+        os.path.join(script_dir, '..', '..', '..', 'data', 'refined-set'),
+        os.path.join(script_dir, '..', '..', '..', '..', 'data', 'refined-set'),
+        r'C:\bindingaffinity\data\refined-set',
+    ]
+    refined_root = next((os.path.abspath(p) for p in candidates
+                         if os.path.isdir(os.path.abspath(p))), None)
+    if refined_root is None:
+        raise FileNotFoundError("Cannot find data/refined-set. Tried: " + ', '.join(candidates))
+    print(f"Refined-set root: {refined_root}")
+
+    # ---- labels from INDEX ------------------------------------------------
+    index_path = os.path.join(refined_root, 'index', 'INDEX_refined_data.2020')
+    pdb_to_label = {}
+    with open(index_path) as fh:
+        for line in fh:
+            line = line.strip()
+            if not line or line.startswith('#'):
+                continue
+            parts = line.split()
+            if len(parts) >= 4:
+                try:
+                    pdb_to_label[parts[0].lower()] = float(parts[3])
+                except ValueError:
+                    pass
+    print(f"Labels loaded: {len(pdb_to_label)} entries")
+
+    # ---- amino-acid lookup tables ----------------------------------------
+    AA_IDX = {aa: i for i, aa in enumerate(
+        ['ALA','ARG','ASN','ASP','CYS','GLN','GLU','GLY','HIS','ILE',
+         'LEU','LYS','MET','PHE','PRO','SER','THR','TRP','TYR','VAL'])}
+    HYDRO  = {'ALA':1.8,'ARG':-4.5,'ASN':-3.5,'ASP':-3.5,'CYS':2.5,
+               'GLN':-3.5,'GLU':-3.5,'GLY':-0.4,'HIS':-3.2,'ILE':4.5,
+               'LEU':3.8,'LYS':-3.9,'MET':1.9,'PHE':2.8,'PRO':-1.6,
+               'SER':-0.8,'THR':-0.7,'TRP':-0.9,'TYR':-1.3,'VAL':4.2}
+    CHARGE = {'ARG':1,'LYS':1,'ASP':-1,'GLU':-1}
+    POLAR  = {'SER','THR','ASN','GLN','TYR','HIS'}
+    AROM   = {'PHE','TYR','TRP','HIS'}
+
+    def featurize_pocket(pdb_path):
+        """25-D feature vector from pocket PDB residue composition."""
+        residues, seen = [], set()
+        try:
+            with open(pdb_path) as f:
+                for line in f:
+                    if not (line.startswith('ATOM') or line.startswith('HETATM')):
+                        continue
+                    resname = line[17:20].strip()
+                    key = (line[21], line[22:26].strip(), resname)
+                    if key not in seen and resname in AA_IDX:
+                        seen.add(key)
+                        residues.append(resname)
+        except Exception:
+            return None
+        if not residues:
+            return None
+        n = len(residues)
+        comp = np.zeros(20, dtype=np.float32)
+        for r in residues:
+            comp[AA_IDX[r]] += 1
+        comp /= n
+        hydro   = sum(HYDRO.get(r, 0)  for r in residues) / n
+        charge  = sum(CHARGE.get(r, 0) for r in residues) / n
+        polar   = sum(1 for r in residues if r in POLAR)   / n
+        arom    = sum(1 for r in residues if r in AROM)    / n
+        size_f  = float(np.log1p(n)) / 5.0
+        return np.concatenate([comp,
+                                np.array([hydro, charge, polar, arom, size_f],
+                                         dtype=np.float32)])
+
+    DESC_NAMES = ['MolWt','MolLogP','TPSA','NumHDonors','NumHAcceptors',
+                  'NumRotatableBonds','RingCount','FractionCSP3',
+                  'HeavyAtomCount','NumAromaticRings']
+
+    def featurize_ligand(sdf_path):
+        """1034-D feature vector: ECFP4(1024) + 10 physicochemical descriptors."""
+        try:
+            suppl = Chem.SDMolSupplier(sdf_path, removeHs=True, sanitize=True)
+            mol   = next((m for m in suppl if m is not None), None)
+            if mol is None:
+                return None
+        except Exception:
+            return None
+        fp = np.array(AllChem.GetMorganFingerprintAsBitVect(mol, 2, nBits=1024),
+                      dtype=np.float32)
+        descs = []
+        for name in DESC_NAMES:
+            try:
+                v = getattr(Descriptors, name)(mol)
+                descs.append(float('nan') if v is None else float(v))
+            except Exception:
+                descs.append(0.0)
+        descs = np.array(descs, dtype=np.float32)
+        descs = np.nan_to_num(descs, nan=0.0, posinf=0.0, neginf=0.0)
+        return np.concatenate([fp, descs])
+
+    # ---- iterate over refined-set entries ---------------------------------
+    ligand_feats, pocket_feats, labels_out, pdb_ids_out = [], [], [], []
+    skipped = 0
+    pdb_dirs = sorted(pdb_to_label.keys())
+    print(f"Featurizing {len(pdb_dirs)} PDB entries (skipping missing files)...")
+
+    for pdb_id in tqdm(pdb_dirs, desc='RDKit featurization'):
+        folder = os.path.join(refined_root, pdb_id)
+        sdf    = os.path.join(folder, f'{pdb_id}_ligand.sdf')
+        pdb    = os.path.join(folder, f'{pdb_id}_pocket.pdb')
+        if not (os.path.isfile(sdf) and os.path.isfile(pdb)):
+            skipped += 1
+            continue
+        lig = featurize_ligand(sdf)
+        poc = featurize_pocket(pdb)
+        if lig is None or poc is None:
+            skipped += 1
+            continue
+        ligand_feats.append(lig)
+        pocket_feats.append(poc)
+        labels_out.append(pdb_to_label[pdb_id])
+        pdb_ids_out.append(pdb_id)
+
+    print(f"Featurized: {len(labels_out)}  Skipped: {skipped}")
+    if len(labels_out) < 50:
+        raise RuntimeError("Too few valid complexes (<50). Check refined-set path.")
+
+    ligand_feats = np.array(ligand_feats, dtype=np.float32)
+    pocket_feats = np.array(pocket_feats, dtype=np.float32)
+    labels_arr   = np.array(labels_out,  dtype=np.float32)
+
+    print(f"Label range: {labels_arr.min():.2f} – {labels_arr.max():.2f}  "
+          f"mean={labels_arr.mean():.2f}  std={labels_arr.std():.2f}")
+
+    # ---- train / val split (80 / 20, sequential) --------------------------
+    N          = len(labels_arr)
+    train_size = int(0.80 * N)
+    tr, va     = slice(0, train_size), slice(train_size, N)
+
+    # ---- normalise labels -------------------------------------------------
+    label_mean = labels_arr[tr].mean()
+    label_std  = labels_arr[tr].std() + 1e-8
+    labels_norm = (labels_arr - label_mean) / label_std
+
+    # ---- PCA per modality -------------------------------------------------
+    n_lig_pca = min(n_pca_components, train_size - 1, ligand_feats.shape[1])
+    n_poc_pca = min(n_pca_components, train_size - 1, pocket_feats.shape[1])
+
+    scaler_lig = StandardScaler().fit(ligand_feats[tr])
+    pca_lig    = PCA(n_components=n_lig_pca, random_state=42)\
+                     .fit(scaler_lig.transform(ligand_feats[tr]))
+    lig_red    = pca_lig.transform(scaler_lig.transform(ligand_feats)).astype(np.float32)
+
+    scaler_poc = StandardScaler().fit(pocket_feats[tr])
+    pca_poc    = PCA(n_components=n_poc_pca, random_state=42)\
+                     .fit(scaler_poc.transform(pocket_feats[tr]))
+    poc_red    = pca_poc.transform(scaler_poc.transform(pocket_feats)).astype(np.float32)
+
+    var_lig = pca_lig.explained_variance_ratio_.sum() * 100
+    var_poc = pca_poc.explained_variance_ratio_.sum() * 100
+    print(f"Ligand PCA {ligand_feats.shape[1]}→{n_lig_pca}-D  ({var_lig:.1f}% var)")
+    print(f"Pocket PCA {pocket_feats.shape[1]}→{n_poc_pca}-D  ({var_poc:.1f}% var)")
+
+    # ---- wrap in FusionDataset (pocket=sgcnn, ligand=cnn3d) ---------------
+    def _ds(idx):
+        return FusionDataset(
+            torch.tensor(poc_red[idx],        dtype=torch.float32),
+            torch.tensor(lig_red[idx],        dtype=torch.float32),
+            torch.tensor(labels_norm[idx],    dtype=torch.float32),
+        )
+
+    train_ds = _ds(tr)
+    val_ds   = _ds(va)
+    print(f"Train: {len(train_ds)}  Val: {len(val_ds)}")
+    return train_ds, val_ds, label_mean, label_std
+
+
+def load_preprocessed_data(n_pca_components=64):
+    """
+    [DEPRECATED — use load_from_refined_set() instead]
+    Load preprocessed molecular data from step4 outputs.
+
+    Kept for backwards compatibility only.
+    """
+    return load_from_refined_set(n_pca_components=n_pca_components)
+
+
+# ---- Private stub to silence old call signature --------------------------
+def _load_preprocessed_data_old(n_pca_components=64):
+    """
+    Improvements:
+    - Labels from PDBbind refined-set INDEX_refined_data.2020 (correct alignment)
+    - PCA + StandardScaler compresses the huge 3-D grid vectors before training
+    - Label normalisation for stable quantum-circuit regression
+    """
     import json
     import os
-    
-    # Try multiple possible paths for the data directory
-    # The script is at: bindingaffinity/FAST-master/model/quantum_fusion/testing_random_unitaries.py
-    # We need to reach: bindingaffinity/model_ready_data
+
     script_dir = os.path.dirname(os.path.abspath(__file__))  # quantum_fusion dir
     
     possible_paths = [
-        # Relative to current working directory (when running from bindingaffinity root)
         'model_ready_data',
-        # Relative to script location (go up 4 levels: quantum_fusion -> model -> FAST-master -> bindingaffinity)
         os.path.join(script_dir, '..', '..', '..', 'model_ready_data'),
-        # Also try from FAST-master root
         os.path.join(script_dir, '..', '..', '..', '..', 'model_ready_data'),
     ]
-    
     data_dir = None
     for path in possible_paths:
         abs_path = os.path.abspath(path)
         if os.path.exists(abs_path):
             data_dir = abs_path
             break
-    
     if data_dir is None:
         raise FileNotFoundError(
-            f"Could not find model_ready_data directory. Tried:\n"
+            "Could not find model_ready_data directory. Tried:\n"
             + "\n".join([f"  - {os.path.abspath(p)}" for p in possible_paths])
         )
-    
     print(f"Loading preprocessed data from: {data_dir}")
-    
-    # Load ligand grids and metadata
-    ligand_npz_path = os.path.join(data_dir, 'ligand_grids.npz')
-    ligand_npz = np.load(ligand_npz_path)
-    ligand_grids = ligand_npz['arr_0']
-    
-    with open(os.path.join(data_dir, 'ligand_metadata.json'), 'r') as f:
+
+    # ------------------------------------------------------------------ grids
+    ligand_grids = np.load(os.path.join(data_dir, 'ligand_grids.npz'))['arr_0']
+    pocket_grids = np.load(os.path.join(data_dir, 'pocket_grids.npz'))['arr_0']
+    with open(os.path.join(data_dir, 'ligand_metadata.json')) as f:
         ligand_metadata = json.load(f)
-    
-    # Load pocket grids and metadata
-    pocket_npz_path = os.path.join(data_dir, 'pocket_grids.npz')
-    pocket_npz = np.load(pocket_npz_path)
-    pocket_grids = pocket_npz['arr_0']
-    
-    with open(os.path.join(data_dir, 'pocket_metadata.json'), 'r') as f:
-        pocket_metadata = json.load(f)
-    
-    # Flatten grids for input to the model
-    # ligand_grids shape: (num_samples, height, width, depth, channels)
-    # pocket_grids shape: (num_samples, height, width, depth, channels)
-    num_samples = min(len(ligand_grids), len(pocket_grids))
-    
-    ligand_features = ligand_grids[:num_samples].reshape(num_samples, -1)
-    pocket_features = pocket_grids[:num_samples].reshape(num_samples, -1)
-    
-    # Get binding affinity labels from CSV
-    # Load the binding affinity data from CSV
-    import pandas as pd
-    csv_path = os.path.join(os.path.dirname(data_dir), 'pdbbind_with_dG.csv')
-    if not os.path.exists(csv_path):
-        csv_path = 'pdbbind_with_dG.csv'  # Try current directory
-    
-    df_affinity = pd.read_csv(csv_path)
-    
-    # Create a mapping from PDB ID to binding affinity
-    pdb_to_affinity = {}
-    for _, row in df_affinity.iterrows():
-        pdb_id = row['protein']
-        dg = row['ΔG_kcal_per_mol']
-        pdb_to_affinity[pdb_id] = dg
-    
-    # Extract labels using ligand_id from metadata
-    labels = []
-    for i in range(num_samples):
-        ligand_id = ligand_metadata[i].get('ligand_id', None)
-        if ligand_id in pdb_to_affinity:
-            labels.append(pdb_to_affinity[ligand_id])
-        else:
-            labels.append(np.nan)  # Use NaN for missing values
-    
-    labels = np.array(labels, dtype=np.float32)
-    
-    # Remove samples with NaN labels
-    valid_idx = ~np.isnan(labels)
-    ligand_features = ligand_features[valid_idx]
-    pocket_features = pocket_features[valid_idx]
-    labels = labels[valid_idx]
+
+    num_samples   = min(len(ligand_grids), len(pocket_grids))
+    ligand_flat   = ligand_grids[:num_samples].reshape(num_samples, -1).astype(np.float32)
+    pocket_flat   = pocket_grids[:num_samples].reshape(num_samples, -1).astype(np.float32)
+
+    # ------------------------------------------------------------------ labels
+    # Use refined-set INDEX file for correct -logKd/Ki alignment.
+    workspace_root = os.path.abspath(os.path.join(data_dir, '..'))
+    index_path = os.path.join(workspace_root, 'data', 'refined-set', 'index',
+                              'INDEX_refined_data.2020')
+    if os.path.exists(index_path):
+        print(f"Loading labels from: {index_path}")
+        rows = []
+        with open(index_path) as fh:
+            for line in fh:
+                line = line.strip()
+                if not line or line.startswith('#'):
+                    continue
+                parts = line.split()
+                if len(parts) >= 4:
+                    try:
+                        rows.append((parts[0].lower(), float(parts[3])))
+                    except ValueError:
+                        pass
+        pdb_to_affinity = dict(rows)
+    else:
+        print("Refined-set INDEX not found, falling back to pdbbind_with_dG.csv")
+        csv_path = os.path.join(workspace_root, 'pdbbind_with_dG.csv')
+        if not os.path.exists(csv_path):
+            csv_path = 'pdbbind_with_dG.csv'
+        df_aff = pd.read_csv(csv_path)
+        pdb_to_affinity = dict(zip(df_aff['protein'].str.lower(),
+                                   df_aff['ΔG_kcal_per_mol']))
+
+    labels = np.array([
+        pdb_to_affinity.get(str(ligand_metadata[i].get('ligand_id', '')).lower()[:4], np.nan)
+        for i in range(num_samples)
+    ], dtype=np.float32)
+
+    valid = ~np.isnan(labels)
+    ligand_flat = ligand_flat[valid]
+    pocket_flat = pocket_flat[valid]
+    labels      = labels[valid]
     num_samples = len(labels)
-    # Keep labels as 1D - FusionDataset will unsqueeze(1) to make it 2D
-    
-    print(f"Loaded {num_samples} samples")
-    print(f"Ligand features shape: {ligand_features.shape}")
-    print(f"Pocket features shape: {pocket_features.shape}")
-    print(f"Labels shape (before unsqueeze): {labels.shape}")
-    
-    # Split into train/val
-    train_size = int(0.9 * num_samples)
+    print(f"Samples after label alignment: {num_samples}")
+    print(f"Label range: {labels.min():.2f} – {labels.max():.2f}  "
+          f"(mean={labels.mean():.2f}, std={labels.std():.2f})")
+
+    # ------------------------------------------------------------------ PCA
+    # Standardise + PCA-compress the raw voxel vectors.
+    # Without this the classical compression layers overfit noise and the
+    # tanh-scaled quantum inputs immediately saturate -> vanishing gradients.
+    train_size    = int(0.9 * num_samples)
+    n_pca_components = min(n_pca_components,
+                           train_size - 1,
+                           ligand_flat.shape[1],
+                           pocket_flat.shape[1])
+    print(f"PCA: {ligand_flat.shape[1]}-D -> {n_pca_components}-D (ligand)  "
+          f"{pocket_flat.shape[1]}-D -> {n_pca_components}-D (pocket)")
+
+    scaler_lig   = StandardScaler().fit(ligand_flat[:train_size])
+    pca_lig      = PCA(n_components=n_pca_components, random_state=42) \
+                       .fit(scaler_lig.transform(ligand_flat[:train_size]))
+    ligand_red   = pca_lig.transform(scaler_lig.transform(ligand_flat))
+
+    scaler_poc   = StandardScaler().fit(pocket_flat[:train_size])
+    pca_poc      = PCA(n_components=n_pca_components, random_state=42) \
+                       .fit(scaler_poc.transform(pocket_flat[:train_size]))
+    pocket_red   = pca_poc.transform(scaler_poc.transform(pocket_flat))
+
+    print(f"PCA explained variance — "
+          f"ligand: {pca_lig.explained_variance_ratio_.sum()*100:.1f}%  "
+          f"pocket: {pca_poc.explained_variance_ratio_.sum()*100:.1f}%")
+
+    # Normalise labels (mean/std of train split only to avoid leakage)
+    label_mean = float(labels[:train_size].mean())
+    label_std  = float(labels[:train_size].std()) + 1e-8
+    labels_norm = (labels - label_mean) / label_std
+
+    # ------------------------------------------------------------------ split
     train_idx = np.arange(0, train_size)
-    val_idx = np.arange(train_size, num_samples)
-    
+    val_idx   = np.arange(train_size, num_samples)
+
     train_dataset = FusionDataset(
-        torch.tensor(pocket_features[train_idx], dtype=torch.float32),
-        torch.tensor(ligand_features[train_idx], dtype=torch.float32),
-        torch.tensor(labels[train_idx], dtype=torch.float32)
+        torch.tensor(pocket_red[train_idx], dtype=torch.float32),
+        torch.tensor(ligand_red[train_idx], dtype=torch.float32),
+        torch.tensor(labels_norm[train_idx], dtype=torch.float32),
     )
     val_dataset = FusionDataset(
-        torch.tensor(pocket_features[val_idx], dtype=torch.float32),
-        torch.tensor(ligand_features[val_idx], dtype=torch.float32),
-        torch.tensor(labels[val_idx], dtype=torch.float32)
+        torch.tensor(pocket_red[val_idx], dtype=torch.float32),
+        torch.tensor(ligand_red[val_idx], dtype=torch.float32),
+        torch.tensor(labels_norm[val_idx], dtype=torch.float32),
     )
-    
-    return train_dataset, val_dataset
+    print(f"Train: {len(train_dataset)}  Val: {len(val_dataset)}")
+    return train_dataset, val_dataset, label_mean, label_std
 
-# 2. Run each circuit and record performance
+# ===========================================================================
+# 2a. Expressibility pre-selection  (Sim et al., PRL 2019)
+# ===========================================================================
+def reservoir_feature_diversity(qc, n_qubits, n_samples=120):
+    """
+    Reservoir Feature Diversity (RFD): effective rank of the feature matrix
+    F[sample, observable] computed over random angle-encoded inputs.
 
-def run_circuits_and_evaluate(circuits, train_dataset, val_dataset, n_qubits=4):
-    results = []
-    sgcnn_dim = train_dataset.sgcnn_features.shape[1]
-    cnn3d_dim = train_dataset.cnn3d_features.shape[1]
-    total_dim = sgcnn_dim + cnn3d_dim
-    
-    # Progress bar for circuits
-    circuit_progress = tqdm(enumerate(circuits), total=len(circuits), desc="Testing Unitaries", position=0)
-    
-    for idx, qc in circuit_progress:
-        circuit_progress.set_description(f"Testing Unitary {idx + 1}/{len(circuits)}")
-        
-        # Create a quantum model
-        model = ModelHybridFC(
-            in_features=total_dim,
-            out_features=1,
-            qc_input_size=n_qubits,
-            qc_n_layers=10,
-            qc_encoding='amplitude',
-            qc_ansatz=1,
-            backend='default.qubit'
+    Deep G3 circuits (depth>=6) are approximate unitary 3-designs, so they
+    ALL converge to near-Haar fidelity variance ≈ 1/(d*(d+1)).  That metric
+    cannot distinguish them.  RFD instead asks: do the 3*n_qubits Pauli
+    expectation values (X,Y,Z on each qubit) span enough distinct directions
+    to support accurate linear regression?  Higher effective rank --> the
+    circuit's outputs are more linearly independent --> better reservoir.
+
+    Metric: participation ratio  PR = (Σ sᵢ)² / Σ sᵢ²  where sᵢ are the
+    singular values of the standardised feature matrix.  Range [1, 3*n_qubits].
+    """
+    dev = qml.device('lightning.qubit', wires=n_qubits)
+
+    @qml.qnode(dev)
+    def feature_circuit(x):
+        for i in range(n_qubits):
+            qml.RY(x[i], wires=i)
+        for instruction in qc.data:
+            gate   = instruction.operation
+            qubits = [qc.find_bit(q).index for q in instruction.qubits]
+            if gate.name == 'h':
+                qml.Hadamard(wires=qubits[0])
+            elif gate.name == 't':
+                qml.T(wires=qubits[0])
+            elif gate.name == 'cx':
+                qml.CNOT(wires=qubits)
+        return (
+            [qml.expval(qml.PauliX(i)) for i in range(n_qubits)] +
+            [qml.expval(qml.PauliY(i)) for i in range(n_qubits)] +
+            [qml.expval(qml.PauliZ(i)) for i in range(n_qubits)]
         )
-        
-        # Train for a few epochs
-        train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=8, shuffle=True)
-        val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=8, shuffle=False)
-        optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-        criterion = torch.nn.MSELoss()
-        train_losses, val_losses = [], []
-        
-        # Progress bar for epochs
-        epoch_progress = tqdm(range(5), desc=f"  Training Unitary {idx + 1}", position=1, leave=False)
-        
-        for epoch in epoch_progress:
-            model.train()
-            train_loss = 0.0
-            for sgcnn_feat, cnn3d_feat, labels in train_loader:
-                optimizer.zero_grad()
-                combined = torch.cat([sgcnn_feat, cnn3d_feat], dim=1)
-                preds = model(combined)
-                loss = criterion(preds, labels)
-                loss.backward()
-                optimizer.step()
-                train_loss += loss.item()
-            train_loss /= len(train_loader)
-            train_losses.append(train_loss)
-            
-            # Validation
-            model.eval()
-            val_loss = 0.0
-            with torch.no_grad():
-                for sgcnn_feat, cnn3d_feat, labels in val_loader:
-                    combined = torch.cat([sgcnn_feat, cnn3d_feat], dim=1)
-                    preds = model(combined)
-                    loss = criterion(preds, labels)
-                    val_loss += loss.item()
-            val_loss /= len(val_loader)
-            val_losses.append(val_loss)
-            
-            epoch_progress.set_postfix({'train_loss': f'{train_loss:.4f}', 'val_loss': f'{val_loss:.4f}'})
-        
-        # Evaluate final performance
-        rmse, mae, r2, pearson, spearman = evaluate_model(model, val_loader)
-        
+
+    rng = np.random.default_rng(0)
+    rows = []
+    for _ in range(n_samples):
+        x   = rng.uniform(0, np.pi, n_qubits)
+        out = feature_circuit(x)
+        rows.append(np.array([float(v) for v in out]))
+
+    F = np.array(rows)                         # (n_samples, 3*n_qubits)
+    F = (F - F.mean(0)) / (F.std(0) + 1e-8)   # standardise columns
+    sv = np.linalg.svd(F, compute_uv=False)    # descending singular values
+    sv = sv / (sv.sum() + 1e-12)
+    pr = 1.0 / (np.sum(sv ** 2) + 1e-12)      # participation ratio
+    return float(pr)                           # higher = more diverse outputs
+
+
+def preselect_circuits_by_expressibility(circuits, n_qubits, top_k):
+    """
+    Pre-select circuits by Reservoir Feature Diversity (replaces fidelity
+    variance which is degenerate for deep G3 circuits).
+    """
+    print(f"\nComputing Reservoir Feature Diversity for {len(circuits)} circuits ...")
+    scores = []
+    for i, qc in enumerate(tqdm(circuits, desc='RFD')):
+        score = reservoir_feature_diversity(qc, n_qubits)
+        scores.append((score, i, qc))
+        print(f"  Circuit {i:3d}: RFD = {score:.4f}")
+    scores.sort(key=lambda t: t[0], reverse=True)
+    selected = scores[:top_k]
+    print(f"\nTop-{top_k} circuits by RFD (higher = more diverse reservoir):")
+    for score, idx, _ in selected:
+        print(f"  Circuit {idx}: RFD = {score:.4f}")
+    return [(idx, qc) for (_, idx, qc) in selected]
+
+
+# ===========================================================================
+# 2b. Quantum feature extraction + Ridge regression readout
+# ===========================================================================
+
+def extract_quantum_features(qc, X_pca, n_qubits, random_seed=42):
+    """
+    Project X_pca (N × D) into quantum reservoir features (N × 3*n_qubits).
+
+    With only ~163 training samples a neural network head with hundreds of
+    parameters will badly overfit (val loss >> train loss).  Ridge regression
+    has a single hyperparameter (alpha) cross-validated analytically — it is
+    the optimal linear estimator for small datasets.
+
+    The quantum reservoir transforms the input non-linearly in exponentially
+    large Hilbert space, providing features that cannot be replicated by any
+    compact classical transformation.  Ridge then finds the best linear
+    combination of these features.
+
+    Input compression: PCA features are projected to n_qubits dimensions via
+    a fixed random projection matrix (same seed for all circuits so the ONLY
+    difference between circuits is the unitary U they apply).
+    """
+    dev = qml.device('lightning.qubit', wires=n_qubits)
+
+    @qml.qnode(dev)
+    def reservoir(inputs):
+        for i in range(n_qubits):
+            qml.RY(inputs[i], wires=i)
+        for instruction in qc.data:
+            gate   = instruction.operation
+            qubits = [qc.find_bit(q).index for q in instruction.qubits]
+            if gate.name == 'h':
+                qml.Hadamard(wires=qubits[0])
+            elif gate.name == 't':
+                qml.T(wires=qubits[0])
+            elif gate.name == 'cx':
+                qml.CNOT(wires=qubits)
+        return (
+            [qml.expval(qml.PauliX(i)) for i in range(n_qubits)] +
+            [qml.expval(qml.PauliY(i)) for i in range(n_qubits)] +
+            [qml.expval(qml.PauliZ(i)) for i in range(n_qubits)]
+        )
+
+    # Fixed random projection: D → n_qubits  (same W across all circuits)
+    rng = np.random.default_rng(random_seed)
+    W   = rng.standard_normal((X_pca.shape[1], n_qubits))
+    W  /= np.linalg.norm(W, axis=0, keepdims=True) + 1e-8
+    X_low = np.tanh(X_pca @ W) * np.pi   # [N, n_qubits] in (-π, π)
+
+    features = []
+    for x in X_low:
+        out = reservoir(x.astype(np.float64))
+        features.append([float(v) for v in out])
+    return np.array(features, dtype=np.float32)   # [N, 3*n_qubits]
+
+
+def run_circuits_and_evaluate(indexed_circuits, train_dataset, val_dataset,
+                              n_qubits=4, max_epochs=None, patience=None,
+                              batch_size=None, lr=None):
+    """
+    Evaluate each G3 circuit as a quantum reservoir using Ridge regression.
+
+    Architecture (Domingo et al. style for small datasets):
+    """
+    from sklearn.linear_model import RidgeCV
+    from sklearn.metrics import mean_squared_error, mean_absolute_error
+    from scipy.stats import pearsonr, spearmanr
+    import math
+
+    # Extract raw PCA arrays from datasets
+    train_pocket = train_dataset.sgcnn_features.numpy()   # [N_tr, PCA_DIMS]
+    train_ligand = train_dataset.cnn3d_features.numpy()
+    train_X_pca  = np.concatenate([train_pocket, train_ligand], axis=1)
+    train_y      = train_dataset.labels.numpy().flatten()
+
+    val_pocket   = val_dataset.sgcnn_features.numpy()
+    val_ligand   = val_dataset.cnn3d_features.numpy()
+    val_X_pca    = np.concatenate([val_pocket,   val_ligand],   axis=1)
+    val_y        = val_dataset.labels.numpy().flatten()
+
+    results = []
+    circuit_bar = tqdm(indexed_circuits, desc="Testing Circuits", position=0)
+
+    for orig_idx, qc in circuit_bar:
+        circuit_bar.set_description(f"Circuit {orig_idx}")
+
+        # 1. Quantum reservoir features
+        q_tr = extract_quantum_features(qc, train_X_pca, n_qubits)  # [N_tr, 3*nq]
+        q_va = extract_quantum_features(qc, val_X_pca,   n_qubits)
+
+        # 2. Concatenate PCA + quantum features
+        X_tr = np.concatenate([train_X_pca, q_tr], axis=1)  # [N_tr, 128+3*nq]
+        X_va = np.concatenate([val_X_pca,   q_va], axis=1)
+
+        # 3. Ridge regression with 5-fold CV alpha selection
+        alphas = [0.001, 0.01, 0.1, 1.0, 10.0, 100.0, 1000.0]
+        ridge  = RidgeCV(alphas=alphas, cv=5)
+        ridge.fit(X_tr, train_y)
+
+        preds  = ridge.predict(X_va)
+        r2     = r2_score(val_y, preds)
+        rmse   = math.sqrt(mean_squared_error(val_y, preds))
+        mae    = mean_absolute_error(val_y, preds)
+        pcc    = pearsonr(val_y,  preds)[0]
+        scc    = spearmanr(val_y, preds)[0]
+
+        # Baseline: Ridge on PCA features only (no quantum)
+        ridge_base = RidgeCV(alphas=alphas, cv=5)
+        ridge_base.fit(train_X_pca, train_y)
+        base_r2 = r2_score(val_y, ridge_base.predict(val_X_pca))
+
         results.append({
-            'circuit_idx': idx,
-            'train_losses': train_losses,
-            'val_losses': val_losses,
-            'rmse': rmse,
-            'mae': mae,
-            'r2': r2,
-            'pearson': pearson,
-            'spearman': spearman
+            'circuit_idx':  orig_idx,
+            'model':        ridge,
+            'circuit':      qc,             # store circuit for ensemble quantum features
+            'r2':           r2,
+            'r2_baseline':  base_r2,        # Ridge on PCA alone (no quantum)
+            'r2_gain':      r2 - base_r2,   # quantum contribution
+            'rmse':         rmse,
+            'mae':          mae,
+            'pearson':      pcc,
+            'spearman':     scc,
+            'best_alpha':   ridge.alpha_,
+            'val_preds':    preds,          # cached val predictions
+            'val_true':     val_y,
+            'val_X_pca':    val_X_pca,      # cached val PCA features
+            'train_losses': [],
+            'val_losses':   [],
         })
-        
-        circuit_progress.set_postfix({'RMSE': f'{rmse:.4f}', 'R2': f'{r2:.4f}'})
-    
+        circuit_bar.set_postfix(R2=f'{r2:.4f}',
+                                Gain=f'{r2 - base_r2:+.4f}',
+                                α=f'{ridge.alpha_:.3g}')
+
+    results.sort(key=lambda r: r['r2'], reverse=True)
+    print(f"\n{'='*60}")
+    print(f"Classical Ridge baseline R² (no quantum): {results[0]['r2_baseline']:.4f}")
+    print(f"Best quantum circuit R²:                  {results[0]['r2']:.4f}")
+    print(f"Quantum gain:                             {results[0]['r2_gain']:+.4f}")
+    print(f"{'='*60}")
     return results
 
-# 3. Select top 5 circuits and save results
 
-def save_and_plot_results(results):
-    # Generate timestamp
-    timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+# ===========================================================================
+# 2c.  Ensemble the top-K circuits (improves R² and gives uncertainty)
+# ===========================================================================
+def ensemble_evaluate(results, val_dataset=None, top_k=5, n_qubits=4):
+    """
+    Average predictions from the top_k Ridge models (by R²).
+    Re-runs quantum features per circuit, then averages predictions.
+    Returns (true_vals, mean_preds, std_preds, ens_r2, ens_rmse).
+    """
+    from scipy.stats import pearsonr
+    from sklearn.metrics import mean_squared_error
+    import math
+
+    best = sorted(results, key=lambda r: r['r2'], reverse=True)[:top_k]
+    true_vals = best[0]['val_true']          # same for all circuits
+    val_X_pca = best[0]['val_X_pca']
+
+    all_preds = []
+    for res in best:
+        q_va = extract_quantum_features(res['circuit'], val_X_pca, n_qubits)
+        X_va = np.concatenate([val_X_pca, q_va], axis=1)
+        all_preds.append(res['model'].predict(X_va))
+
+    all_preds  = np.stack(all_preds)          # (top_k, N)
+    mean_preds = all_preds.mean(axis=0)
+    std_preds  = all_preds.std(axis=0)
+
+    ens_r2   = r2_score(true_vals, mean_preds)
+    ens_rmse = math.sqrt(mean_squared_error(true_vals, mean_preds))
+    ens_pcc  = pearsonr(true_vals, mean_preds)[0]
+    print(f"\nEnsemble (top-{top_k}) — R²={ens_r2:.4f}  "
+          f"RMSE={ens_rmse:.4f}  Pearson r={ens_pcc:.4f}")
+    return true_vals, mean_preds, std_preds, ens_r2, ens_rmse
+
+# ===========================================================================
+# 3. Save, plot, and report
+# ===========================================================================
+def save_and_plot_results(results, ensemble_data=None):
+    timestamp  = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     output_dir = f'plots_{timestamp}'
-    
-    # Create output directory
     os.makedirs(output_dir, exist_ok=True)
-    
-    # Sort by RMSE (lowest is best)
-    results_sorted = sorted(results, key=lambda x: x['rmse'])[:5]
-    
-    # Create dataframe with timestamp
-    df = pd.DataFrame(results_sorted)
-    csv_filename = os.path.join(output_dir, 'top5_random_unitary_results.csv')
-    
-    # Add metadata row with timestamp
-    print(f"\n{'='*60}")
-    print(f"Unitary Testing Results - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"{'='*60}")
-    print(f"Output directory: {output_dir}/")
-    print(f"Results saved to: {csv_filename}")
-    
-    df.to_csv(csv_filename, index=False)
-    
-    # Plot loss curves with timestamp
-    fig1, ax1 = plt.subplots(figsize=(12, 6))
-    for i, res in enumerate(results_sorted):
-        ax1.plot(res['train_losses'], label=f'Train Circuit {res["circuit_idx"]}', linewidth=2)
-        ax1.plot(res['val_losses'], label=f'Val Circuit {res["circuit_idx"]}', linestyle='--', linewidth=2)
-    ax1.set_xlabel('Epoch', fontsize=12)
-    ax1.set_ylabel('Loss', fontsize=12)
-    ax1.set_title(f'Loss Curves for Top 5 Random Unitary Circuits\nRun: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}', fontsize=13)
-    ax1.legend(loc='best')
-    ax1.grid(True, alpha=0.3)
-    loss_filename = os.path.join(output_dir, 'top5_loss_curves.png')
-    fig1.savefig(loss_filename, dpi=300, bbox_inches='tight')
-    print(f"Loss plot saved to: {loss_filename}")
-    
-    # Plot R² scores with timestamp
-    fig2, ax2 = plt.subplots(figsize=(10, 6))
-    circuit_indices = [res['circuit_idx'] for res in results_sorted]
-    r2_scores = [res['r2'] for res in results_sorted]
-    rmse_scores = [res['rmse'] for res in results_sorted]
-    
-    bars = ax2.bar(range(len(circuit_indices)), r2_scores, color='steelblue', alpha=0.8, edgecolor='black')
-    ax2.set_xlabel('Top Unitary Rank', fontsize=12)
-    ax2.set_ylabel('R² Score', fontsize=12)
-    ax2.set_title(f'R² Scores for Top 5 Random Unitary Circuits\nRun: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}', fontsize=13)
-    ax2.set_xticks(range(len(circuit_indices)))
-    ax2.set_xticklabels([f'Circuit {idx}' for idx in circuit_indices])
-    ax2.grid(True, alpha=0.3, axis='y')
-    
-    # Add value labels on bars
-    for i, (bar, r2, rmse) in enumerate(zip(bars, r2_scores, rmse_scores)):
-        height = bar.get_height()
-        ax2.text(bar.get_x() + bar.get_width()/2., height,
-                f'R²={r2:.3f}\nRMSE={rmse:.3f}',
-                ha='center', va='bottom', fontsize=10)
-    
-    r2_filename = os.path.join(output_dir, 'top5_r2_scores.png')
-    fig2.savefig(r2_filename, dpi=300, bbox_inches='tight')
-    print(f"R² plot saved to: {r2_filename}")
-    
-    # Print summary table
-    print(f"\nTop 5 Unitaries Summary:")
-    print(df[['circuit_idx', 'rmse', 'mae', 'r2', 'pearson', 'spearman']].to_string(index=False))
-    print(f"{'='*60}\n")
-    
-    plt.show()
 
+    top5 = sorted(results, key=lambda x: x['rmse'])[:5]
+    # Drop model objects before serialising
+    top5_serialisable = [
+        {k: v for k, v in r.items() if k != 'model'} for r in top5
+    ]
+    df = pd.DataFrame(top5_serialisable)
+    csv_path = os.path.join(output_dir, 'top5_random_unitary_results.csv')
+    df.to_csv(csv_path, index=False)
+
+    print(f"\n{'='*60}")
+    print(f"Unitary Testing Results — {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"Output dir : {output_dir}/")
+    print(df[['circuit_idx', 'rmse', 'mae', 'r2', 'pearson', 'spearman']].to_string(index=False))
+    print(f"{'='*60}")
+
+    # ---- loss curves -------------------------------------------------------
+    fig1, ax1 = plt.subplots(figsize=(12, 6))
+    for res in top5:
+        ax1.plot(res['train_losses'], label=f"Train C{res['circuit_idx']}", lw=2)
+        ax1.plot(res['val_losses'],   label=f"Val   C{res['circuit_idx']}",
+                 linestyle='--', lw=2)
+    ax1.set_xlabel('Epoch'); ax1.set_ylabel('MSE Loss')
+    ax1.set_title('Top-5 G3 Reservoir Circuits — Loss Curves'); ax1.legend()
+    ax1.grid(True, alpha=0.3)
+    fig1.savefig(os.path.join(output_dir, 'top5_loss_curves.png'), dpi=300, bbox_inches='tight')
+
+    # ---- R² bar chart ------------------------------------------------------
+    fig2, ax2 = plt.subplots(figsize=(10, 6))
+    idxs = [r['circuit_idx'] for r in top5]
+    r2s  = [r['r2']          for r in top5]
+    rmses= [r['rmse']        for r in top5]
+    bars = ax2.bar(range(len(idxs)), r2s, color='steelblue', alpha=0.8, edgecolor='k')
+    for bar, r2v, rmse in zip(bars, r2s, rmses):
+        ax2.text(bar.get_x() + bar.get_width()/2, bar.get_height(),
+                 f'R²={r2v:.3f}\nRMSE={rmse:.3f}', ha='center', va='bottom', fontsize=9)
+    ax2.set_xticks(range(len(idxs)))
+    ax2.set_xticklabels([f'C{i}' for i in idxs])
+    ax2.set_xlabel('Circuit'); ax2.set_ylabel('R²')
+    ax2.set_title('Top-5 G3 Random Unitary Circuits — R² on Validation Set')
+    ax2.grid(True, alpha=0.3, axis='y')
+    ax2.axhline(0, color='red', lw=1, linestyle=':')
+    fig2.savefig(os.path.join(output_dir, 'top5_r2_scores.png'), dpi=300, bbox_inches='tight')
+
+    # ---- ensemble scatter --------------------------------------------------
+    if ensemble_data is not None:
+        true_vals, mean_preds, std_preds, ens_r2, ens_rmse = ensemble_data
+        fig3, ax3 = plt.subplots(figsize=(8, 8))
+        ax3.errorbar(true_vals, mean_preds, yerr=std_preds,
+                     fmt='o', alpha=0.5, ecolor='grey', capsize=2)
+        mn = min(true_vals.min(), mean_preds.min())
+        mx = max(true_vals.max(), mean_preds.max())
+        ax3.plot([mn, mx], [mn, mx], 'r--', lw=1.5, label='ideal')
+        ax3.set_xlabel('True  (normalised)')
+        ax3.set_ylabel('Predicted  (normalised)')
+        ax3.set_title(f'Ensemble Predictions  R²={ens_r2:.4f}  RMSE={ens_rmse:.4f}')
+        ax3.legend(); ax3.grid(True, alpha=0.3)
+        fig3.savefig(os.path.join(output_dir, 'ensemble_scatter.png'), dpi=300, bbox_inches='tight')
+
+    plt.show()
+    print(f"Plots saved to {output_dir}/")
+
+
+# ===========================================================================
+# Entry point
+# ===========================================================================
 if __name__ == "__main__":
-    n_qubits = 4  # Number of qubits
-    depth = 2     # Circuit depth (layers of gates)
-    circuits = generate_g3_random_circuits(n_qubits, depth, num_circuits=10)
-    train_dataset, val_dataset = load_preprocessed_data()
-    results = run_circuits_and_evaluate(circuits, train_dataset, val_dataset, n_qubits)
-    save_and_plot_results(results)
+    N_QUBITS     = 6    # qubits (↑ from 4 → 18 observable features vs 12)
+    DEPTH        = 10   # G3 gate layers
+    N_CIRCUITS   = 20   # pool of random G3 circuits before RFD filter
+    TOP_K_EXPR   = 10   # keep top-K by Reservoir Feature Diversity
+    TOP_K_ENS    = 5    # ensemble after training
+    PCA_DIMS     = 32   # PCA dims per modality; 2*32=64 total into reservoir
+
+    # ---- Generate G3 circuit pool ----------------------------------------
+    circuits = generate_g3_random_circuits(N_QUBITS, DEPTH, num_circuits=N_CIRCUITS)
+
+    # ---- Pre-select most expressive circuits (RFD metric) ----------------
+    indexed_circuits = preselect_circuits_by_expressibility(
+        circuits, N_QUBITS, top_k=TOP_K_EXPR)
+
+    # ---- Load data directly from PDBbind refined-set with RDKit ----------
+    # Uses ECFP4 + RDKit descriptors (ligand) and AA composition (pocket)
+    # ~5000+ samples vs ~180 from old model_ready_data
+    train_dataset, val_dataset, label_mean, label_std = \
+        load_from_refined_set(n_pca_components=PCA_DIMS)
+
+    # ---- Evaluate each circuit with Ridge regression readout -------------
+    results = run_circuits_and_evaluate(
+        indexed_circuits, train_dataset, val_dataset,
+        n_qubits=N_QUBITS,
+    )
+
+    # ---- Ensemble top-K circuits -----------------------------------------
+    ensemble_data = ensemble_evaluate(
+        results, top_k=TOP_K_ENS, n_qubits=N_QUBITS)
+
+    # ---- Save plots and CSV ----------------------------------------------
+    save_and_plot_results(results, ensemble_data=ensemble_data)

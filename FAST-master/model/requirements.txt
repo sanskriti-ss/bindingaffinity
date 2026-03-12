@@ -7,7 +7,7 @@ matplotlib
 torch
 torchvision
 torchaudio
-
+tqdm
 # Chemistry and molecular data processing
 rdkit
 
