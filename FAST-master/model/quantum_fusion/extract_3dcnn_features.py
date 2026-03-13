@@ -13,7 +13,7 @@ Steps performed:
 Usage:
     python extract_3dcnn_features.py \
         --hdf    C:/bindingaffinity/FAST-master/model/quantum_fusion/refined_all.hdf \
-        --ckpt   C:/bindingaffinity/FAST-master/model/3dcnn/clyde-train-3/best_checkpoint.pth \
+        --ckpt   C:/bindingaffinity/FAST-master/model/3dcnn/checkpoint_3dcnn_refined/best_checkpoint.pth \
         --output C:/bindingaffinity/FAST-master/model/quantum_fusion/refined_3dcnn_features.npz
 """
 

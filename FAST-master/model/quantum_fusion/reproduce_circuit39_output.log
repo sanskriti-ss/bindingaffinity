@@ -1,0 +1,34 @@
+Rebuilding Circuit #39 from C:\bindingaffinity\FAST-master\model\quantum_fusion\top25_circuit_gates.csv ...
+  6-qubit circuit, 60 gates
+Drawing circuit diagram ...
+  Saved -> C:\bindingaffinity\FAST-master\model\quantum_fusion\circuit39_diagram.png
+
+Loading features ...
+Refined-set: C:\bindingaffinity\data\refined-set
+Labels: 5316 entries
+Featurized 836 complexes
+Feature dims ù pocket: 25  ligand(PCA): 64
+Label range: 2.12 û 11.92  mean=6.32
+[load_with_model_features] 3DCNN features (10-dim) loaded for 836/836 complexes
+[load_with_model_features] SGCNN features (54-dim) loaded for 836/836 complexes
+[load_with_model_features] Final feature dim: 153
+  Label stats: mean=6.357  std=1.781
+  Train/Val/Test: 585/125/126
+  Input dim: 153
+
+Training ModelHybridFC_Reservoir with Circuit #39 ...
+
+  Circuit #39 reproduced results:
+    R▓         = 0.3487
+    Adj-R▓     = 3.9075
+    Pearson r  = 0.6084
+    Spearman r = 0.6723
+    RMSE       = 1.5214 pKi
+    MAE        = 1.0750 pKi
+
+Generating scatter plot ...
+  Saved -> C:\bindingaffinity\FAST-master\model\quantum_fusion\circuit39_scatter.png
+
+Done. Outputs written to:
+  C:\bindingaffinity\FAST-master\model\quantum_fusion\circuit39_diagram.png
+  C:\bindingaffinity\FAST-master\model\quantum_fusion\circuit39_scatter.png
