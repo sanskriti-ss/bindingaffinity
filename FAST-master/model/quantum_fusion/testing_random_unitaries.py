@@ -509,7 +509,7 @@ def preselect_circuits_by_expressibility(circuits, n_qubits, top_k):
     """
     print(f"\nComputing Reservoir Feature Diversity for {len(circuits)} circuits ...")
     scores = []
-    for i, qc in enumerate(tqdm(circuits, desc='RFD')):
+    for i, qc in enumerate(tqdm(circuits, desc='RFD', ascii=True)):
         score = reservoir_feature_diversity(qc, n_qubits)
         scores.append((score, i, qc))
         print(f"  Circuit {i:3d}: RFD = {score:.4f}")
@@ -528,11 +528,6 @@ def preselect_circuits_by_expressibility(circuits, n_qubits, top_k):
 def extract_quantum_features(qc, X_pca, n_qubits, random_seed=42):
     """
     Project X_pca (N × D) into quantum reservoir features (N × 3*n_qubits).
-
-    With only ~163 training samples a neural network head with hundreds of
-    parameters will badly overfit (val loss >> train loss).  Ridge regression
-    has a single hyperparameter (alpha) cross-validated analytically — it is
-    the optimal linear estimator for small datasets.
 
     The quantum reservoir transforms the input non-linearly in exponentially
     large Hilbert space, providing features that cannot be replicated by any

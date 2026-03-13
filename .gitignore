@@ -17,3 +17,4 @@ data
 # Large installer files
 *.exe
 ChimeraX-1.9.exe
+*.hdf
