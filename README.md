@@ -18,7 +18,7 @@ This project implements and compares multiple approaches for protein-ligand bind
 - Analysis and performance benchmarking across all model families
 
 **Research Insights:**
-- Quantum reservoir computing (fixed G3 circuits + classical MLP head) achieves **R² ≈ 0.86** on the full PDBbind refined set (4641 complexes)
+- Quantum reservoir computing (fixed G3 circuits + classical MLP head) achieves **R² ≈ 0.88** on the full PDBbind refined set (4641 complexes)
 - Fusing 3DCNN and SGCNN embeddings with RDKit features into a 153-dim input is critical — RDKit-only features give R² ≈ 0.10
 - Circuit expressibility pre-selection (RFD) consistently identifies circuits that generalise better
 - Demonstrates a viable NISQ-era approach: the quantum reservoir is fixed and non-trainable; only classical layers are optimised
@@ -32,12 +32,16 @@ FAST-master/model/
 ├── quantum_fusion/     # Quantum Fusion: fused features --> G3 reservoir --> MLP head
 │   ├── main_train.py            # Model definitions & data loading
 │   ├── testing_random_unitaries.py  # G3 circuit generation & RFD selection
-│   ├── evaluate_top5.py         # 100-circuit sweep, top-25 by RFD, top-5 results
+│   ├── evaluate_top5.py         # 100-circuit sweep, top-25 by RFD, full analysis
 │   ├── extract_3dcnn_features.py
 │   ├── extract_sgcnn_features.py
-│   ├── top5_unitary_results.csv # latest benchmark results
-│   ├── scatter_best.png         # predicted vs actual for best circuit
-│   └── top5_r2_bar.png          # R² bar chart for top-5 circuits
+│   ├── top5_unitary_results.csv     # latest benchmark results (25 circuits)
+│   ├── top5_circuit_gates.csv       # gate-by-gate breakdown for each circuit
+│   ├── top5_circuit_diagrams/       # PNG circuit diagram per trained circuit
+│   ├── scatter_best.png             # predicted vs actual for best circuit
+│   ├── top5_r2_bar.png              # R² / Adj-R² bar chart for top circuits
+│   ├── quartile_comparison.png      # box + violin plot: Adj-R² by quartile
+│   └── best_vs_worst_scatter.png    # side-by-side scatter: best vs worst circuit
 └── fusion_tf/          # TF fusion baseline
 ```
 
@@ -52,27 +56,30 @@ The quantum fusion model (`ModelHybridFC_Reservoir`) follows the Quantum Reservo
 3. **Fixed quantum reservoir** — 6-qubit G3 circuit (H, T, CNOT gates); X/Y/Z Pauli measurements yield **18 quantum features**; skip-connect appends the 6-dim encoding → **24-dim combined**
 4. **MLP regression head** — Linear(24→64) → BN → ReLU → Dropout(0.2) → Linear(64→32) → ReLU → Linear(32→1)
 
-**Circuit selection:** 100 G3 circuits are generated, scored by Reservoir Feature Diversity (RFD) expressibility, and the top-25 are fully trained (50 epochs, Adam, LR=3×10⁻⁴). The best 5 are reported below.
+**Circuit selection:** 100 G3 circuits are generated, scored by Reservoir Feature Diversity (RFD) expressibility, and the top-25 are fully trained in parallel (4 workers, 50 epochs, early stopping patience=15, Adam LR=3×10⁻⁴). The best 5 are reported below.
 
-### Performance Results — Top-5 Quantum Reservoir Circuits (Note that whenever you run main_train in quantum fusion, you get different circuits everytime hence random unitary circuits!)
+### Performance Results — Top-5 Quantum Reservoir Circuits (Note that whenever you run evaluate_top5.py, you get different circuits every time you run random unitary circuits!)
 
 Evaluated on 697-sample held-out test set (PDBbind 2020 refined set, 4641 complexes total, 3248/696/697 train/val/test split, label mean=6.42, std=1.976 pKi):
 
 | Rank | Circuit | Test R² | Adj R² | Pearson r | Spearman ρ | RMSE (pKi) | MAE (pKi) |
 |------|---------|---------|--------|-----------|------------|-----------|----------|
-| 1 | #12 | **0.8603** | 0.821 | **0.9281** | **0.920** | **0.6638** | 0.4948 |
-| 2 | #15 | 0.8548 | 0.814 | 0.9246 | 0.916 | 0.6768 | 0.4886 |
-| 3 | #10 | 0.8558 | 0.815 | 0.9268 | 0.920 | 0.6744 | 0.4908 |
-| 4 | #2  | 0.8480 | 0.805 | 0.9213 | 0.914 | 0.6925 | 0.4838 |
-| 5 | #8  | 0.8586 | 0.819 | 0.9272 | 0.918 | 0.6679 | **0.4686** |
+| 1 | #39 | **0.8798** | **0.8459** | **0.9382** | **0.9328** | **0.6159** | **0.4294** |
+| 2 | #66 | 0.8699 | 0.8333 | 0.9339 | 0.9254 | 0.6405 | 0.4655 |
+| 3 | #81 | 0.8687 | 0.8318 | 0.9330 | 0.9221 | 0.6435 | 0.4616 |
+| 4 | #37 | 0.8657 | 0.8278 | 0.9305 | 0.9163 | 0.6509 | 0.4733 |
+| 5 | #5  | 0.8653 | 0.8273 | 0.9305 | 0.9172 | 0.6518 | 0.4683 |
 
 Scatter plot (predicted vs actual, best circuit): `FAST-master/model/quantum_fusion/scatter_best.png`
-R² comparison bar chart: `FAST-master/model/quantum_fusion/top5_r2_bar.png`
+R² / Adj-R² bar chart: `FAST-master/model/quantum_fusion/top5_r2_bar.png`
+Quartile comparison (box + violin): `FAST-master/model/quantum_fusion/quartile_comparison.png`
+Best vs worst circuit scatter: `FAST-master/model/quantum_fusion/best_vs_worst_scatter.png`
 
 **Key Findings:**
-- All top-5 circuits achieve R² > 0.848 and Pearson r > 0.92, indicating strong predictive correlation
-- Top circuit (#12) achieves RMSE ≈ 0.66 pKi — competitive with classical deep learning baselines on PDBbind
-- Variance across top-5 is small (ΔR² < 0.013), suggesting stable learning regardless of circuit topology
+- All top-5 circuits achieve R² > 0.865 and Pearson r > 0.930, indicating strong predictive correlation
+- Top circuit (#39) achieves R²=0.8798 and RMSE=0.616 pKi — competitive with classical deep learning baselines on PDBbind
+- Variance across top-5 is small (ΔR² < 0.015), suggesting robust learning regardless of circuit topology
+- Quartile analysis shows a clear performance gradient: top-25% circuits (by RFD) consistently outperform lower quartiles on Adj-R²
 - The quantum reservoir adds complementary non-linear projections that consistently benefit the MLP head when the input feature space is rich (153-dim fused)
 
 
