@@ -14,6 +14,8 @@ Run from quantum_fusion/ directory:
 """
 
 import os, sys, math, glob
+# Pass UTF-8 flag to any spawned subprocess workers
+os.environ.setdefault('PYTHONUTF8', '1')
 import numpy as np
 import pandas as pd
 import torch
@@ -27,6 +29,8 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from datetime import datetime
 from tqdm import tqdm
+from concurrent.futures import ProcessPoolExecutor, as_completed
+import pickle as _pickle
 
 # ── imports from main_train ──────────────────────────────────────────────────
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -48,8 +52,10 @@ EPOCHS     = 50
 BATCH_SIZE = 64
 LR         = 3e-4
 TOP_K      = 25           # Train on top-25 by RFD
-NUM_CIRCS  = 100          # Generate 100 circuits for quartile analysis
-DEVICE     = torch.device('cpu')   # PennyLane simulators are CPU-only
+NUM_CIRCS  = 100          # Generate 100 circuits for quartile analysis (each circuit is ~1-2 min to train on 2000 samples for 50 epochs, so 25 circuits is ~30-60 min total)
+DEVICE         = torch.device('cpu')   # PennyLane simulators are CPU-only
+N_WORKERS      = min(4, (os.cpu_count() or 1))   # parallel workers (set to 1 to disable)
+EARLY_STOP_PAT = 15                               # patience epochs before early stop
 
 _qf_dir    = os.path.dirname(os.path.abspath(__file__))
 _dcnn_npz  = os.path.join(_qf_dir, 'refined_3dcnn_features.npz')
@@ -57,15 +63,16 @@ _sgcnn_npz = os.path.join(_qf_dir, 'refined_sgcnn_features.npz')
 OUT_DIR    = _qf_dir   # write outputs next to this script
 
 
-def _train_one(model, loaders, epochs=EPOCHS, lr=LR, device=DEVICE):
-    """Train a single reservoir model, return best val RMSE and its test metrics."""
+def _train_one(model, loaders, epochs=EPOCHS, lr=LR, device=DEVICE, early_stop_patience=0):
+    """Train a single reservoir model, return best val RMSE and its state dict."""
     optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=1e-4)
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(
         optimizer, patience=15, factor=0.5, min_lr=1e-6)
     criterion = nn.MSELoss()
 
-    best_val  = float('inf')
+    best_val   = float('inf')
     best_state = None
+    no_improve = 0
 
     for epoch in range(1, epochs + 1):
         model.train()
@@ -83,6 +90,11 @@ def _train_one(model, loaders, epochs=EPOCHS, lr=LR, device=DEVICE):
         if rmse < best_val:
             best_val   = rmse
             best_state = {k: v.clone() for k, v in model.state_dict().items()}
+            no_improve = 0
+        else:
+            no_improve += 1
+            if early_stop_patience > 0 and no_improve >= early_stop_patience:
+                break
 
     model.load_state_dict(best_state)
     return best_val, best_state
@@ -99,6 +111,52 @@ def _get_predictions(model, loader, device=DEVICE):
             preds.extend(out.cpu().numpy().flatten())
             labs.extend(y.cpu().numpy().flatten())
     return np.array(preds), np.array(labs)
+
+
+def _train_circuit_worker(args):
+    """Module-level worker for ProcessPoolExecutor: trains one circuit end-to-end.
+
+    args = (rank, circ_idx, circ_bytes, datasets_payload, dims)
+    datasets_payload = {'train': {'sg':..., 'c3':..., 'y':...}, 'val':..., 'test':...}
+    Returns dict with all metrics + raw preds/labs arrays.
+    """
+    rank, circ_idx, circ_bytes, datasets, dims = args
+    circuit = _pickle.loads(circ_bytes)
+
+    from torch.utils.data import DataLoader as _DL
+    lok = {}
+    for split in ['train', 'val', 'test']:
+        dset = FusionDataset(
+            datasets[split]['sg'], datasets[split]['c3'], datasets[split]['y'])
+        lok[split] = _DL(dset, batch_size=BATCH_SIZE, shuffle=(split == 'train'))
+
+    model = ModelHybridFC_Reservoir(
+        in_features=dims, out_features=1,
+        qiskit_circuit=circuit, n_qubits=N_QUBITS,
+        backend='lightning.qubit',
+    ).to(DEVICE)
+
+    _, best_state = _train_one(model, lok, early_stop_patience=EARLY_STOP_PAT)
+    model.load_state_dict(best_state)
+    preds, labs = _get_predictions(model, lok['test'])
+
+    import math as _m
+    from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+    from scipy.stats import pearsonr, spearmanr
+    rmse  = _m.sqrt(mean_squared_error(labs, preds))
+    mae   = mean_absolute_error(labs, preds)
+    r2    = r2_score(labs, preds)
+    pear  = pearsonr(labs, preds)[0]
+    spear = spearmanr(labs, preds)[0]
+    adj_r2 = 1 - (1 - r2) * (len(labs) - 1) / (len(labs) - dims - 1)
+
+    return {
+        'rank': rank, 'circ_idx': circ_idx,
+        'r2': r2, 'adj_r2': adj_r2,
+        'pearson_r': pear, 'spearman_rho': spear,
+        'rmse': rmse, 'mae': mae,
+        'preds': preds, 'labs': labs,
+    }
 
 
 def main():
@@ -147,44 +205,65 @@ def main():
     indexed  = preselect_circuits_by_expressibility(circuits, N_QUBITS, top_k=TOP_K)
     print(f"Top-{TOP_K} circuit indices (by RFD): {[i for i,_ in indexed]}")
 
-    # ── 3. Train each circuit ────────────────────────────────────────────────
-    results = []
+    # ── 3. Train each circuit (parallel) ────────────────────────────────────
+    print(f"\nTraining {TOP_K} circuits  (N_WORKERS={N_WORKERS}, "
+          f"EPOCHS={EPOCHS}, EARLY_STOP_PAT={EARLY_STOP_PAT}) …")
+
+    # Serialise everything that crosses the process boundary
+    datasets_payload = {
+        split: {'sg': datasets[split]['sg'],
+                'c3': datasets[split]['c3'],
+                'y':  datasets[split]['y']}
+        for split in ['train', 'val', 'test']
+    }
+    worker_args = [
+        (rank, circ_idx, _pickle.dumps(circuit), datasets_payload, dims)
+        for rank, (circ_idx, circuit) in enumerate(indexed, 1)
+    ]
+
+    raw_results: dict = {}
+    if N_WORKERS > 1:
+        with ProcessPoolExecutor(max_workers=N_WORKERS) as executor:
+            futures = {executor.submit(_train_circuit_worker, a): a[0]
+                       for a in worker_args}
+            for fut in tqdm(as_completed(futures), total=len(futures),
+                            desc="Training circuits", ascii=True):
+                try:
+                    res = fut.result()
+                    raw_results[res['rank']] = res
+                    rmse_w = res['rmse'] * label_std
+                    print(f"  Circuit #{res['circ_idx']} (rank {res['rank']}) "
+                          f"-> R²={res['r2']:.4f}  Adj-R²={res['adj_r2']:.4f}  "
+                          f"RMSE={rmse_w:.4f} pKi")
+                except Exception as exc:
+                    rank_f = futures[fut]
+                    print(f"  Circuit rank {rank_f} FAILED: {exc}")
+    else:
+        for warg in tqdm(worker_args, desc="Training circuits", ascii=True):
+            res = _train_circuit_worker(warg)
+            raw_results[res['rank']] = res
+            rmse_w = res['rmse'] * label_std
+            print(f"  Circuit #{res['circ_idx']} (rank {res['rank']}) "
+                  f"-> R²={res['r2']:.4f}  Adj-R²={res['adj_r2']:.4f}  "
+                  f"RMSE={rmse_w:.4f} pKi")
+
+    # Reconstruct ordered results list + track best
+    results       = []
     best_r2       = -np.inf
     best_preds    = None
     best_labs     = None
     best_circ_idx = None
+    best_state_save = None
 
-    for rank, (circ_idx, circuit) in enumerate(indexed, 1):
-        print(f"\n{'='*60}")
-        print(f"Circuit {circ_idx}  (rank {rank}/{TOP_K})")
-        print(f"{'='*60}")
-
-        model = ModelHybridFC_Reservoir(
-            in_features=dims,
-            out_features=1,
-            qiskit_circuit=circuit,
-            n_qubits=N_QUBITS,
-            backend='lightning.qubit',
-        ).to(DEVICE)
-
-        _, best_state = _train_one(model, loaders)
-        model.load_state_dict(best_state)
-
-        # Evaluate on test set
-        preds, labs = _get_predictions(model, loaders['test'])
-        rmse  = math.sqrt(mean_squared_error(labs, preds))
-        mae   = mean_absolute_error(labs, preds)
-        r2    = r2_score(labs, preds)
-        pear  = pearsonr(labs, preds)[0]
-        spear = spearmanr(labs, preds)[0]
-
-        # Adjusted R²: 1 - (1-R²)*(n-1)/(n-p-1)
-        n_test = len(labs)
-        adj_r2 = 1 - (1 - r2) * (n_test - 1) / (n_test - dims - 1)
-
-        # Convert RMSE/MAE back to pKi units
-        rmse_pki = rmse * label_std
-        mae_pki  = mae  * label_std
+    for rank in sorted(raw_results.keys()):
+        res      = raw_results[rank]
+        r2       = res['r2']
+        adj_r2   = res['adj_r2']
+        pear     = res['pearson_r']
+        spear    = res['spearman_rho']
+        rmse_pki = res['rmse'] * label_std
+        mae_pki  = res['mae']  * label_std
+        circ_idx = res['circ_idx']
 
         print(f"  Test  R²={r2:.4f}  Adj-R²={adj_r2:.4f}  Pearson={pear:.4f}  "
               f"Spearman={spear:.4f}  RMSE={rmse_pki:.4f} pKi  MAE={mae_pki:.4f} pKi")
@@ -192,28 +271,27 @@ def main():
         results.append({
             'rank':          rank,
             'circuit_index': circ_idx,
-            'r2':            round(r2,     4),
-            'adj_r2':        round(adj_r2, 4),
-            'pearson_r':     round(pear,   4),
-            'spearman_rho':  round(spear,  4),
+            'r2':            round(r2,      4),
+            'adj_r2':        round(adj_r2,  4),
+            'pearson_r':     round(pear,    4),
+            'spearman_rho':  round(spear,   4),
             'rmse_pki':      round(rmse_pki, 4),
             'mae_pki':       round(mae_pki,  4),
-            'rmse_norm':     round(rmse, 4),
-            'mae_norm':      round(mae,  4),
+            'rmse_norm':     round(res['rmse'], 4),
+            'mae_norm':      round(res['mae'],  4),
         })
 
         if r2 > best_r2:
             best_r2       = r2
-            best_preds    = preds
-            best_labs     = labs
+            best_preds    = res['preds']
+            best_labs     = res['labs']
             best_circ_idx = circ_idx
-            best_state_save = best_state
 
     # ── 4. Save results CSV ──────────────────────────────────────────────────
     csv_path = os.path.join(OUT_DIR, 'top5_unitary_results.csv')
     df = pd.DataFrame(results).sort_values('r2', ascending=False).reset_index(drop=True)
     df.to_csv(csv_path, index=False)
-    print(f"\nSaved CSV → {csv_path}")
+    print(f"\nSaved CSV -> {csv_path}")
     print(df.to_string(index=False))
 
     # ── 4b. Circuit diagram PNGs + gate-sequence CSV ──────────────────────────
@@ -234,7 +312,7 @@ def main():
             diag_path = os.path.join(circs_dir, f'circuit_{circ_idx}_rank{rank}.png')
             fig_c.savefig(diag_path, dpi=150, bbox_inches='tight')
             plt.close(fig_c)
-            print(f"  Saved circuit diagram → {diag_path}")
+            print(f"  Saved circuit diagram -> {diag_path}")
         except Exception as e:
             print(f"  Could not draw circuit #{circ_idx}: {e}")
 
@@ -254,7 +332,7 @@ def main():
 
     gates_csv = os.path.join(OUT_DIR, 'top5_circuit_gates.csv')
     pd.DataFrame(gate_rows).to_csv(gates_csv, index=False)
-    print(f"Saved gate-sequence CSV → {gates_csv}  ({len(gate_rows)} gate entries)")
+    print(f"Saved gate-sequence CSV -> {gates_csv}  ({len(gate_rows)} gate entries)")
 
     # ── 5. Scatter plot (best circuit + optional existing best_model) ─────────
     fig, axes = plt.subplots(1, 2, figsize=(14, 6))
@@ -320,7 +398,7 @@ def main():
             ax2.set_ylim(vmin2, vmax2)
             ax2.set_aspect('equal', adjustable='box')
             ax2.grid(True, alpha=0.3)
-            print(f"  Existing model → Test R²={prev_r2:.4f}  Pearson={prev_pear:.4f}")
+            print(f"  Existing model -> Test R²={prev_r2:.4f}  Pearson={prev_pear:.4f}")
         except Exception as e:
             ax2.text(0.5, 0.5, f'Could not load\nbest_model.pth\n{e}',
                      ha='center', va='center', transform=ax2.transAxes, fontsize=9)
@@ -337,7 +415,7 @@ def main():
     scatter_path = os.path.join(OUT_DIR, 'scatter_best.png')
     plt.savefig(scatter_path, dpi=150, bbox_inches='tight')
     plt.close()
-    print(f"Saved scatter plot → {scatter_path}")
+    print(f"Saved scatter plot -> {scatter_path}")
 
     # ── 6. Bar chart of R² across top-5 ──────────────────────────────────────
     fig2, ax3 = plt.subplots(figsize=(8, 4))
@@ -370,7 +448,7 @@ def main():
     bar_path = os.path.join(OUT_DIR, 'top5_r2_bar.png')
     plt.savefig(bar_path, dpi=150, bbox_inches='tight')
     plt.close()
-    print(f"Saved bar chart → {bar_path}")
+    print(f"Saved bar chart -> {bar_path}")
 
     # ── 7. Quartile Analysis: Performance by Top-25% vs Other Quartiles ──────
     # Sort results by R² to establish quartiles
@@ -463,7 +541,7 @@ def main():
     quartile_path = os.path.join(OUT_DIR, 'quartile_comparison.png')
     plt.savefig(quartile_path, dpi=150, bbox_inches='tight')
     plt.close()
-    print(f"Saved quartile comparison → {quartile_path}")
+    print(f"Saved quartile comparison -> {quartile_path}")
 
     # ── 7b. Best vs Worst scatter (side-by-side) ────────────────────────────
     # Rebuild models for best and worst circuits to get their predictions
@@ -514,7 +592,7 @@ def main():
     best_worst_path = os.path.join(OUT_DIR, 'best_vs_worst_scatter.png')
     plt.savefig(best_worst_path, dpi=150, bbox_inches='tight')
     plt.close()
-    print(f"Saved best vs worst scatter → {best_worst_path}")
+    print(f"Saved best vs worst scatter -> {best_worst_path}")
 
     print("\nDone!")
 
