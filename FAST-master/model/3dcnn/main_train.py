@@ -12,13 +12,14 @@ import sys
 sys.stdout.flush()
 sys.path.insert(0, "../common")
 import argparse
+from dataclasses import dataclass
 import random
 import numpy as np
 import torch
 import torch.nn as nn
 
 from torch.nn.parallel import DataParallel, DistributedDataParallel
-from torch.optim import Adam, RMSprop, lr_scheduler
+from torch.optim import Adam, AdamW, RMSprop, lr_scheduler
 from torch.utils.data import Dataset, DataLoader, Subset
 
 from model import Model_3DCNN, strip_prefix_if_present
@@ -45,44 +46,87 @@ from scipy.stats import pearsonr, spearmanr
 #torch.backends.cudnn.benchmark = False  # NOTE: https://discuss.pytorch.org/t/what-does-torch-backends-cudnn-benchmark-do/5936
 #os.environ["PYTHONHASHSEED"] = "0"
 
+# Resolved at import time so paths are stable regardless of working directory
+_DATA_DIR = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../data"))
+
+@dataclass
+class TrainArgs:
+    device_name: str = "cuda:0"
+    data_dir: str = _DATA_DIR
+    dataset_type: float = 2  # 2=pre-voxelized (48,48,48,19); 1=atom-level pafnucy format
+    mlhdf_fn: str = "3dcnn_train.hdf"  # pre-voxelized split of step5a.hdf
+    csv_fn: str = ""                   # no CSV needed; Dataset_MLHDF reads all keys from HDF
+    vmlhdf_fn: str = "3dcnn_val.hdf"
+    vcsv_fn: str = ""
+    model_path: str = os.path.join(_DATA_DIR, "checkpoints/best_model.pth")
+    complex_type: int = 1
+    rmsd_weight: bool = False
+    rmsd_threshold: float = 2.0
+    epoch_count: int = 50
+    batch_size: int = 50
+    learning_rate: float = 0.0007
+    weight_decay: float = 1e-2  # AdamW weight decay; important regularizer on small datasets
+    # decay_rate: float = 0.95  # StepLR
+    # decay_iter: int = 100     # StepLR
+    cosine_T_max: int = 50      # CosineAnnealingLR: steps to eta_min; set to epoch_count if stepping per epoch
+    cosine_eta_min: float = 5e-7  # CosineAnnealingLR: minimum LR at trough
+    checkpoint_dir: str = os.path.join(_DATA_DIR, "checkpoints/3dcnn")
+    checkpoint_iter: int = 10000
+    verbose: int = 0
+    multi_gpus: bool = False
 
 
-# program arguments
-parser = argparse.ArgumentParser()
-parser.add_argument("--device-name", default="cuda:0", help="use cpu or cuda:0, cuda:1 ...")
-parser.add_argument("--data-dir", default="data", help="dataset directory")
-parser.add_argument("--dataset-type", type=float, default=1, help="ml-hdf version, (1: for fusion, 1.5: for cfusion 2: ml-hdf v2)")
-parser.add_argument("--mlhdf-fn", default="pdbbind2021_demo_train.hdf", help="training ml-hdf path")
-parser.add_argument("--csv-fn", default="", help="training csv file name")
-parser.add_argument("--vmlhdf-fn", default="pdbbind2021_demo_val.hdf", help="validation ml-hdf path")
-parser.add_argument("--vcsv-fn", default="", help="validation csv file name")
-parser.add_argument("--model-path", default="data/pdbbind2021_a1_demo_model_20250716.pth", help="model checkpoint file path")
-parser.add_argument("--complex-type", type=int, default=1, help="1: crystal, 2: docking")
-parser.add_argument("--rmsd-weight", action='store_false', default=0, help="whether rmsd-based weighted loss is used or not")
-parser.add_argument("--rmsd-threshold", type=float, default=2, help="rmsd cut-off threshold in case of docking data and/or --rmsd-weight is true")
-parser.add_argument("--epoch-count", type=int, default=50, help="number of training epochs")
-parser.add_argument("--batch-size", type=int, default=50, help="mini-batch size")
-parser.add_argument("--learning-rate", type=float, default=0.0007, help="initial learning rate")
-parser.add_argument("--decay-rate", type=float, default=0.95, help="learning rate decay")
-parser.add_argument("--decay-iter", type=int, default=100, help="learning rate decay")
-parser.add_argument("--checkpoint-dir", default="checkpoint/", help="checkpoint save directory")
-parser.add_argument("--checkpoint-iter", type=int, default=10000, help="number of epochs per checkpoint")
-parser.add_argument("--verbose", type=int, default=0, help="print all input/output shapes or not")
-parser.add_argument("--multi-gpus", default=False, action="store_true", help="whether to use multi-gpus")
-args = parser.parse_args()
-
-
-# set CUDA for PyTorch
-use_cuda = torch.cuda.is_available() and args.device_name != "cpu"
-cuda_count = torch.cuda.device_count()
-if use_cuda:
-    device = torch.device(args.device_name)
-    torch.cuda.set_device(int(args.device_name.split(':')[1]))
-    torch.backends.cudnn.benchmark = True
-else:
-    device = torch.device("cpu")
-print(f"Use cuda: {use_cuda}, count: {cuda_count}, device: {device}") 
-
+def get_args() -> TrainArgs:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--device-name", default="cuda:0")
+    parser.add_argument("--data-dir", default=_DATA_DIR)
+    parser.add_argument("--dataset-type", type=float, default=2)
+    parser.add_argument("--mlhdf-fn", default="3dcnn_train.hdf")
+    parser.add_argument("--csv-fn", default="")
+    parser.add_argument("--vmlhdf-fn", default="3dcnn_val.hdf")
+    parser.add_argument("--vcsv-fn", default="")
+    parser.add_argument("--model-path", default=os.path.join(_DATA_DIR, "checkpoints/best_model.pth"))
+    parser.add_argument("--complex-type", type=int, default=1)
+    parser.add_argument("--rmsd-weight", action='store_false', default=0)
+    parser.add_argument("--rmsd-threshold", type=float, default=2)
+    parser.add_argument("--epoch-count", type=int, default=50)
+    parser.add_argument("--batch-size", type=int, default=50)
+    parser.add_argument("--learning-rate", type=float, default=0.0007)
+    parser.add_argument("--weight-decay", type=float, default=1e-2)
+    # parser.add_argument("--decay-rate", type=float, default=0.95)
+    # parser.add_argument("--decay-iter", type=int, default=100)
+    parser.add_argument("--cosine-T-max", type=int, default=50)
+    parser.add_argument("--cosine-eta-min", type=float, default=5e-7)
+    parser.add_argument("--checkpoint-dir", default=os.path.join(_DATA_DIR, "checkpoints/3dcnn"))
+    parser.add_argument("--checkpoint-iter", type=int, default=10000)
+    parser.add_argument("--verbose", type=int, default=0)
+    parser.add_argument("--multi-gpus", default=False, action="store_true")
+    ns = parser.parse_args()
+    return TrainArgs(
+        device_name=ns.device_name,
+        data_dir=ns.data_dir,
+        dataset_type=ns.dataset_type,
+        mlhdf_fn=ns.mlhdf_fn,
+        csv_fn=ns.csv_fn,
+        vmlhdf_fn=ns.vmlhdf_fn,
+        vcsv_fn=ns.vcsv_fn,
+        model_path=ns.model_path,
+        complex_type=ns.complex_type,
+        rmsd_weight=bool(ns.rmsd_weight),
+        rmsd_threshold=ns.rmsd_threshold,
+        epoch_count=ns.epoch_count,
+        batch_size=ns.batch_size,
+        learning_rate=ns.learning_rate,
+        weight_decay=ns.weight_decay,
+        # decay_rate=ns.decay_rate,
+        # decay_iter=ns.decay_iter,
+        cosine_T_max=ns.cosine_T_max,
+        cosine_eta_min=ns.cosine_eta_min,
+        checkpoint_dir=ns.checkpoint_dir,
+        checkpoint_iter=ns.checkpoint_iter,
+        verbose=ns.verbose,
+        multi_gpus=ns.multi_gpus,
+    )
 
 
 class WeightedMSELoss(nn.Module):
@@ -96,19 +140,27 @@ class WeightedMSELoss(nn.Module):
 def worker_init_fn(worker_id):
     np.random.seed(int(0))
 
-def train():
+def train(args: TrainArgs):
+
+    # set CUDA for PyTorch
+    use_cuda = torch.cuda.is_available() and args.device_name != "cpu"
+    cuda_count = torch.cuda.device_count()
+    if use_cuda:
+        device = torch.device(args.device_name)
+        torch.cuda.set_device(int(args.device_name.split(':')[1]))
+        torch.backends.cudnn.benchmark = True
+    else:
+        device = torch.device("cpu")
+    print(f"Use cuda: {use_cuda}, count: {cuda_count}, device: {device}")
 
     # load dataset
-    if args.complex_type == 1:
-        is_crystal = True
-    else:
-        is_crystal = False
-    dataset = Dataset_MLHDF(os.path.join(args.data_dir, args.mlhdf_fn), args.dataset_type, os.path.join(args.data_dir, args.csv_fn), is_crystal=is_crystal, rmsd_weight=args.rmsd_weight, rmsd_thres=args.rmsd_threshold)
+    is_crystal = args.complex_type == 1
+    dataset = Dataset_MLHDF(os.path.join(args.data_dir, args.mlhdf_fn), args.dataset_type, os.path.join(args.data_dir, args.csv_fn), is_crystal=is_crystal, rmsd_weight=args.rmsd_weight, rmsd_thres=int(args.rmsd_threshold))
 
     # if validation set is available
     val_dataset = None
     if len(args.vmlhdf_fn) > 0:
-        val_dataset = Dataset_MLHDF(os.path.join(args.data_dir, args.vmlhdf_fn), args.dataset_type, os.path.join(args.data_dir, args.vcsv_fn), is_crystal=is_crystal, rmsd_weight=args.rmsd_weight, rmsd_thres=args.rmsd_threshold)
+        val_dataset = Dataset_MLHDF(os.path.join(args.data_dir, args.vmlhdf_fn), args.dataset_type, os.path.join(args.data_dir, args.vcsv_fn), is_crystal=is_crystal, rmsd_weight=args.rmsd_weight, rmsd_thres=int(args.rmsd_threshold))
 
     # check multi-gpus
     num_workers = 0
@@ -118,7 +170,7 @@ def train():
     # initialize data loader
     batch_count = len(dataset) // args.batch_size
     dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True, num_workers=num_workers, worker_init_fn=None)
-    
+
     # if validation set is available
     val_dataloader = None
     if val_dataset:
@@ -136,7 +188,7 @@ def train():
         model = nn.DataParallel(model)
     model.to(device)
     scaler = torch.amp.GradScaler('cuda')
-    
+
     if isinstance(model, (DistributedDataParallel, DataParallel)):
         model_to_save = model.module
     else:
@@ -147,9 +199,15 @@ def train():
         loss_fn = WeightedMSELoss().float()
     else:
         loss_fn = nn.MSELoss().float()
-    #optimizer = Adam(model.parameters(), lr=args.learning_rate, betas=(0.9, 0.999), eps=1e-08)
-    optimizer = RMSprop(model.parameters(), lr=args.learning_rate)
-    scheduler = lr_scheduler.StepLR(optimizer, step_size=args.decay_iter, gamma=args.decay_rate)
+    optimizer = AdamW(model.parameters(), lr=args.learning_rate, weight_decay=args.weight_decay)
+    # optimizer = RMSprop(model.parameters(), lr=args.learning_rate)
+    # scheduler = lr_scheduler.StepLR(optimizer, step_size=args.decay_iter, gamma=args.decay_rate)
+    
+    warmup_scheduler = lr_scheduler.LinearLR(optimizer, start_factor=0.1, end_factor=1.0, total_iters= args.epoch_count // 10)
+    cos_scheduler = lr_scheduler.CosineAnnealingLR(optimizer, args.cosine_T_max, args.cosine_eta_min)
+    
+    scheduler = lr_scheduler.SequentialLR(optimizer, schedulers=[warmup_scheduler, cos_scheduler], milestones=[10])
+    
 
     # load model
     epoch_start = 0
@@ -171,7 +229,7 @@ def train():
     output_dir = os.path.dirname(args.model_path)
 
     step = 0
-    
+
     best_checkpoint_dict = None
     best_checkpoint_epoch = 0
     best_checkpoint_r2 = -9e9
@@ -179,8 +237,6 @@ def train():
     for epoch_ind in range(epoch_start, args.epoch_count):
         losses = []
         model.train()
-
-        
 
         y_true_arr = np.zeros((len(dataset),), dtype=np.float32)
         y_pred_arr = np.zeros((len(dataset),), dtype=np.float32)
@@ -193,12 +249,15 @@ def train():
                 pdb_id_batch, x_batch_cpu, y_batch_cpu = batch
             x_batch, y_batch = x_batch_cpu.to(device), y_batch_cpu.to(device)
 
-            # voxelize into 3d volume (vectorized batch op)
             bsize = x_batch.shape[0]
             with torch.autocast(device_type='cuda'):
-                vol_batch = voxelize_batch(x_batch[:, :, :3], x_batch[:, :, 3:])
-                vol_batch = gaussian_filter(vol_batch)
-                
+                if args.dataset_type == 2:
+                    # already voxelized: x_batch is (B, 19, 48, 48, 48)
+                    vol_batch = x_batch
+                else:
+                    vol_batch = voxelize_batch(x_batch[:, :, :3], x_batch[:, :, 3:])
+                    vol_batch = gaussian_filter(vol_batch)
+
                 # forward training
                 ypred_batch, _ = model(vol_batch[:x_batch.shape[0]])
 
@@ -207,46 +266,47 @@ def train():
                     loss = loss_fn(ypred_batch.cpu().float(), y_batch_cpu.float(), w_batch_cpu.float())
                 else:
                     loss = loss_fn(ypred_batch.cpu().float(), y_batch_cpu.float())
-                
+
             print("[%d/%d-%d/%d] training, loss: %.3f, lr: %.7f" % (epoch_ind+1, args.epoch_count, batch_ind+1, batch_count, loss.cpu().data.item(), optimizer.param_groups[0]['lr']))
-            
+
             ytrue = y_batch.detach().cpu().float().numpy()[:,0]
             ypred = ypred_batch.detach().cpu().float().numpy()[:,0]
             y_true_arr[batch_ind*args.batch_size : batch_ind*args.batch_size+bsize] = ytrue
             y_pred_arr[batch_ind*args.batch_size : batch_ind*args.batch_size+bsize] = ypred
-            
+
             step += 1
-            
+
             losses.append(loss.item())
             optimizer.zero_grad()
             scaler.scale(loss).backward()
             scaler.step(optimizer)
             scaler.update()
-            scheduler.step()
+            
+        scheduler.step() # lr updates once per epoch rather than batch
 
         print("[%d/%d] training, epoch loss: %.3f" % (epoch_ind+1, args.epoch_count, np.mean(losses)))
 
         if (epoch_ind+1) % args.checkpoint_iter == 0:
             train_metrics = compute_metrics(y_true_arr, y_pred_arr, float(loss))
-        
+
             tqdm.write(
                 "After Training: \tloss:{:0.4f}\n Metrics: {}"
                 .format(
                     loss.cpu().data.numpy(), train_metrics
                 )
             )
-            
+
             checkpoint_dict = checkpoint_model(model, val_dataloader,
                 args.checkpoint_dir
                     + "/model-epoch-{}.pth".format(epoch_ind),
-                optimizer, train_metrics)
-            
+                optimizer, train_metrics, args, device, use_cuda)
+
             if checkpoint_dict["validate_dict"]["r2"] > best_checkpoint_r2:
                 best_checkpoint_epoch = epoch_ind
                 best_checkpoint_r2 = checkpoint_dict["validate_dict"]["r2"]
                 best_checkpoint_dict = checkpoint_dict
 
-        
+
     if best_checkpoint_dict is not None:
         print("best checkpoint epoch: %d, r2: %.4f" % (best_checkpoint_epoch, best_checkpoint_r2))
         torch.save(best_checkpoint_dict, args.checkpoint_dir + "/best_checkpoint.pth")
@@ -255,13 +315,15 @@ def train():
     dataset.close()
     val_dataset.close()
 
+    return best_checkpoint_dict
+
 
 def compute_metrics(ytrue_arr, ypred_arr, loss):
     print("Compute metrics shape debug: true/pred", ytrue_arr.shape, "/", ypred_arr.shape)
     rmse = math.sqrt(mean_squared_error(ytrue_arr, ypred_arr))
     mae = mean_absolute_error(ytrue_arr, ypred_arr)
     r2 = r2_score(ytrue_arr, ypred_arr)
-    
+
     try:
         pearson, ppval = pearsonr(ytrue_arr, ypred_arr)
     except:
@@ -285,38 +347,33 @@ def compute_metrics(ytrue_arr, ypred_arr, loss):
         "pred_stdev": float(np.std(ypred_arr)),
     }
 
-def validate(model, val_dataloader, epoch_ind):
+def validate(model, val_dataloader, epoch_ind, args: TrainArgs, device, use_cuda):
 
     model.eval()
-
-    y_true_arr = []
-    y_pred_arr = []
-    pdbid_list = []
-    pose_list = []
 
     val_batch_count = len(val_dataloader.dataset) // args.batch_size
 
     y_true_arr = np.zeros((len(val_dataloader.dataset),), dtype=np.float32)
     y_pred_arr = np.zeros((len(val_dataloader.dataset),), dtype=np.float32)
 
-
     val_gaussian = GaussianFilter(dim=3, channels=19, kernel_size=11, sigma=1, use_cuda=use_cuda)
-    for batch_ind,batch in enumerate(val_dataloader):
+    for batch_ind, batch in enumerate(val_dataloader):
         # transfer to GPU
         if args.rmsd_weight == True:
             pdb_id_batch, x_batch_cpu, y_batch_cpu, w_batch_cpu = batch
         else:
             pdb_id_batch, x_batch_cpu, y_batch_cpu = batch
-        
+
         x_batch, y_batch = x_batch_cpu.to(device), y_batch_cpu.to(device)
 
-        # voxelize into 3d volume (vectorized batch op)
         with torch.autocast(device_type='cuda'):
-            vol_batch = voxelize_batch(x_batch[:, :, :3], x_batch[:, :, 3:])
-            vol_batch = val_gaussian(vol_batch)
-            
-            # forward training
             bsize = x_batch.shape[0]
+            if args.dataset_type == 2:
+                vol_batch = x_batch
+            else:
+                vol_batch = voxelize_batch(x_batch[:, :, :3], x_batch[:, :, 3:])
+                vol_batch = val_gaussian(vol_batch)
+
             ypred_batch, _ = model(vol_batch[:x_batch.shape[0]])
 
         if args.rmsd_weight == True:
@@ -328,22 +385,18 @@ def validate(model, val_dataloader, epoch_ind):
             loss = loss_fn(ypred_batch.cpu().float(), y_batch_cpu.float())
 
         print("[%d/%d-%d/%d] validation, loss: %.3f" % (epoch_ind+1, args.epoch_count, batch_ind+1, val_batch_count, loss.cpu().data.item()))
-        
+
         ytrue = y_batch.detach().cpu().float().numpy()[:,0]
         ypred = ypred_batch.detach().cpu().float().numpy()[:,0]
 
         y_true_arr[batch_ind*args.batch_size:batch_ind*args.batch_size+bsize] = ytrue
         y_pred_arr[batch_ind*args.batch_size:batch_ind*args.batch_size+bsize] = ypred
 
-
-
-
     print(f"Len y_true_arr: {len(y_true_arr)}")
     print(f"Len y_pred_arr: {len(y_pred_arr)}")
 
-    
     val_metrics = compute_metrics(y_true_arr, y_pred_arr, float(loss))
-            
+
     tqdm.write(
         "[{}/{}-{}/{}] Validation: \tloss:{:0.4f}\n Metrics: {}"
         .format(
@@ -357,25 +410,23 @@ def validate(model, val_dataloader, epoch_ind):
     return val_metrics
 
 
-        
-def checkpoint_model(model, dataloader, checkpoint_path, optimizer, train_dict):
-    import os
+
+def checkpoint_model(model, dataloader, checkpoint_path, optimizer, train_dict, args: TrainArgs, device, use_cuda):
+    import re
     if not os.path.exists(os.path.dirname(checkpoint_path)):
         os.makedirs(os.path.dirname(checkpoint_path))
-    
-    import re
-    # Extract the filename from the path
+
     filename = os.path.basename(checkpoint_path)
     if match := re.match(r"model-epoch-(\d+)\.pth", filename):
         epoch_ind = int(match.group(1))
 
-    validate_dict = validate(model, dataloader, epoch_ind)
+    validate_dict = validate(model, dataloader, epoch_ind, args, device, use_cuda)
     model.train()
 
     checkpoint_dict = {
         "model_state_dict": model.state_dict(),
         "optimizer_state_dict": optimizer.state_dict(),
-        "args": vars(args),
+        "args": vars(args) if hasattr(args, '__dict__') else args.__dict__,
         "train_dict": train_dict,
         "validate_dict": validate_dict,
     }
@@ -386,11 +437,9 @@ def checkpoint_model(model, dataloader, checkpoint_path, optimizer, train_dict):
     return checkpoint_dict
 
 
-
-
-
 def main():
-    train()
+    args = get_args()
+    train(args)
 
 if __name__ == "__main__":
     main()

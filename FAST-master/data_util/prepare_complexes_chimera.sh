@@ -1,38 +1,38 @@
-#!/usr/bin/bash
-################################################################################
-# Copyright 2019-2020 Lawrence Livermore National Security, LLC and other
-# Spack Project Developers. See the LICENSE file for details.
-# SPDX-License-Identifier: MIT
-#
-# Fusion models for Atomic and molecular STructures (FAST)
-# based on implementation provide in https://gitlab.com/cheminfIBB/pafnucy/blob/master/pdbbind_data.ipynb
-################################################################################
+#!/bin/bash
+set -euo pipefail
 
-# Prepare pockets with UCSF Chimera - pybel sometimes fails to calculate the charges.
-# Even if Chimera fails to calculate several charges (mostly for non-standard residues),
-# it returns charges for other residues.
+complex_dir="$1"
 
-path=$@
+process_one() {
+    local pdb="$1"
+    local mol2="${pdb%.pdb}.mol2"
 
+    # Skip if mol2 already exists
+    if [[ -f "$mol2" ]]; then
+        echo "Skipping $(basename "$pdb") (mol2 exists)"
+        return
+    fi
 
-# get list of pdb files from stdin and iterate over them. each instance of this script appends
-# its PID to the tmp.mol2 file in order to prevent race conditions, enabling this to be run with
-# gnu parallel
+    # Unique temp file for parallel safety
+    local tmp
+    tmp=$(mktemp "${pdb%.pdb}_XXXX_tmp.mol2")
 
+    echo "Running Chimera on $(basename "$pdb")..."
 
-tmp_file=$$_tmp.mol2
+    echo -e "open $pdb\naddh\naddcharge\nwrite format mol2 0 $tmp\nstop" \
+        | chimera --nogui > /dev/null 2>&1
 
-echo "my tmp file is ${tmp_file}"
+    # Only continue if Chimera produced output
+    if [[ -f "$tmp" ]]; then
+        sed 's/H\.t3p/H    /' "$tmp" | sed 's/O\.t3p/O\.3  /' > "$mol2"
+        rm -f "$tmp"
+        echo "Created $(basename "$mol2")"
+    else
+        echo "Chimera failed for $(basename "$pdb")"
+    fi
+}
 
-for pdbfile in $path; do
-
-        echo ${pdbfile}
-        mol2file=${pdbfile%pdb}mol2
-
-        # NOTICED THAT SOME INPUTS seem to never finish chimera step
-        echo -e "open $pdbfile \n addh \n addcharge \n write format mol2 0 $$_tmp.mol2 \n stop" | chimera --nogui 
-        # Do not use TIP3P atom types, pybel cannot read them
-        sed 's/H\.t3p/H    /' ${tmp_file} | sed 's/O\.t3p/O\.3  /' > $mol2file
-
+# Process only the specific pocket/ligand files in this directory
+for pdb in "$complex_dir"/*_pocket.pdb "$complex_dir"/*_ligand.pdb; do
+    [[ -f "$pdb" ]] && process_one "$pdb"
 done
-echo "finished processing"

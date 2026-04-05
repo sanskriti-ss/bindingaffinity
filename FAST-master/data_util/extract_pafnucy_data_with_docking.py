@@ -117,7 +117,7 @@ def main():
  
     affinity_data = pd.read_csv(args.metadata)
 
-    element_dict = parse_element_description("data_util/elements.xml")
+    element_dict = parse_element_description("elements.xml")
  
     failure_dict = {"name": [], "partition": [], "set": [], "error": []}
 

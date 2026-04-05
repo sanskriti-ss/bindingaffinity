@@ -33,70 +33,79 @@ from model import PotentialNetParallel, GraphThreshold
 from sklearn.preprocessing import StandardScaler
 from torch.utils.data import ConcatDataset, SubsetRandomSampler
 
-
 import argparse
+from dataclasses import dataclass, field
+from typing import List
 
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    "--checkpoint", type=bool, default=False, help="boolean flag for checkpoints"
-)
-parser.add_argument(
-    "--checkpoint-dir", default=os.getcwd(), help="path to store model checkpoints"
-)
-parser.add_argument(
-    "--checkpoint-iter", default=10, type=int, help="number of epochs per checkpoint"
-)
-parser.add_argument("--epochs", default=100, type=int, help="number of training epochs")
-parser.add_argument(
-    "--num-workers", default=24, type=int, help="number of workers for dataloader"
-)
-parser.add_argument(
-    "--batch-size", default=32, type=int, help="batch size to use for training"
-)
-parser.add_argument(
-    "--lr", default=1e-3, type=float, help="learning rate to use for training"
-)
-parser.add_argument(
-    "--preprocessing-type",
-    type=str,
-    choices=["raw", "processed"],
-    help="idicate raw pdb or (chimera) processed",
-    required=True,
-)
-parser.add_argument(
-    "--feature-type",
-    type=str,
-    choices=["pybel", "rdkit"],
-    help="indicate pybel (openbabel) or rdkit features",
-    required=True,
-)
-parser.add_argument(
-    "--dataset-name", type=str, required=True
-)  # NOTE: this should probably just consist of a set of choices
+# Resolved at import time so paths are stable regardless of working directory
+_DATA_DIR = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../../../data"))
+
+@dataclass
+class TrainArgs:
+    checkpoint: bool = True
+    checkpoint_dir: str = os.path.join(_DATA_DIR, "checkpoints/sgcnn")
+    checkpoint_iter: int = 10
+    epochs: int = 100
+    num_workers: int = 24
+    batch_size: int = 32
+    lr: float = 1e-3
+    preprocessing_type: str = "processed"
+    feature_type: str = "pybel"        # only supported option; matches step5a.hdf key hierarchy
+    dataset_name: str = "pdbbind"      # matches {pdbid}["pybel"]["processed"]["pdbbind"] HDF path
+    covalent_gather_width: int = 128
+    non_covalent_gather_width: int = 128
+    covalent_k: int = 1
+    non_covalent_k: int = 1
+    covalent_threshold: float = 1.5
+    non_covalent_threshold: float = 7.5
+    train_data: List[str] = field(default_factory=lambda: [os.path.join(_DATA_DIR, "sgcnn_train.hdf")])
+    val_data: List[str] = field(default_factory=lambda: [os.path.join(_DATA_DIR, "sgcnn_val.hdf")])
+    use_docking: bool = False
 
 
-
-
-parser.add_argument("--covalent-gather-width", type=int, default=128)
-parser.add_argument("--non-covalent-gather-width", type=int, default=128)
-parser.add_argument("--covalent-k", type=int, default=1)
-parser.add_argument("--non-covalent-k", type=int, default=1)
-parser.add_argument("--covalent-threshold", type=float, default=1.5)
-parser.add_argument("--non-covalent-threshold", type=float, default=7.5)
-parser.add_argument("--train-data", type=str, required=True, nargs="+")
-parser.add_argument("--val-data", type=str, required=True, nargs="+")
-parser.add_argument("--use-docking", default=False, action="store_true")
-args = parser.parse_args()
-
-# seed all random number generators and set cudnn settings for deterministic: https://github.com/rusty1s/pytorch_geometric/issues/217
-random.seed(0)
-np.random.seed(0)
-torch.manual_seed(0)
-torch.cuda.manual_seed(0)
-torch.cuda.manual_seed_all(0)
-torch.backends.cudnn.deterministic = True
-torch.backends.cudnn.benchmark = False  # NOTE: https://discuss.pytorch.org/t/what-does-torch-backends-cudnn-benchmark-do/5936
-os.environ["PYTHONHASHSEED"] = "0"
+def get_args() -> TrainArgs:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--checkpoint", type=bool, default=True)
+    parser.add_argument("--checkpoint-dir", default=os.path.join(_DATA_DIR, "checkpoints/sgcnn"))
+    parser.add_argument("--checkpoint-iter", default=10, type=int)
+    parser.add_argument("--epochs", default=100, type=int)
+    parser.add_argument("--num-workers", default=24, type=int)
+    parser.add_argument("--batch-size", default=32, type=int)
+    parser.add_argument("--lr", default=1e-3, type=float)
+    parser.add_argument("--preprocessing-type", type=str, choices=["raw", "processed"], default="processed")
+    parser.add_argument("--feature-type", type=str, choices=["pybel", "rdkit"], default="pybel")
+    parser.add_argument("--dataset-name", type=str, default="pdbbind")
+    parser.add_argument("--covalent-gather-width", type=int, default=128)
+    parser.add_argument("--non-covalent-gather-width", type=int, default=128)
+    parser.add_argument("--covalent-k", type=int, default=1)
+    parser.add_argument("--non-covalent-k", type=int, default=1)
+    parser.add_argument("--covalent-threshold", type=float, default=1.5)
+    parser.add_argument("--non-covalent-threshold", type=float, default=7.5)
+    parser.add_argument("--train-data", type=str, nargs="+", default=[os.path.join(_DATA_DIR, "sgcnn_train.hdf")])
+    parser.add_argument("--val-data", type=str, nargs="+", default=[os.path.join(_DATA_DIR, "sgcnn_val.hdf")])
+    parser.add_argument("--use-docking", default=False, action="store_true")
+    ns = parser.parse_args()
+    return TrainArgs(
+        checkpoint=ns.checkpoint,
+        checkpoint_dir=ns.checkpoint_dir,
+        checkpoint_iter=ns.checkpoint_iter,
+        epochs=ns.epochs,
+        num_workers=ns.num_workers,
+        batch_size=ns.batch_size,
+        lr=ns.lr,
+        preprocessing_type=ns.preprocessing_type,
+        feature_type=ns.feature_type,
+        dataset_name=ns.dataset_name,
+        covalent_gather_width=ns.covalent_gather_width,
+        non_covalent_gather_width=ns.non_covalent_gather_width,
+        covalent_k=ns.covalent_k,
+        non_covalent_k=ns.non_covalent_k,
+        covalent_threshold=ns.covalent_threshold,
+        non_covalent_threshold=ns.non_covalent_threshold,
+        train_data=ns.train_data,
+        val_data=ns.val_data,
+        use_docking=ns.use_docking,
+    )
 
 
 def worker_init_fn(worker_id):
@@ -107,7 +116,18 @@ def collate_fn_none_filter(batch):
     return [x for x in batch if x is not None]
 
 
-def train():
+def train(args: TrainArgs):
+
+    # seed all random number generators and set cudnn settings for deterministic
+    # https://github.com/rusty1s/pytorch_geometric/issues/217
+    random.seed(0)
+    np.random.seed(0)
+    torch.manual_seed(0)
+    torch.cuda.manual_seed(0)
+    torch.cuda.manual_seed_all(0)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    os.environ["PYTHONHASHSEED"] = "0"
 
     # set the input channel dims based on featurization type
     if args.feature_type == "pybel":
@@ -238,14 +258,13 @@ def train():
             yo_ = model(data)
 
             if len(yo_) > 1:
-                import numpy as np
                 y_, avg_covalent_x, avg_non_covalent_x, pool_x, fc0_x, fc1_x = yo_
                 # np.save(f'fc-layer/fc-0-epoch-{epoch}-step-{step}.npy', fc0_x.cpu().detach().numpy())
                 # np.save(f'fc-layer/fc-1-epoch-{epoch}-step-{step}.npy', fc1_x.cpu().detach().numpy())
             else:
                 y_, *_ = yo_
 
-            
+
 
             y = torch.cat([x[2].y for x in batch])
 
@@ -300,6 +319,7 @@ def train():
                         step,
                         args.checkpoint_dir
                         + "/model-epoch-{}-step-{}.pth".format(epoch, step),
+                        args,
                     )
                     if checkpoint_dict["validate_dict"]["r2"] > best_checkpoint_r2:
                         best_checkpoint_step = step
@@ -317,6 +337,7 @@ def train():
                 epoch,
                 step,
                 args.checkpoint_dir + "/model-epoch-{}-step-{}.pth".format(epoch, step),
+                args,
             )
             if checkpoint_dict["validate_dict"]["r2"] > best_checkpoint_r2:
                 best_checkpoint_step = step
@@ -332,6 +353,7 @@ def train():
             epoch,
             step,
             args.checkpoint_dir + "/model-epoch-{}-step-{}.pth".format(epoch, step),
+            args,
         )
 
         if checkpoint_dict["validate_dict"]["r2"] > best_checkpoint_r2:
@@ -342,11 +364,14 @@ def train():
 
     if args.checkpoint:
         torch.save(best_checkpoint_dict, args.checkpoint_dir + "/best_checkpoint.pth")
+
     print(
         "best training checkpoint epoch {}/step {} with r2: {}".format(
             best_checkpoint_epoch, best_checkpoint_step, best_checkpoint_r2
         )
     )
+
+    return best_checkpoint_dict
 
 
 def validate(model, val_dataloader):
@@ -374,7 +399,7 @@ def validate(model, val_dataloader):
 
         pdbid_list.extend([x[0] for x in batch])
         pose_list.extend([x[1] for x in batch])
-        
+
         # y_true.append(y.cpu().data.numpy())
         # y_pred.append(y_.cpu().data.numpy())
         y_true.append(y.cpu().detach().numpy())
@@ -413,7 +438,7 @@ def validate(model, val_dataloader):
     }
 
 
-def checkpoint_model(model, dataloader, epoch, step, output_path):
+def checkpoint_model(model, dataloader, epoch, step, output_path, args: TrainArgs):
     if not os.path.exists(os.path.dirname(output_path)):
         os.makedirs(os.path.dirname(output_path))
     validate_dict = validate(model, dataloader)
@@ -421,7 +446,7 @@ def checkpoint_model(model, dataloader, epoch, step, output_path):
 
     checkpoint_dict = {
         "model_state_dict": model.state_dict(),
-        "args": vars(args),
+        "args": args.__dict__,
         "step": step,
         "epoch": epoch,
         "validate_dict": validate_dict,
@@ -434,7 +459,8 @@ def checkpoint_model(model, dataloader, epoch, step, output_path):
 
 
 def main():
-    train()
+    args = get_args()
+    train(args)
 
 
 if __name__ == "__main__":

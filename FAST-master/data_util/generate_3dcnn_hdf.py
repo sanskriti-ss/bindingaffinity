@@ -42,7 +42,7 @@ g_feat_type_ind = 1
 
 g_feat_pdbbind_type_list = ['crystal', 'docking'] # for display
 g_feat_pdbbind_type_list2 = ['pdbbind', 'docking'] # for reading hdf
-g_feat_pdbbind_type_ind = 1
+g_feat_pdbbind_type_ind = 0 # no docking
 
 g_feat_data_str = 'data'
 
