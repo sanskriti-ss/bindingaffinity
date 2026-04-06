@@ -13,7 +13,7 @@
 path=$1
 
 echo 'pdbid,-logKd/Ki' > affinity_data.csv
-cat $path/PDBbind_2016_plain_text_index/index/INDEX_general_PL_data.2016 | while read l1 l2 l3 l4 l5; do
+cat $path/index/INDEX_refined_data.2020 | while read l1 l2 l3 l4 l5; do
     if [[ ! $l1 =~ "#" ]]; then
         echo $l1,$l4
     fi
@@ -23,13 +23,13 @@ done >> affinity_data.csv
 # Find affinities without structural data (i.e. with missing directories)
 
 cut -f 1 -d ',' affinity_data.csv | tail -n +2 | while read l;
-    do if [ ! -e $path/general-set-except-refined/$l ] &&  [ ! -e $path/refined-set/$l ]; then
+    do if [ ! -e $path/$l ]; then
         echo $l;
     fi
 done
 
 
 
-grep -v '#' $path/PDBbind_2016_plain_text_index/index/INDEX_core_data.2016 | cut -f 1 -d ' '  > core.csv
+# grep -v '#' $path/PDBbind_2016_plain_text_index/index/INDEX_core_data.2016 | cut -f 1 -d ' '  > core.csv
 
-grep -v '#' $path/PDBbind_2016_plain_text_index/index/INDEX_refined_data.2016 | cut -f 1 -d ' ' > refined.csv
+grep -v '#' $path/index/INDEX_refined_data.2020 | cut -f 1 -d ' ' > refined.csv

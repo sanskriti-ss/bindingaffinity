@@ -33,3 +33,6 @@ qiskit
 pennylane
 scikit-learn
 ingenii-quantum
+
+#h5py
+h5py

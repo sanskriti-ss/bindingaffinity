@@ -37,7 +37,10 @@ class Dataset_MLHDF(Dataset):
 
 		self.mlhdf = h5py.File(self.mlhdf_path, 'r')
 		self.data_info_list = []
-		if self.mlhdf_ver == 1: # for fusion model
+		if self.mlhdf_ver == 2: # pre-voxelized: {pdbid} -> (48,48,48,19) dataset
+			for pdbid in self.mlhdf.keys():
+				self.data_info_list.append([pdbid])
+		elif self.mlhdf_ver == 1: # for fusion model
 			try:
 				with open(self.csv_path, 'r') as fp:
 					csv_reader = csv.reader(fp, delimiter=',')
@@ -69,6 +72,9 @@ class Dataset_MLHDF(Dataset):
 		return count
 
 	def __getitem__(self, idx):
+		if self.mlhdf_ver == 2:
+			return self._getitem_prevox(idx)
+
 		pdbid, poseid, rmsd, affinity = self.data_info_list[idx]
 
 		data = np.zeros((self.max_atoms, self.feat_dim), dtype=np.float32)
@@ -100,5 +106,18 @@ class Dataset_MLHDF(Dataset):
 			w = torch.tensor(np.expand_dims(data_w, axis=0))
 			return (pdbid, x, y, w)
 		else:
-			return (pdbid,x, y)
+			return (pdbid, x, y)
+
+	# -------------------------------------------------------------------------
+	# dataset_type 2: pre-voxelized format (48, 48, 48, 19) with affinity attr
+	# Output: (pdbid, vol_tensor[19,48,48,48], affinity_tensor[1])
+	# -------------------------------------------------------------------------
+	def _getitem_prevox(self, idx):
+		pdbid = self.data_info_list[idx][0]
+		vol = self.mlhdf[pdbid][:]                                # (48,48,48,19)
+		vol = np.transpose(vol, (3, 0, 1, 2)).astype(np.float32) # (19,48,48,48)
+		affinity = float(self.mlhdf[pdbid].attrs["affinity"])
+		x = torch.tensor(vol)
+		y = torch.tensor(np.array([affinity], dtype=np.float32))
+		return (pdbid, x, y)
 

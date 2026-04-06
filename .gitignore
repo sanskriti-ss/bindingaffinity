@@ -10,6 +10,10 @@ v2013-core
 best_*_model.pth
 *model.pth
 *.h5
+.DS_Store
+FAST-master/data/refined-set/*
+FAST-master/data_util/chimera_process_*
+FAST-master/data_util/prepare_chimera_*
 
 P-L
 new_processed_2022
@@ -18,3 +22,7 @@ data
 *.exe
 ChimeraX-1.9.exe
 *.hdf
+
+
+h5py
+.venv/
