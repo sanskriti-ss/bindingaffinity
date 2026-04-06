@@ -2,11 +2,11 @@
 """
 cd FAST-master/model/
 pip install requirements.txt
-python -m quantum_fusion.testing_random_unitaries
+python -m testing_unitaries.testing_random_unitaries
 
 OR
 
-cd FAST-master/model/quantum_fusion/
+cd FAST-master/model/testing_unitaries/
 python testing_random_unitaries.py
 
 -----------------------------------------------------------------------
@@ -54,12 +54,17 @@ from sklearn.model_selection import train_test_split
 
 import pennylane as qml
 
+THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_DIR = os.path.dirname(THIS_DIR)
+QF_DIR = os.path.join(MODEL_DIR, 'quantum_fusion')
+
+# Ensure moved script can still import quantum_fusion modules/resources.
+for _p in [MODEL_DIR, QF_DIR]:
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
+
 # Handle both relative and direct imports
-try:
-    from .main_train import ModelHybridFC, ModelHybridFC_Reservoir, FusionDataset, evaluate_model, load_with_model_features
-except ImportError:
-    # If running as script directly from quantum_fusion directory
-    from main_train import ModelHybridFC, ModelHybridFC_Reservoir, FusionDataset, evaluate_model, load_with_model_features
+from quantum_fusion.main_train import ModelHybridFC, ModelHybridFC_Reservoir, FusionDataset, evaluate_model, load_with_model_features
 
 
 def load_from_model_feature_npz(max_samples=6000, val_fraction=0.2, random_state=42):
@@ -69,9 +74,8 @@ def load_from_model_feature_npz(max_samples=6000, val_fraction=0.2, random_state
 
     This usually provides a richer feature space than RDKit-only vectors.
     """
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    dcnn_npz = os.path.join(script_dir, 'refined_3dcnn_features.npz')
-    sgcnn_npz = os.path.join(script_dir, 'refined_sgcnn_features.npz')
+    dcnn_npz = os.path.join(QF_DIR, 'refined_3dcnn_features.npz')
+    sgcnn_npz = os.path.join(QF_DIR, 'refined_sgcnn_features.npz')
 
     sgcnn_features, cnn3d_features, labels, _ = load_with_model_features(
         max_samples=max_samples,
@@ -227,10 +231,9 @@ def load_from_refined_set(n_pca_components=32):
     RDLogger.DisableLog('rdApp.*')        # suppress RDKit warnings
 
     # ---- locate refined-set root ------------------------------------------
-    script_dir = os.path.dirname(os.path.abspath(__file__))
     candidates = [
-        os.path.join(script_dir, '..', '..', '..', 'data', 'refined-set'),
-        os.path.join(script_dir, '..', '..', '..', '..', 'data', 'refined-set'),
+        os.path.join(MODEL_DIR, '..', '..', 'data', 'refined-set'),
+        os.path.join(MODEL_DIR, '..', '..', '..', 'data', 'refined-set'),
         r'C:\bindingaffinity\data\refined-set',
     ]
     refined_root = next((os.path.abspath(p) for p in candidates
@@ -422,12 +425,10 @@ def _load_preprocessed_data_old(n_pca_components=64):
     import json
     import os
 
-    script_dir = os.path.dirname(os.path.abspath(__file__))  # quantum_fusion dir
-    
     possible_paths = [
         'model_ready_data',
-        os.path.join(script_dir, '..', '..', '..', 'model_ready_data'),
-        os.path.join(script_dir, '..', '..', '..', '..', 'model_ready_data'),
+        os.path.join(MODEL_DIR, '..', '..', 'model_ready_data'),
+        os.path.join(MODEL_DIR, '..', '..', '..', 'model_ready_data'),
     ]
     data_dir = None
     for path in possible_paths:
