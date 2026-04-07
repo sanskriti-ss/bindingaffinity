@@ -58,7 +58,7 @@ class TrainArgs:
     csv_fn: str = ""                   # no CSV needed; Dataset_MLHDF reads all keys from HDF
     vmlhdf_fn: str = "3dcnn_val.hdf"
     vcsv_fn: str = ""
-    model_path: str = os.path.join(_DATA_DIR, "checkpoints/best_model.pth")
+    model_path: str =  "checkpoints/best_model.pth" # os.path.join(_DATA_DIR, "checkpoints/best_model.pth")
     complex_type: int = 1
     rmsd_weight: bool = False
     rmsd_threshold: float = 2.0
@@ -70,10 +70,11 @@ class TrainArgs:
     # decay_iter: int = 100     # StepLR
     cosine_T_max: int = 50      # CosineAnnealingLR: steps to eta_min; set to epoch_count if stepping per epoch
     cosine_eta_min: float = 5e-7  # CosineAnnealingLR: minimum LR at trough
-    checkpoint_dir: str = os.path.join(_DATA_DIR, "checkpoints/3dcnn")
+    checkpoint_dir: str = "checkpoints/3dcnn" # os.path.join(_DATA_DIR, "checkpoints/3dcnn")
     checkpoint_iter: int = 10000
     verbose: int = 0
     multi_gpus: bool = False
+    train_from_scratch: bool = False
 
 
 def get_args() -> TrainArgs:
@@ -101,6 +102,7 @@ def get_args() -> TrainArgs:
     parser.add_argument("--checkpoint-iter", type=int, default=10000)
     parser.add_argument("--verbose", type=int, default=0)
     parser.add_argument("--multi-gpus", default=False, action="store_true")
+    parser.add_argument("--train-from-scratch", default=False, action="store_true")
     ns = parser.parse_args()
     return TrainArgs(
         device_name=ns.device_name,
@@ -126,6 +128,7 @@ def get_args() -> TrainArgs:
         checkpoint_iter=ns.checkpoint_iter,
         verbose=ns.verbose,
         multi_gpus=ns.multi_gpus,
+        train_from_scratch=ns.train_from_scratch,
     )
 
 
@@ -211,7 +214,9 @@ def train(args: TrainArgs):
 
     # load model
     epoch_start = 0
-    if valid_file(args.model_path):
+    if args.train_from_scratch:
+        print("train_from_scratch enabled: skipping checkpoint load")
+    elif valid_file(args.model_path):
         checkpoint = torch.load(args.model_path, map_location=device)
         #checkpoint = torch.load(args.model_path)
         model_state_dict = checkpoint.pop("model_state_dict")

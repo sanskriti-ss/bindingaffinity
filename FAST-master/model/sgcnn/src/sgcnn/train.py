@@ -43,7 +43,7 @@ _DATA_DIR = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file
 @dataclass
 class TrainArgs:
     checkpoint: bool = True
-    checkpoint_dir: str = os.path.join(_DATA_DIR, "checkpoints/sgcnn")
+    checkpoint_dir: str = "checkpoints/sgcnn" # os.path.join(_DATA_DIR, "checkpoints/sgcnn")
     checkpoint_iter: int = 10
     epochs: int = 100
     num_workers: int = 24
