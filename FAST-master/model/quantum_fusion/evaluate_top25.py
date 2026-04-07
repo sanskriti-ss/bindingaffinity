@@ -47,7 +47,7 @@ from testing_random_unitaries import (
 
 # ── Config ───────────────────────────────────────────────────────────────────
 N_QUBITS   = 6
-DEPTH      = 10
+NUM_GATES  = 300
 EPOCHS     = 50
 BATCH_SIZE = 64
 LR         = 3e-4
@@ -200,8 +200,8 @@ def main():
     print(f"Input dim: {dims}   Train/Val/Test: {len(train_idx)}/{len(val_idx)}/{len(test_idx)}")
 
     # ── 2. Generate & rank circuits ──────────────────────────────────────────
-    print(f"\nGenerating {NUM_CIRCS} G3 circuits and selecting top {TOP_K} by RFD …")
-    circuits = generate_g3_random_circuits(N_QUBITS, DEPTH, num_circuits=NUM_CIRCS)
+    print(f"\nGenerating {NUM_CIRCS} G3 circuits ({NUM_GATES} gates each) and selecting top {TOP_K} by RFD …")
+    circuits = generate_g3_random_circuits(N_QUBITS, num_gates=NUM_GATES, num_circuits=NUM_CIRCS)
     indexed  = preselect_circuits_by_expressibility(circuits, N_QUBITS, top_k=TOP_K)
     print(f"Top-{TOP_K} circuit indices (by RFD): {[i for i,_ in indexed]}")
 

@@ -37,7 +37,11 @@ KEY IMPROVEMENTS OVER FIRST VERSION
 import numpy as np
 import torch
 import pandas as pd
+import argparse
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+import hashlib
 from qiskit import QuantumCircuit
 from tqdm import tqdm
 import sys
@@ -46,18 +50,112 @@ from datetime import datetime
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import r2_score
+from sklearn.model_selection import train_test_split
 
 import pennylane as qml
 
 # Handle both relative and direct imports
 try:
-    from .main_train import ModelHybridFC, ModelHybridFC_Reservoir, FusionDataset, evaluate_model
+    from .main_train import ModelHybridFC, ModelHybridFC_Reservoir, FusionDataset, evaluate_model, load_with_model_features
 except ImportError:
     # If running as script directly from quantum_fusion directory
-    from main_train import ModelHybridFC, ModelHybridFC_Reservoir, FusionDataset, evaluate_model
+    from main_train import ModelHybridFC, ModelHybridFC_Reservoir, FusionDataset, evaluate_model, load_with_model_features
+
+
+def load_from_model_feature_npz(max_samples=6000, val_fraction=0.2, random_state=42):
+    """
+    Load precomputed fusion-model embeddings (3DCNN + SGCNN NPZ) plus RDKit
+    base features through main_train.load_with_model_features().
+
+    This usually provides a richer feature space than RDKit-only vectors.
+    """
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    dcnn_npz = os.path.join(script_dir, 'refined_3dcnn_features.npz')
+    sgcnn_npz = os.path.join(script_dir, 'refined_sgcnn_features.npz')
+
+    sgcnn_features, cnn3d_features, labels, _ = load_with_model_features(
+        max_samples=max_samples,
+        dcnn_npz=dcnn_npz if os.path.exists(dcnn_npz) else None,
+        sgcnn_npz=sgcnn_npz if os.path.exists(sgcnn_npz) else None,
+    )
+
+    labels = np.asarray(labels, dtype=np.float32)
+    n = len(labels)
+    if n < 50:
+        raise RuntimeError("Too few samples from NPZ feature loader (<50).")
+
+    # Stratified shuffled split by label quantiles for a more stable validation estimate.
+    idx = np.arange(n)
+    n_bins = min(10, max(2, int(np.sqrt(n))))
+    bins = pd.qcut(labels, q=n_bins, labels=False, duplicates='drop')
+    train_idx, val_idx = train_test_split(
+        idx,
+        test_size=val_fraction,
+        random_state=random_state,
+        shuffle=True,
+        stratify=bins,
+    )
+
+    label_mean = labels[train_idx].mean()
+    label_std = labels[train_idx].std() + 1e-8
+    labels_norm = (labels - label_mean) / label_std
+
+    train_ds = FusionDataset(
+        torch.tensor(sgcnn_features[train_idx], dtype=torch.float32),
+        torch.tensor(cnn3d_features[train_idx], dtype=torch.float32),
+        torch.tensor(labels_norm[train_idx], dtype=torch.float32),
+    )
+    val_ds = FusionDataset(
+        torch.tensor(sgcnn_features[val_idx], dtype=torch.float32),
+        torch.tensor(cnn3d_features[val_idx], dtype=torch.float32),
+        torch.tensor(labels_norm[val_idx], dtype=torch.float32),
+    )
+
+    print("Using precomputed NPZ model features (via load_with_model_features)")
+    print(f"Train: {len(train_ds)}  Val: {len(val_ds)}")
+    print(f"Label stats (train): mean={label_mean:.3f}  std={label_std:.3f}")
+    return train_ds, val_ds, float(label_mean), float(label_std)
+
+
+def split_validation_for_holdout(val_dataset, holdout_fraction=0.5, random_state=42):
+    """
+    Split an existing validation dataset into (validation_for_selection, holdout).
+
+    The holdout split remains completely unseen during circuit/model selection and
+    is used only for final reporting/plots when --holdout is enabled.
+    """
+    if not (0.0 < holdout_fraction < 1.0):
+        raise ValueError("holdout_fraction must be in (0, 1)")
+
+    y = val_dataset.labels.numpy().astype(np.float32).flatten()
+    n = len(y)
+    if n < 20:
+        raise RuntimeError("Validation set too small to split into holdout.")
+
+    idx = np.arange(n)
+    n_bins = min(10, max(2, int(np.sqrt(n))))
+    bins = pd.qcut(y, q=n_bins, labels=False, duplicates='drop')
+    val_idx, holdout_idx = train_test_split(
+        idx,
+        test_size=holdout_fraction,
+        random_state=random_state,
+        shuffle=True,
+        stratify=bins,
+    )
+
+    def _subset(ds, subset_idx):
+        return FusionDataset(
+            ds.sgcnn_features[subset_idx],
+            ds.cnn3d_features[subset_idx],
+            ds.labels[subset_idx],
+        )
+
+    val_split = _subset(val_dataset, val_idx)
+    holdout_split = _subset(val_dataset, holdout_idx)
+    return val_split, holdout_split
 
 # 1. Generate random circuits from G3 gate family {CNOT, H, T}
-def generate_g3_random_circuits(n_qubits, depth, num_circuits=10):
+def generate_g3_random_circuits(n_qubits, num_gates=300, num_circuits=10):
     """
     Generate random unitary circuits sampled from the G3 gate family.
     G3 gates: {CNOT, H, T} with uniform random selection (1/3 each in expectation).
@@ -68,7 +166,7 @@ def generate_g3_random_circuits(n_qubits, depth, num_circuits=10):
     
     Args:
         n_qubits: Number of qubits
-        depth: Circuit depth (number of layers)
+        num_gates: Total number of gate instructions per circuit
         num_circuits: Number of circuits to generate
     
     Returns:
@@ -83,31 +181,28 @@ def generate_g3_random_circuits(n_qubits, depth, num_circuits=10):
         qc = QuantumCircuit(n_qubits)
         
         # Add random gates: each gate (H, T, CNOT) chosen uniformly with 1/3 probability each
-        for layer in range(depth):
-            # Generate random gates for this layer
-            # Total gates per layer: aim for ~n_qubits gates (mix of single and two-qubit)
-            for _ in range(n_qubits):
-                # Choose gate type uniformly from {H, T, CNOT}
-                gate_type = random.choices(['h', 't', 'cnot'], weights=[1, 1, 1], k=1)[0]
-                
-                if gate_type == 'h':
-                    # Apply H to random qubit
-                    qubit = random.randint(0, n_qubits - 1)
-                    qc.h(qubit)
-                    
-                elif gate_type == 't':
-                    # Apply T to random qubit
-                    qubit = random.randint(0, n_qubits - 1)
-                    qc.t(qubit)
-                    
-                else:  # cnot
-                    # Apply CNOT between two random qubits (control != target)
-                    control = random.randint(0, n_qubits - 1)
+        for _ in range(num_gates):
+            # Choose gate type uniformly from {H, T, CNOT}
+            gate_type = random.choices(['h', 't', 'cnot'], weights=[1, 1, 1], k=1)[0]
+
+            if gate_type == 'h':
+                # Apply H to random qubit
+                qubit = random.randint(0, n_qubits - 1)
+                qc.h(qubit)
+
+            elif gate_type == 't':
+                # Apply T to random qubit
+                qubit = random.randint(0, n_qubits - 1)
+                qc.t(qubit)
+
+            else:  # cnot
+                # Apply CNOT between two random qubits (control != target)
+                control = random.randint(0, n_qubits - 1)
+                target = random.randint(0, n_qubits - 1)
+                # Ensure control and target are different
+                while target == control:
                     target = random.randint(0, n_qubits - 1)
-                    # Ensure control and target are different
-                    while target == control:
-                        target = random.randint(0, n_qubits - 1)
-                    qc.cx(control, target)
+                qc.cx(control, target)
         
         circuits.append(qc)
     
@@ -574,7 +669,7 @@ def extract_quantum_features(qc, X_pca, n_qubits, random_seed=42):
 
 def run_circuits_and_evaluate(indexed_circuits, train_dataset, val_dataset,
                               n_qubits=4, max_epochs=None, patience=None,
-                              batch_size=None, lr=None):
+                              batch_size=None, lr=None, holdout_dataset=None):
     """
     Evaluate each G3 circuit as a quantum reservoir using Ridge regression.
 
@@ -582,6 +677,7 @@ def run_circuits_and_evaluate(indexed_circuits, train_dataset, val_dataset,
     """
     from sklearn.linear_model import RidgeCV
     from sklearn.metrics import mean_squared_error, mean_absolute_error
+    from sklearn.preprocessing import StandardScaler
     from scipy.stats import pearsonr, spearmanr
     import math
 
@@ -596,6 +692,13 @@ def run_circuits_and_evaluate(indexed_circuits, train_dataset, val_dataset,
     val_X_pca    = np.concatenate([val_pocket,   val_ligand],   axis=1)
     val_y        = val_dataset.labels.numpy().flatten()
 
+    eval_dataset = holdout_dataset if holdout_dataset is not None else val_dataset
+    eval_name = 'holdout' if holdout_dataset is not None else 'validation'
+    eval_pocket = eval_dataset.sgcnn_features.numpy()
+    eval_ligand = eval_dataset.cnn3d_features.numpy()
+    eval_X_pca  = np.concatenate([eval_pocket, eval_ligand], axis=1)
+    eval_y      = eval_dataset.labels.numpy().flatten()
+
     results = []
     circuit_bar = tqdm(indexed_circuits, desc="Testing Circuits", position=0)
 
@@ -605,52 +708,90 @@ def run_circuits_and_evaluate(indexed_circuits, train_dataset, val_dataset,
         # 1. Quantum reservoir features
         q_tr = extract_quantum_features(qc, train_X_pca, n_qubits)  # [N_tr, 3*nq]
         q_va = extract_quantum_features(qc, val_X_pca,   n_qubits)
+        q_ev = extract_quantum_features(qc, eval_X_pca,  n_qubits)
 
         # 2. Concatenate PCA + quantum features
         X_tr = np.concatenate([train_X_pca, q_tr], axis=1)  # [N_tr, 128+3*nq]
         X_va = np.concatenate([val_X_pca,   q_va], axis=1)
+        X_ev = np.concatenate([eval_X_pca,  q_ev], axis=1)
 
-        # 3. Ridge regression with 5-fold CV alpha selection
+        # 3. Scale combined features
+        x_scaler = StandardScaler().fit(X_tr)
+        X_tr_s = x_scaler.transform(X_tr)
+        X_va_s = x_scaler.transform(X_va)
+        X_ev_s = x_scaler.transform(X_ev)
+
+        # 4. Ridge readout with CV alpha selection
         alphas = [0.001, 0.01, 0.1, 1.0, 10.0, 100.0, 1000.0]
         ridge  = RidgeCV(alphas=alphas, cv=5)
-        ridge.fit(X_tr, train_y)
+        ridge.fit(X_tr_s, train_y)
+        train_preds = ridge.predict(X_tr_s)
+        preds_val = ridge.predict(X_va_s)
+        preds_eval = ridge.predict(X_ev_s)
+        r2_select = r2_score(val_y, preds_val)
+        r2 = r2_score(eval_y, preds_eval)
+        model = ridge
+        model_type = 'ridge'
+        best_alpha = ridge.alpha_
 
-        preds  = ridge.predict(X_va)
-        r2     = r2_score(val_y, preds)
-        rmse   = math.sqrt(mean_squared_error(val_y, preds))
-        mae    = mean_absolute_error(val_y, preds)
-        pcc    = pearsonr(val_y,  preds)[0]
-        scc    = spearmanr(val_y, preds)[0]
+        train_mse = mean_squared_error(train_y, train_preds)
+        val_mse = mean_squared_error(eval_y, preds_eval)
+        rmse   = math.sqrt(mean_squared_error(eval_y, preds_eval))
+        mae    = mean_absolute_error(eval_y, preds_eval)
+        pcc    = pearsonr(eval_y,  preds_eval)[0]
+        scc    = spearmanr(eval_y, preds_eval)[0]
 
-        # Baseline: Ridge on PCA features only (no quantum)
+        # Baseline (classical-only): same readout family candidates on classical features.
+        x_scaler_base = StandardScaler().fit(train_X_pca)
+        X_tr_base_s = x_scaler_base.transform(train_X_pca)
+        X_va_base_s = x_scaler_base.transform(val_X_pca)
+
         ridge_base = RidgeCV(alphas=alphas, cv=5)
-        ridge_base.fit(train_X_pca, train_y)
-        base_r2 = r2_score(val_y, ridge_base.predict(val_X_pca))
+        ridge_base.fit(X_tr_base_s, train_y)
+        base_preds_val = ridge_base.predict(X_va_base_s)
+        base_r2_select = r2_score(val_y, base_preds_val)
+
+        X_ev_base_s = x_scaler_base.transform(eval_X_pca)
+        base_preds_eval = ridge_base.predict(X_ev_base_s)
+        base_r2 = r2_score(eval_y, base_preds_eval)
 
         results.append({
             'circuit_idx':  orig_idx,
-            'model':        ridge,
+            'model':        model,
+            'model_type':   model_type,
+            'x_scaler':     x_scaler,
             'circuit':      qc,             # store circuit for ensemble quantum features
             'r2':           r2,
             'r2_baseline':  base_r2,        # Ridge on PCA alone (no quantum)
             'r2_gain':      r2 - base_r2,   # quantum contribution
+            'selection_r2': r2_select,
+            'selection_r2_baseline': base_r2_select,
+            'selection_r2_gain': r2_select - base_r2_select,
+            'evaluation_split': eval_name,
             'rmse':         rmse,
             'mae':          mae,
             'pearson':      pcc,
             'spearman':     scc,
-            'best_alpha':   ridge.alpha_,
-            'val_preds':    preds,          # cached val predictions
-            'val_true':     val_y,
-            'val_X_pca':    val_X_pca,      # cached val PCA features
-            'train_losses': [],
-            'val_losses':   [],
+            'best_alpha':   best_alpha,
+            'eval_preds':   preds_eval,     # cached eval predictions
+            'eval_true':    eval_y,
+            'eval_X_pca':   eval_X_pca,     # cached eval PCA features
+            'val_preds':    preds_val,      # legacy cache key
+            'val_true':     eval_y,         # legacy cache key kept for compatibility
+            'val_X_pca':    eval_X_pca,     # legacy cache key kept for compatibility
+            # Ridge has no epoch-wise training, so store final MSE as a
+            # single-point "curve" to keep downstream plotting informative.
+            'train_losses': [float(train_mse)],
+            'val_losses':   [float(val_mse)],
         })
         circuit_bar.set_postfix(R2=f'{r2:.4f}',
                                 Gain=f'{r2 - base_r2:+.4f}',
-                                α=f'{ridge.alpha_:.3g}')
+                                M=model_type)
 
     results.sort(key=lambda r: r['r2'], reverse=True)
     print(f"\n{'='*60}")
+    split_name = results[0].get('evaluation_split', 'validation') if results else 'validation'
+    print(f"Evaluation split:                         {split_name}")
     print(f"Classical Ridge baseline R² (no quantum): {results[0]['r2_baseline']:.4f}")
     print(f"Best quantum circuit R²:                  {results[0]['r2']:.4f}")
     print(f"Quantum gain:                             {results[0]['r2_gain']:+.4f}")
@@ -672,13 +813,15 @@ def ensemble_evaluate(results, val_dataset=None, top_k=5, n_qubits=4):
     import math
 
     best = sorted(results, key=lambda r: r['r2'], reverse=True)[:top_k]
-    true_vals = best[0]['val_true']          # same for all circuits
-    val_X_pca = best[0]['val_X_pca']
+    true_vals = best[0].get('eval_true', best[0]['val_true'])          # same for all circuits
+    val_X_pca = best[0].get('eval_X_pca', best[0]['val_X_pca'])
 
     all_preds = []
     for res in best:
         q_va = extract_quantum_features(res['circuit'], val_X_pca, n_qubits)
         X_va = np.concatenate([val_X_pca, q_va], axis=1)
+        if res.get('x_scaler') is not None:
+            X_va = res['x_scaler'].transform(X_va)
         all_preds.append(res['model'].predict(X_va))
 
     all_preds  = np.stack(all_preds)          # (top_k, N)
@@ -692,18 +835,166 @@ def ensemble_evaluate(results, val_dataset=None, top_k=5, n_qubits=4):
           f"RMSE={ens_rmse:.4f}  Pearson r={ens_pcc:.4f}")
     return true_vals, mean_preds, std_preds, ens_r2, ens_rmse
 
+
+def _circuit_signature(qc: QuantumCircuit) -> str:
+    """Stable textual fingerprint for a circuit based on ordered gate stream."""
+    tokens = []
+    for inst in qc.data:
+        gate_name = inst.operation.name
+        qubits = [qc.find_bit(q).index for q in inst.qubits]
+        tokens.append(f"{gate_name}:{','.join(map(str, qubits))}")
+    raw = "|".join(tokens)
+    digest = hashlib.sha1(raw.encode('utf-8')).hexdigest()[:12]
+    return f"g3-{qc.num_qubits}q-{qc.size()}g-{digest}"
+
+
+def _save_top_circuit_diagrams(results, output_dir, top_k=25):
+    """Save text diagrams and metadata for top-K circuits in a dedicated folder."""
+    top = sorted(results, key=lambda r: r['r2'], reverse=True)[:min(top_k, len(results))]
+    diag_dir = os.path.join(output_dir, f"top{len(top)}_circuit_diagrams")
+    os.makedirs(diag_dir, exist_ok=True)
+
+    rows = []
+    for rank, r in enumerate(top, start=1):
+        qc = r['circuit']
+        cid = _circuit_signature(qc)
+        depth = int(qc.depth()) if qc.depth() is not None else -1
+        counts = qc.count_ops()
+        count_h = int(counts.get('h', 0))
+        count_t = int(counts.get('t', 0))
+        count_cx = int(counts.get('cx', 0))
+
+        txt_name = f"rank{rank:02d}_idx{r['circuit_idx']}_{cid}.txt"
+        txt_path = os.path.join(diag_dir, txt_name)
+        with open(txt_path, 'w', encoding='utf-8') as f:
+            f.write(str(qc.draw(output='text')))
+
+        rows.append({
+            'rank': rank,
+            'circuit_idx': r['circuit_idx'],
+            'circuit_id': cid,
+            'n_qubits': qc.num_qubits,
+            'n_gates': qc.size(),
+            'depth': depth,
+            'count_h': count_h,
+            'count_t': count_t,
+            'count_cx': count_cx,
+            'r2': r['r2'],
+            'r2_baseline': r['r2_baseline'],
+            'r2_gain': r['r2_gain'],
+            'rmse': r['rmse'],
+            'mae': r['mae'],
+            'pearson': r['pearson'],
+            'spearman': r['spearman'],
+            'best_alpha': r['best_alpha'],
+            'model_type': r.get('model_type', 'ridge'),
+            'diagram_file': txt_name,
+        })
+
+    gates_csv = os.path.join(output_dir, f'top{len(top)}_circuit_gates.csv')
+    pd.DataFrame(rows).to_csv(gates_csv, index=False)
+    print(f"Saved top-circuit diagrams -> {diag_dir}")
+    print(f"Saved top-circuit metadata -> {gates_csv}")
+
+
+def _save_quartile_violin_plot(results, output_dir):
+    """Create quartile box + violin comparison plot using per-circuit R²."""
+    if len(results) < 4:
+        print("Skipping quartile plot (need at least 4 circuits).")
+        return
+
+    sorted_r = sorted(results, key=lambda r: r['r2'], reverse=True)
+    n = len(sorted_r)
+    q25 = max(1, n // 4)
+    q50 = max(1, n // 2)
+    q75 = max(1, 3 * n // 4)
+
+    quartiles = {
+        'Top 25%': [r['r2'] for r in sorted_r[:q25]],
+        'Q2 (25-50%)': [r['r2'] for r in sorted_r[q25:q50]],
+        'Q3 (50-75%)': [r['r2'] for r in sorted_r[q50:q75]],
+        'Bottom 25%': [r['r2'] for r in sorted_r[q75:]],
+    }
+
+    fig_q, axes_q = plt.subplots(1, 2, figsize=(14, 5))
+    colors_q = ['#2ecc71', '#f39c12', '#e74c3c', '#c0392b']
+
+    ax_box = axes_q[0]
+    bp = ax_box.boxplot(
+        [quartiles[q] for q in ['Top 25%', 'Q2 (25-50%)', 'Q3 (50-75%)', 'Bottom 25%']],
+        labels=['Top 25%', 'Q2\n(25-50%)', 'Q3\n(50-75%)', 'Bottom 25%'],
+        patch_artist=True,
+        widths=0.6,
+    )
+    for patch, color in zip(bp['boxes'], colors_q):
+        patch.set_facecolor(color)
+        patch.set_alpha(0.7)
+    ax_box.set_ylabel('R²', fontsize=11)
+    ax_box.set_title('Quartile Comparison: R² Distribution', fontsize=12, fontweight='bold')
+    ax_box.grid(True, axis='y', alpha=0.3)
+
+    ax_vio = axes_q[1]
+    vio_data = [quartiles[q] for q in ['Top 25%', 'Q2 (25-50%)', 'Q3 (50-75%)', 'Bottom 25%']]
+    positions = [1, 2, 3, 4]
+    parts = ax_vio.violinplot(vio_data, positions=positions, showmeans=True, showmedians=True)
+    for pc, color in zip(parts['bodies'], colors_q):
+        pc.set_facecolor(color)
+        pc.set_alpha(0.7)
+    ax_vio.set_xticks(positions)
+    ax_vio.set_xticklabels(['Top 25%', 'Q2\n(25-50%)', 'Q3\n(50-75%)', 'Bottom 25%'])
+    ax_vio.set_ylabel('R²', fontsize=11)
+    ax_vio.set_title('Violin Plot: R² by Quartile', fontsize=12, fontweight='bold')
+    ax_vio.grid(True, axis='y', alpha=0.3)
+
+    plt.tight_layout()
+    quartile_path = os.path.join(output_dir, 'quartile_comparison.png')
+    plt.savefig(quartile_path, dpi=150, bbox_inches='tight')
+    plt.close(fig_q)
+    print(f"Saved quartile comparison -> {quartile_path}")
+
 # ===========================================================================
 # 3. Save, plot, and report
 # ===========================================================================
 def save_and_plot_results(results, ensemble_data=None):
     timestamp  = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-    output_dir = f'plots_{timestamp}'
+    output_dir = os.path.abspath(f'plots_{timestamp}')
     os.makedirs(output_dir, exist_ok=True)
 
+    sorted_by_r2 = sorted(results, key=lambda x: x['r2'], reverse=True)
     top5 = sorted(results, key=lambda x: x['rmse'])[:5]
+
+    # All circuits CSV with identities + gate composition
+    all_rows = []
+    for rank, r in enumerate(sorted_by_r2, start=1):
+        qc = r['circuit']
+        depth = int(qc.depth()) if qc.depth() is not None else -1
+        counts = qc.count_ops()
+        all_rows.append({
+            'rank_by_r2': rank,
+            'circuit_idx': r['circuit_idx'],
+            'circuit_id': _circuit_signature(qc),
+            'n_qubits': qc.num_qubits,
+            'n_gates': qc.size(),
+            'depth': depth,
+            'count_h': int(counts.get('h', 0)),
+            'count_t': int(counts.get('t', 0)),
+            'count_cx': int(counts.get('cx', 0)),
+            'model_type': r.get('model_type', 'ridge'),
+            'best_alpha': r['best_alpha'],
+            'r2': r['r2'],
+            'r2_baseline': r['r2_baseline'],
+            'r2_gain': r['r2_gain'],
+            'rmse': r['rmse'],
+            'mae': r['mae'],
+            'pearson': r['pearson'],
+            'spearman': r['spearman'],
+        })
+    all_csv_path = os.path.join(output_dir, 'all_circuit_results.csv')
+    pd.DataFrame(all_rows).to_csv(all_csv_path, index=False)
     # Drop model objects before serialising
     top5_serialisable = [
-        {k: v for k, v in r.items() if k != 'model'} for r in top5
+        {k: v for k, v in r.items() if k not in {'model', 'x_scaler', 'circuit', 'val_preds', 'val_true', 'val_X_pca'}}
+        for r in top5
     ]
     df = pd.DataFrame(top5_serialisable)
     csv_path = os.path.join(output_dir, 'top5_random_unitary_results.csv')
@@ -711,18 +1002,36 @@ def save_and_plot_results(results, ensemble_data=None):
 
     print(f"\n{'='*60}")
     print(f"Unitary Testing Results — {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    eval_split = results[0].get('evaluation_split', 'validation') if results else 'validation'
+    print(f"Evaluation split for reported metrics: {eval_split}")
     print(f"Output dir : {output_dir}/")
+    print(f"All circuits CSV: {all_csv_path}")
     print(df[['circuit_idx', 'rmse', 'mae', 'r2', 'pearson', 'spearman']].to_string(index=False))
     print(f"{'='*60}")
 
     # ---- loss curves -------------------------------------------------------
     fig1, ax1 = plt.subplots(figsize=(12, 6))
+    max_points = 0
     for res in top5:
-        ax1.plot(res['train_losses'], label=f"Train C{res['circuit_idx']}", lw=2)
-        ax1.plot(res['val_losses'],   label=f"Val   C{res['circuit_idx']}",
-                 linestyle='--', lw=2)
-    ax1.set_xlabel('Epoch'); ax1.set_ylabel('MSE Loss')
-    ax1.set_title('Top-5 G3 Reservoir Circuits — Loss Curves'); ax1.legend()
+        train_losses = res.get('train_losses', [])
+        val_losses = res.get('val_losses', [])
+        max_points = max(max_points, len(train_losses), len(val_losses))
+
+        if len(train_losses) > 0:
+            ax1.plot(range(len(train_losses)), train_losses,
+                     label=f"Train C{res['circuit_idx']}", lw=2,
+                     marker='o' if len(train_losses) == 1 else None)
+        if len(val_losses) > 0:
+            ax1.plot(range(len(val_losses)), val_losses,
+                     label=f"Val   C{res['circuit_idx']}", linestyle='--', lw=2,
+                     marker='o' if len(val_losses) == 1 else None)
+
+    xlabel = 'Epoch' if max_points > 1 else 'Final step'
+    title = 'Top-5 G3 Reservoir Circuits — Loss Curves' if max_points > 1 \
+        else 'Top-5 G3 Reservoir Circuits — Final Train/Val MSE'
+    ax1.set_xlabel(xlabel); ax1.set_ylabel('MSE Loss')
+    ax1.set_title(title)
+    ax1.legend()
     ax1.grid(True, alpha=0.3)
     fig1.savefig(os.path.join(output_dir, 'top5_loss_curves.png'), dpi=300, bbox_inches='tight')
 
@@ -758,7 +1067,10 @@ def save_and_plot_results(results, ensemble_data=None):
         ax3.legend(); ax3.grid(True, alpha=0.3)
         fig3.savefig(os.path.join(output_dir, 'ensemble_scatter.png'), dpi=300, bbox_inches='tight')
 
-    plt.show()
+    _save_quartile_violin_plot(results, output_dir)
+    _save_top_circuit_diagrams(results, output_dir, top_k=25)
+
+    plt.close('all')
     print(f"Plots saved to {output_dir}/")
 
 
@@ -766,30 +1078,56 @@ def save_and_plot_results(results, ensemble_data=None):
 # Entry point
 # ===========================================================================
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Test random G3 unitary circuits for quantum reservoir regression.')
+    parser.add_argument('--holdout', action='store_true',
+                        help='Reserve part of validation data as unseen holdout and report metrics/plots on holdout.')
+    parser.add_argument('--holdout-fraction', type=float, default=0.5,
+                        help='Fraction of validation split to reserve as holdout when --holdout is set. Default: 0.5')
+    parser.add_argument('--seed', type=int, default=42,
+                        help='Random seed for holdout split. Default: 42')
+    args = parser.parse_args()
+
     N_QUBITS     = 6    # qubits (↑ from 4 → 18 observable features vs 12)
-    DEPTH        = 10   # G3 gate layers
-    N_CIRCUITS   = 20   # pool of random G3 circuits before RFD filter
-    TOP_K_EXPR   = 10   # keep top-K by Reservoir Feature Diversity
-    TOP_K_ENS    = 5    # ensemble after training
+    NUM_GATES    = 300  # gate instructions per circuit
+    N_CIRCUITS   = 100  # pool of random G3 circuits before RFD filter
+    TOP_K_EXPR   = 25   # keep top-K by Reservoir Feature Diversity
+    TOP_K_ENS    = 25   # ensemble after training
     PCA_DIMS     = 32   # PCA dims per modality; 2*32=64 total into reservoir
+    USE_MODEL_FEATURE_NPZ = True  # leverage precomputed 3DCNN/SGCNN NPZ features
 
     # ---- Generate G3 circuit pool ----------------------------------------
-    circuits = generate_g3_random_circuits(N_QUBITS, DEPTH, num_circuits=N_CIRCUITS)
+    circuits = generate_g3_random_circuits(N_QUBITS, num_gates=NUM_GATES, num_circuits=N_CIRCUITS)
 
     # ---- Pre-select most expressive circuits (RFD metric) ----------------
     indexed_circuits = preselect_circuits_by_expressibility(
         circuits, N_QUBITS, top_k=TOP_K_EXPR)
 
-    # ---- Load data directly from PDBbind refined-set with RDKit ----------
-    # Uses ECFP4 + RDKit descriptors (ligand) and AA composition (pocket)
-    # ~5000+ samples vs ~180 from old model_ready_data
-    train_dataset, val_dataset, label_mean, label_std = \
-        load_from_refined_set(n_pca_components=PCA_DIMS)
+    # ---- Load data --------------------------------------------------------
+    if USE_MODEL_FEATURE_NPZ:
+        train_dataset, val_dataset, label_mean, label_std = \
+            load_from_model_feature_npz(max_samples=6000, random_state=args.seed)
+    else:
+        # Uses ECFP4 + RDKit descriptors (ligand) and AA composition (pocket)
+        # ~5000+ samples vs ~180 from old model_ready_data
+        train_dataset, val_dataset, label_mean, label_std = \
+            load_from_refined_set(n_pca_components=PCA_DIMS)
+
+    holdout_dataset = None
+    if args.holdout:
+        val_dataset, holdout_dataset = split_validation_for_holdout(
+            val_dataset,
+            holdout_fraction=args.holdout_fraction,
+            random_state=args.seed,
+        )
+        print(f"Holdout enabled: selection-val={len(val_dataset)}  holdout={len(holdout_dataset)}")
+    else:
+        print(f"Holdout disabled: using validation split (n={len(val_dataset)}) for metrics/plots")
 
     # ---- Evaluate each circuit with Ridge regression readout -------------
     results = run_circuits_and_evaluate(
         indexed_circuits, train_dataset, val_dataset,
         n_qubits=N_QUBITS,
+        holdout_dataset=holdout_dataset,
     )
 
     # ---- Ensemble top-K circuits -----------------------------------------
