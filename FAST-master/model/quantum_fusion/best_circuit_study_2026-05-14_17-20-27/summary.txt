@@ -1,0 +1,18 @@
+======================================================================
+BEST CIRCUIT STUDY — SUMMARY
+======================================================================
+Best circuit: gate_count=100  seed=2  circuit_idx=27  n_qubits=6
+Baseline R² (classical Ridge, split_seed=42): n/a
+
+Part A — Stability (15 split seeds, fixed circuit):
+  R² quantum+classical:  0.476503 ± 0.000315  [0.475807, 0.476869]
+  R² classical only:     0.475672 ± 0.000282
+  Gain:                  +0.000831 ± 0.000128
+  Splits w/ positive gain: 15/15
+
+Part B — Qubit Scaling:
+  nq= 6  best R²=0.475573  mean R²=0.475527  gain=+0.000380
+  nq= 8  best R²=0.475548  mean R²=0.475305  gain=+0.000355
+  nq=10  best R²=0.475717  mean R²=0.475040  gain=+0.000525
+
+======================================================================

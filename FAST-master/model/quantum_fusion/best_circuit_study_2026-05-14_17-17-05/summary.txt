@@ -1,0 +1,13 @@
+======================================================================
+BEST CIRCUIT STUDY — SUMMARY
+======================================================================
+Best circuit: gate_count=100  seed=2  circuit_idx=27  n_qubits=6
+Baseline R² (classical Ridge, split_seed=42): n/a
+
+Part C — Readout Comparison (fixed best circuit, split_seed=42):
+  Ridge  quantum+classical: R²=0.476304  gain=+0.001111
+  Ridge  classical only:   R²=0.475193
+  MLP    quantum+classical: R²=0.481581 ± 0.001647  gain=+0.001194
+  MLP    classical only:   R²=0.480387 ± 0.000890
+
+======================================================================

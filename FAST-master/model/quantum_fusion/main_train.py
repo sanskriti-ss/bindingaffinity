@@ -181,13 +181,17 @@ def load_sample_data(max_samples: int = 2000):
     ids_arr = np.array(ids_list)
 
     # ---- PCA: compress ligand 1034 -> 64 dims ----------------------------
-    n_pca = min(64, len(lab_arr) - 1)
-    scaler_l = StandardScaler().fit(lig_arr)
-    lig_pca  = PCA(n_components=n_pca, random_state=42).fit_transform(
-                   scaler_l.transform(lig_arr)).astype(np.float32)
+    # Fit scaler and PCA on the approximate train portion only (first 80%)
+    # to avoid leaking val-set statistics into the feature transform.
+    n_pca      = min(64, len(lab_arr) - 1)
+    n_tr_approx = max(1, int(0.80 * len(lab_arr)))
+    scaler_l = StandardScaler().fit(lig_arr[:n_tr_approx])
+    pca_l    = PCA(n_components=n_pca, random_state=42).fit(
+                   scaler_l.transform(lig_arr[:n_tr_approx]))
+    lig_pca  = pca_l.transform(scaler_l.transform(lig_arr)).astype(np.float32)
 
     # StandardScale pocket too (already low-D, skip PCA)
-    scaler_p = StandardScaler().fit(poc_arr)
+    scaler_p   = StandardScaler().fit(poc_arr[:n_tr_approx])
     poc_scaled = scaler_p.transform(poc_arr).astype(np.float32)
 
     print(f"Feature dims — pocket: {poc_scaled.shape[1]}  ligand(PCA): {lig_pca.shape[1]}")
@@ -230,7 +234,9 @@ def load_with_model_features(
             if pid in npz:
                 buf[i] = npz[pid]
                 hits += 1
-        buf = StandardScaler().fit_transform(buf).astype(np.float32)
+        # Fit scaler on first 80% (approx train portion) to avoid val leakage
+        n_tr = max(1, int(0.80 * len(ids_arr)))
+        buf = StandardScaler().fit(buf[:n_tr]).transform(buf).astype(np.float32)
         parts.append(buf)
         print(f"[load_with_model_features] 3DCNN features ({dim}-dim) "
               f"loaded for {hits}/{len(ids_arr)} complexes")
@@ -249,7 +255,9 @@ def load_with_model_features(
             if pid in npz2:
                 buf2[i] = npz2[pid]
                 hits2 += 1
-        buf2 = StandardScaler().fit_transform(buf2).astype(np.float32)
+        # Fit scaler on first 80% (approx train portion) to avoid val leakage
+        n_tr2 = max(1, int(0.80 * len(ids_arr)))
+        buf2 = StandardScaler().fit(buf2[:n_tr2]).transform(buf2).astype(np.float32)
         parts.append(buf2)
         print(f"[load_with_model_features] SGCNN features ({dim2}-dim) "
               f"loaded for {hits2}/{len(ids_arr)} complexes")
