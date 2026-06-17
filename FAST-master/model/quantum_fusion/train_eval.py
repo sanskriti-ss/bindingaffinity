@@ -221,6 +221,31 @@ def build_model(
     raise ValueError(f"Unknown mode {mode!r}; use fixed_e2e or param_vqc")
 
 
+def build_multi_layer_model(
+    mode: str,
+    in_features: int,
+    circuits,
+    n_qubits: int,
+) -> nn.Module:
+    """Build stacked G3 hybrid model (fixed reservoir or param VQC per layer)."""
+    from multi_layer_models import ModelMultiLayerG3Hybrid  # noqa: E402
+
+    if mode in ("fixed", "fixed_e2e"):
+        ml_mode = "fixed"
+    elif mode in ("param", "param_vqc"):
+        ml_mode = "param"
+    else:
+        raise ValueError(f"Unknown mode {mode!r}; use fixed or param")
+
+    return ModelMultiLayerG3Hybrid(
+        in_features=in_features,
+        circuits=circuits,
+        mode=ml_mode,
+        n_qubits=n_qubits,
+        out_features=1,
+    )
+
+
 def train_model(
     model: nn.Module,
     loaders: DataBundle,
@@ -288,6 +313,10 @@ def train_model(
     n_quantum = 0
     if hasattr(model, "quantum_params"):
         n_quantum = int(model.quantum_params.numel())
+    elif hasattr(model, "blocks"):
+        for block in model.blocks:
+            if hasattr(block, "quantum_params"):
+                n_quantum += int(block.quantum_params.numel())
 
     return {
         "r2_holdout": float(ho_r2),
