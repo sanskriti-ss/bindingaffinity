@@ -2,11 +2,11 @@
 """
 cd FAST-master/model/
 pip install requirements.txt
-python -m quantum_fusion.testing_random_unitaries
+python -m testing_unitaries.testing_random_unitaries
 
 OR
 
-cd FAST-master/model/quantum_fusion/
+cd FAST-master/model/testing_unitaries/
 python testing_random_unitaries.py
 
 -----------------------------------------------------------------------
@@ -54,12 +54,32 @@ from sklearn.model_selection import train_test_split
 
 import pennylane as qml
 
+THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_DIR = os.path.dirname(THIS_DIR)
+QF_DIR = os.path.join(MODEL_DIR, 'quantum_fusion')
+
+# Ensure moved script can still import quantum_fusion modules/resources.
+for _p in [MODEL_DIR, QF_DIR]:
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
+
 # Handle both relative and direct imports
+from quantum_fusion.main_train import ModelHybridFC, ModelHybridFC_Reservoir, FusionDataset, evaluate_model, load_with_model_features
+
 try:
-    from .main_train import ModelHybridFC, ModelHybridFC_Reservoir, FusionDataset, evaluate_model, load_with_model_features
-except ImportError:
-    # If running as script directly from quantum_fusion directory
-    from main_train import ModelHybridFC, ModelHybridFC_Reservoir, FusionDataset, evaluate_model, load_with_model_features
+    from testing_unitaries.circuit_visualization import (
+        render_circuit_diagram,
+        publication_qiskit_style,
+        circuit_summary_stats,
+        circuit_gate_rows,
+    )
+except Exception:
+    from circuit_visualization import (
+        render_circuit_diagram,
+        publication_qiskit_style,
+        circuit_summary_stats,
+        circuit_gate_rows,
+    )
 
 
 def load_from_model_feature_npz(max_samples=6000, val_fraction=0.2, random_state=42):
@@ -69,9 +89,8 @@ def load_from_model_feature_npz(max_samples=6000, val_fraction=0.2, random_state
 
     This usually provides a richer feature space than RDKit-only vectors.
     """
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    dcnn_npz = os.path.join(script_dir, 'refined_3dcnn_features.npz')
-    sgcnn_npz = os.path.join(script_dir, 'refined_sgcnn_features.npz')
+    dcnn_npz = os.path.join(QF_DIR, 'refined_3dcnn_features.npz')
+    sgcnn_npz = os.path.join(QF_DIR, 'refined_sgcnn_features.npz')
 
     sgcnn_features, cnn3d_features, labels, _ = load_with_model_features(
         max_samples=max_samples,
@@ -227,10 +246,9 @@ def load_from_refined_set(n_pca_components=32):
     RDLogger.DisableLog('rdApp.*')        # suppress RDKit warnings
 
     # ---- locate refined-set root ------------------------------------------
-    script_dir = os.path.dirname(os.path.abspath(__file__))
     candidates = [
-        os.path.join(script_dir, '..', '..', '..', 'data', 'refined-set'),
-        os.path.join(script_dir, '..', '..', '..', '..', 'data', 'refined-set'),
+        os.path.join(MODEL_DIR, '..', '..', 'data', 'refined-set'),
+        os.path.join(MODEL_DIR, '..', '..', '..', 'data', 'refined-set'),
         r'C:\bindingaffinity\data\refined-set',
     ]
     refined_root = next((os.path.abspath(p) for p in candidates
@@ -422,12 +440,10 @@ def _load_preprocessed_data_old(n_pca_components=64):
     import json
     import os
 
-    script_dir = os.path.dirname(os.path.abspath(__file__))  # quantum_fusion dir
-    
     possible_paths = [
         'model_ready_data',
-        os.path.join(script_dir, '..', '..', '..', 'model_ready_data'),
-        os.path.join(script_dir, '..', '..', '..', '..', 'model_ready_data'),
+        os.path.join(MODEL_DIR, '..', '..', 'model_ready_data'),
+        os.path.join(MODEL_DIR, '..', '..', '..', 'model_ready_data'),
     ]
     data_dir = None
     for path in possible_paths:
@@ -597,7 +613,7 @@ def reservoir_feature_diversity(qc, n_qubits, n_samples=120):
     return float(pr)                           # higher = more diverse outputs
 
 
-def preselect_circuits_by_expressibility(circuits, n_qubits, top_k):
+def preselect_circuits_by_expressibility(circuits, n_qubits, top_k, return_all_scores=False):
     """
     Pre-select circuits by Reservoir Feature Diversity (replaces fidelity
     variance which is degenerate for deep G3 circuits).
@@ -613,7 +629,19 @@ def preselect_circuits_by_expressibility(circuits, n_qubits, top_k):
     print(f"\nTop-{top_k} circuits by RFD (higher = more diverse reservoir):")
     for score, idx, _ in selected:
         print(f"  Circuit {idx}: RFD = {score:.4f}")
-    return [(idx, qc) for (_, idx, qc) in selected]
+
+    indexed_selected = [(idx, qc) for (_, idx, qc) in selected]
+    if return_all_scores:
+        all_scores = [
+            {
+                'circuit_idx': idx,
+                'rfd_score': float(score),
+                'rfd_rank': rank,
+            }
+            for rank, (score, idx, _) in enumerate(scores, start=1)
+        ]
+        return indexed_selected, all_scores
+    return indexed_selected
 
 
 # ===========================================================================
@@ -699,6 +727,38 @@ def run_circuits_and_evaluate(indexed_circuits, train_dataset, val_dataset,
     eval_X_pca  = np.concatenate([eval_pocket, eval_ligand], axis=1)
     eval_y      = eval_dataset.labels.numpy().flatten()
 
+    def _ridge_learning_curve(X_tr, y_tr, X_eval, y_eval, alphas, n_points=8, seed=42):
+        """Build train/eval MSE curves by fitting Ridge on increasing train fractions."""
+        n = X_tr.shape[0]
+        if n < 20:
+            n_points = 3
+        fractions = np.linspace(0.15, 1.0, n_points)
+        rng = np.random.default_rng(seed)
+        perm = rng.permutation(n)
+
+        train_losses, eval_losses = [], []
+        from sklearn.linear_model import RidgeCV as _RidgeCV
+
+        for frac in fractions:
+            m = max(8, int(round(frac * n)))
+            sub_idx = perm[:m]
+            X_sub = X_tr[sub_idx]
+            y_sub = y_tr[sub_idx]
+
+            scaler = StandardScaler().fit(X_sub)
+            X_sub_s = scaler.transform(X_sub)
+            X_eval_s = scaler.transform(X_eval)
+
+            model_lc = _RidgeCV(alphas=alphas, cv=3)
+            model_lc.fit(X_sub_s, y_sub)
+            pred_sub = model_lc.predict(X_sub_s)
+            pred_eval = model_lc.predict(X_eval_s)
+
+            train_losses.append(float(mean_squared_error(y_sub, pred_sub)))
+            eval_losses.append(float(mean_squared_error(y_eval, pred_eval)))
+
+        return train_losses, eval_losses
+
     results = []
     circuit_bar = tqdm(indexed_circuits, desc="Testing Circuits", position=0)
 
@@ -741,6 +801,17 @@ def run_circuits_and_evaluate(indexed_circuits, train_dataset, val_dataset,
         pcc    = pearsonr(eval_y,  preds_eval)[0]
         scc    = spearmanr(eval_y, preds_eval)[0]
 
+        # Learning curves (multiple points) so saved plot shows true curves, not dots.
+        train_curve, eval_curve = _ridge_learning_curve(
+            X_tr=X_tr,
+            y_tr=train_y,
+            X_eval=X_ev,
+            y_eval=eval_y,
+            alphas=alphas,
+            n_points=8,
+            seed=orig_idx + 42,
+        )
+
         # Baseline (classical-only): same readout family candidates on classical features.
         x_scaler_base = StandardScaler().fit(train_X_pca)
         X_tr_base_s = x_scaler_base.transform(train_X_pca)
@@ -779,10 +850,8 @@ def run_circuits_and_evaluate(indexed_circuits, train_dataset, val_dataset,
             'val_preds':    preds_val,      # legacy cache key
             'val_true':     eval_y,         # legacy cache key kept for compatibility
             'val_X_pca':    eval_X_pca,     # legacy cache key kept for compatibility
-            # Ridge has no epoch-wise training, so store final MSE as a
-            # single-point "curve" to keep downstream plotting informative.
-            'train_losses': [float(train_mse)],
-            'val_losses':   [float(val_mse)],
+            'train_losses': train_curve if len(train_curve) > 1 else [float(train_mse)],
+            'val_losses':   eval_curve if len(eval_curve) > 1 else [float(val_mse)],
         })
         circuit_bar.set_postfix(R2=f'{r2:.4f}',
                                 Gain=f'{r2 - base_r2:+.4f}',
@@ -849,36 +918,28 @@ def _circuit_signature(qc: QuantumCircuit) -> str:
 
 
 def _save_top_circuit_diagrams(results, output_dir, top_k=25):
-    """Save text diagrams and metadata for top-K circuits in a dedicated folder."""
+    """Save high-quality PNG diagrams and metadata for top-K circuits."""
     top = sorted(results, key=lambda r: r['r2'], reverse=True)[:min(top_k, len(results))]
     diag_dir = os.path.join(output_dir, f"top{len(top)}_circuit_diagrams")
     os.makedirs(diag_dir, exist_ok=True)
 
+    style = publication_qiskit_style()
     rows = []
     for rank, r in enumerate(top, start=1):
         qc = r['circuit']
         cid = _circuit_signature(qc)
-        depth = int(qc.depth()) if qc.depth() is not None else -1
-        counts = qc.count_ops()
-        count_h = int(counts.get('h', 0))
-        count_t = int(counts.get('t', 0))
-        count_cx = int(counts.get('cx', 0))
+        stats = circuit_summary_stats(qc)
 
-        txt_name = f"rank{rank:02d}_idx{r['circuit_idx']}_{cid}.txt"
-        txt_path = os.path.join(diag_dir, txt_name)
-        with open(txt_path, 'w', encoding='utf-8') as f:
-            f.write(str(qc.draw(output='text')))
+        png_name = f"rank{rank:02d}_idx{r['circuit_idx']}_{cid}.png"
+        png_path = os.path.join(diag_dir, png_name)
+        title = f"G3 Circuit #{r['circuit_idx']}  (rank {rank}/{len(top)},  R²={r['r2']:.4f})"
+        render_circuit_diagram(qc, png_path, title=title, style=style, fold=-1)
 
         rows.append({
             'rank': rank,
             'circuit_idx': r['circuit_idx'],
             'circuit_id': cid,
-            'n_qubits': qc.num_qubits,
-            'n_gates': qc.size(),
-            'depth': depth,
-            'count_h': count_h,
-            'count_t': count_t,
-            'count_cx': count_cx,
+            **stats,
             'r2': r['r2'],
             'r2_baseline': r['r2_baseline'],
             'r2_gain': r['r2_gain'],
@@ -888,13 +949,88 @@ def _save_top_circuit_diagrams(results, output_dir, top_k=25):
             'spearman': r['spearman'],
             'best_alpha': r['best_alpha'],
             'model_type': r.get('model_type', 'ridge'),
-            'diagram_file': txt_name,
+            'diagram_file': png_name,
         })
 
     gates_csv = os.path.join(output_dir, f'top{len(top)}_circuit_gates.csv')
     pd.DataFrame(rows).to_csv(gates_csv, index=False)
     print(f"Saved top-circuit diagrams -> {diag_dir}")
     print(f"Saved top-circuit metadata -> {gates_csv}")
+
+
+def _save_all_circuit_exports(all_circuits, all_rfd_scores, results, output_dir, render_all_diagrams=True):
+    """Save all generated circuits in analysis-friendly summary + long-form gate CSVs."""
+    result_by_idx = {r['circuit_idx']: r for r in results}
+    score_by_idx = {int(s['circuit_idx']): s for s in all_rfd_scores}
+    selected_idxs = set(result_by_idx.keys())
+
+    rows_catalog = []
+    rows_long = []
+
+    all_diag_dir = os.path.join(output_dir, 'all_circuit_diagrams')
+    if render_all_diagrams:
+        os.makedirs(all_diag_dir, exist_ok=True)
+
+    style = publication_qiskit_style()
+    for idx, qc in enumerate(all_circuits):
+        cid = _circuit_signature(qc)
+        stats = circuit_summary_stats(qc)
+        score_info = score_by_idx.get(idx, {})
+        perf = result_by_idx.get(idx)
+
+        diagram_name = ''
+        if render_all_diagrams:
+            diagram_name = f"idx{idx:03d}_{cid}.png"
+            diagram_path = os.path.join(all_diag_dir, diagram_name)
+            title_parts = [f"G3 Circuit #{idx}"]
+            if score_info.get('rfd_rank') is not None:
+                title_parts.append(f"RFD rank {score_info['rfd_rank']}")
+            if perf is not None:
+                title_parts.append(f"R²={perf['r2']:.4f}")
+            render_circuit_diagram(qc, diagram_path, title='  |  '.join(title_parts), style=style, fold=-1)
+
+        row = {
+            'circuit_idx': idx,
+            'circuit_id': cid,
+            **stats,
+            'selected_for_eval': idx in selected_idxs,
+            'evaluated': perf is not None,
+            'rfd_score': score_info.get('rfd_score', np.nan),
+            'rfd_rank': score_info.get('rfd_rank', np.nan),
+            'diagram_file': diagram_name,
+            'model_type': perf.get('model_type') if perf is not None else '',
+            'best_alpha': perf.get('best_alpha') if perf is not None else np.nan,
+            'r2': perf.get('r2') if perf is not None else np.nan,
+            'r2_baseline': perf.get('r2_baseline') if perf is not None else np.nan,
+            'r2_gain': perf.get('r2_gain') if perf is not None else np.nan,
+            'selection_r2': perf.get('selection_r2') if perf is not None else np.nan,
+            'selection_r2_baseline': perf.get('selection_r2_baseline') if perf is not None else np.nan,
+            'selection_r2_gain': perf.get('selection_r2_gain') if perf is not None else np.nan,
+            'rmse': perf.get('rmse') if perf is not None else np.nan,
+            'mae': perf.get('mae') if perf is not None else np.nan,
+            'pearson': perf.get('pearson') if perf is not None else np.nan,
+            'spearman': perf.get('spearman') if perf is not None else np.nan,
+            'evaluation_split': perf.get('evaluation_split') if perf is not None else '',
+        }
+        rows_catalog.append(row)
+
+        gate_rows = circuit_gate_rows(qc, circuit_idx=idx, circuit_id=cid)
+        for g in gate_rows:
+            g['rfd_score'] = row['rfd_score']
+            g['rfd_rank'] = row['rfd_rank']
+            g['evaluated'] = row['evaluated']
+            g['r2'] = row['r2']
+            g['r2_gain'] = row['r2_gain']
+        rows_long.extend(gate_rows)
+
+    catalog_csv = os.path.join(output_dir, 'all_circuit_catalog.csv')
+    gates_csv = os.path.join(output_dir, 'all_circuit_gate_steps.csv')
+    pd.DataFrame(rows_catalog).sort_values('circuit_idx').to_csv(catalog_csv, index=False)
+    pd.DataFrame(rows_long).to_csv(gates_csv, index=False)
+    print(f"Saved full circuit catalog -> {catalog_csv}")
+    print(f"Saved full gate-step table -> {gates_csv}")
+    if render_all_diagrams:
+        print(f"Saved all circuit diagrams -> {all_diag_dir}")
 
 
 def _save_quartile_violin_plot(results, output_dir):
@@ -916,6 +1052,22 @@ def _save_quartile_violin_plot(results, output_dir):
         'Bottom 25%': [r['r2'] for r in sorted_r[q75:]],
     }
 
+    # Classical baseline reference (Ridge on classical-only features).
+    baseline_vals = [r.get('r2_baseline', np.nan) for r in sorted_r]
+    baseline_vals = [float(v) for v in baseline_vals if pd.notna(v)]
+    baseline_r2 = float(np.mean(baseline_vals)) if baseline_vals else None
+
+    # Compute comfortable y-limits that always include the baseline line.
+    y_data = [v for arr in quartiles.values() for v in arr]
+    if baseline_r2 is not None:
+        y_data.append(baseline_r2)
+    y_min = float(min(y_data))
+    y_max = float(max(y_data))
+    y_span = max(1e-4, y_max - y_min)
+    y_pad = max(0.03, 0.15 * y_span)
+    y_lo = y_min - y_pad
+    y_hi = y_max + y_pad
+
     fig_q, axes_q = plt.subplots(1, 2, figsize=(14, 5))
     colors_q = ['#2ecc71', '#f39c12', '#e74c3c', '#c0392b']
 
@@ -932,6 +1084,17 @@ def _save_quartile_violin_plot(results, output_dir):
     ax_box.set_ylabel('R²', fontsize=11)
     ax_box.set_title('Quartile Comparison: R² Distribution', fontsize=12, fontweight='bold')
     ax_box.grid(True, axis='y', alpha=0.3)
+    ax_box.set_ylim(y_lo, y_hi)
+    if baseline_r2 is not None:
+        ax_box.axhline(
+            baseline_r2,
+            color='#34495e',
+            linestyle='--',
+            linewidth=2.0,
+            alpha=0.95,
+            label=f'Classical baseline R²={baseline_r2:.3f}',
+        )
+        ax_box.legend(loc='best')
 
     ax_vio = axes_q[1]
     vio_data = [quartiles[q] for q in ['Top 25%', 'Q2 (25-50%)', 'Q3 (50-75%)', 'Bottom 25%']]
@@ -945,6 +1108,17 @@ def _save_quartile_violin_plot(results, output_dir):
     ax_vio.set_ylabel('R²', fontsize=11)
     ax_vio.set_title('Violin Plot: R² by Quartile', fontsize=12, fontweight='bold')
     ax_vio.grid(True, axis='y', alpha=0.3)
+    ax_vio.set_ylim(y_lo, y_hi)
+    if baseline_r2 is not None:
+        ax_vio.axhline(
+            baseline_r2,
+            color='#34495e',
+            linestyle='--',
+            linewidth=2.0,
+            alpha=0.95,
+            label=f'Classical baseline R²={baseline_r2:.3f}',
+        )
+        ax_vio.legend(loc='best')
 
     plt.tight_layout()
     quartile_path = os.path.join(output_dir, 'quartile_comparison.png')
@@ -955,7 +1129,7 @@ def _save_quartile_violin_plot(results, output_dir):
 # ===========================================================================
 # 3. Save, plot, and report
 # ===========================================================================
-def save_and_plot_results(results, ensemble_data=None):
+def save_and_plot_results(results, ensemble_data=None, all_circuits=None, all_rfd_scores=None):
     timestamp  = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     output_dir = os.path.abspath(f'plots_{timestamp}')
     os.makedirs(output_dir, exist_ok=True)
@@ -963,22 +1137,16 @@ def save_and_plot_results(results, ensemble_data=None):
     sorted_by_r2 = sorted(results, key=lambda x: x['r2'], reverse=True)
     top5 = sorted(results, key=lambda x: x['rmse'])[:5]
 
-    # All circuits CSV with identities + gate composition
+    # Evaluated-circuit CSV (typically top-K after RFD preselection)
     all_rows = []
     for rank, r in enumerate(sorted_by_r2, start=1):
         qc = r['circuit']
-        depth = int(qc.depth()) if qc.depth() is not None else -1
-        counts = qc.count_ops()
+        stats = circuit_summary_stats(qc)
         all_rows.append({
             'rank_by_r2': rank,
             'circuit_idx': r['circuit_idx'],
             'circuit_id': _circuit_signature(qc),
-            'n_qubits': qc.num_qubits,
-            'n_gates': qc.size(),
-            'depth': depth,
-            'count_h': int(counts.get('h', 0)),
-            'count_t': int(counts.get('t', 0)),
-            'count_cx': int(counts.get('cx', 0)),
+            **stats,
             'model_type': r.get('model_type', 'ridge'),
             'best_alpha': r['best_alpha'],
             'r2': r['r2'],
@@ -1069,6 +1237,14 @@ def save_and_plot_results(results, ensemble_data=None):
 
     _save_quartile_violin_plot(results, output_dir)
     _save_top_circuit_diagrams(results, output_dir, top_k=25)
+    if all_circuits is not None and all_rfd_scores is not None:
+        _save_all_circuit_exports(
+            all_circuits=all_circuits,
+            all_rfd_scores=all_rfd_scores,
+            results=results,
+            output_dir=output_dir,
+            render_all_diagrams=True,
+        )
 
     plt.close('all')
     print(f"Plots saved to {output_dir}/")
@@ -1085,12 +1261,18 @@ if __name__ == "__main__":
                         help='Fraction of validation split to reserve as holdout when --holdout is set. Default: 0.5')
     parser.add_argument('--seed', type=int, default=42,
                         help='Random seed for holdout split. Default: 42')
+    parser.add_argument('--num-circuits', type=int, default=100,
+                        help='Number of random G3 circuits to generate. Default: 100')
+    parser.add_argument('--num-gates', type=int, default=300,
+                        help='Gate depth/instruction count per circuit. Default: 300')
+    parser.add_argument('--top-k', type=int, default=25,
+                        help='Top-K circuits selected by RFD for evaluation. Default: 25')
     args = parser.parse_args()
 
     N_QUBITS     = 6    # qubits (↑ from 4 → 18 observable features vs 12)
-    NUM_GATES    = 300  # gate instructions per circuit
-    N_CIRCUITS   = 100  # pool of random G3 circuits before RFD filter
-    TOP_K_EXPR   = 25   # keep top-K by Reservoir Feature Diversity
+    NUM_GATES    = args.num_gates
+    N_CIRCUITS   = args.num_circuits
+    TOP_K_EXPR   = args.top_k
     TOP_K_ENS    = 25   # ensemble after training
     PCA_DIMS     = 32   # PCA dims per modality; 2*32=64 total into reservoir
     USE_MODEL_FEATURE_NPZ = True  # leverage precomputed 3DCNN/SGCNN NPZ features
@@ -1099,8 +1281,8 @@ if __name__ == "__main__":
     circuits = generate_g3_random_circuits(N_QUBITS, num_gates=NUM_GATES, num_circuits=N_CIRCUITS)
 
     # ---- Pre-select most expressive circuits (RFD metric) ----------------
-    indexed_circuits = preselect_circuits_by_expressibility(
-        circuits, N_QUBITS, top_k=TOP_K_EXPR)
+    indexed_circuits, all_rfd_scores = preselect_circuits_by_expressibility(
+        circuits, N_QUBITS, top_k=TOP_K_EXPR, return_all_scores=True)
 
     # ---- Load data --------------------------------------------------------
     if USE_MODEL_FEATURE_NPZ:
@@ -1135,4 +1317,9 @@ if __name__ == "__main__":
         results, top_k=TOP_K_ENS, n_qubits=N_QUBITS)
 
     # ---- Save plots and CSV ----------------------------------------------
-    save_and_plot_results(results, ensemble_data=ensemble_data)
+    save_and_plot_results(
+        results,
+        ensemble_data=ensemble_data,
+        all_circuits=circuits,
+        all_rfd_scores=all_rfd_scores,
+    )
