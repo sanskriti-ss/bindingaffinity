@@ -1,0 +1,71 @@
+{
+  "timestamp": "20260617_145101",
+  "circuit_type": "fixed",
+  "n_quantum_layers": null,
+  "layer_counts": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "gates_per_layer": 3,
+  "circuit_sharing": "independent",
+  "shots": 3,
+  "epochs": 15,
+  "batch_size": 64,
+  "lr": 0.0003,
+  "n_qubits": 6,
+  "base_seed": 2000,
+  "data_source": "hdf_embed_split",
+  "n_train": 3615,
+  "n_val": 904,
+  "n_holdout": 797,
+  "layer_circuits": [
+    {
+      "layer_idx": 0,
+      "seed": 7247,
+      "n_h": 0,
+      "n_t": 2,
+      "n_cnot": 1,
+      "fingerprint": "t:0|cx:2,5|t:0",
+      "n_quantum_params": 2
+    },
+    {
+      "layer_idx": 1,
+      "seed": 7264,
+      "n_h": 0,
+      "n_t": 0,
+      "n_cnot": 3,
+      "fingerprint": "cx:2,5|cx:4,3|cx:3,4",
+      "n_quantum_params": 0
+    },
+    {
+      "layer_idx": 2,
+      "seed": 7281,
+      "n_h": 1,
+      "n_t": 1,
+      "n_cnot": 1,
+      "fingerprint": "cx:2,3|h:1|t:4",
+      "n_quantum_params": 2
+    },
+    {
+      "layer_idx": 3,
+      "seed": 7298,
+      "n_h": 1,
+      "n_t": 2,
+      "n_cnot": 0,
+      "fingerprint": "t:1|h:5|t:4",
+      "n_quantum_params": 3
+    },
+    {
+      "layer_idx": 4,
+      "seed": 7315,
+      "n_h": 1,
+      "n_t": 2,
+      "n_cnot": 0,
+      "fingerprint": "h:4|t:1|t:3",
+      "n_quantum_params": 3
+    }
+  ]
+}

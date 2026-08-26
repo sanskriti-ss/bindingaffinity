@@ -9,8 +9,11 @@ evaluate_top25.py
 5. Performs quartile analysis: compares top-25% circuits vs other quartiles
 6. Plots scatter (predicted vs actual) for best/worst and existing best_model.pth
 
-Run from quantum_fusion/ directory:
-    python evaluate_top5.py
+Run from model/ directory:
+    python -m testing_unitaries.evaluate_top25
+
+or from testing_unitaries/ directly:
+    python evaluate_top25.py
 """
 
 import os, sys, math, glob
@@ -33,14 +36,21 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 import pickle as _pickle
 
 # ── imports from main_train ──────────────────────────────────────────────────
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from main_train import (
+THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_DIR = os.path.dirname(THIS_DIR)
+QF_DIR = os.path.join(MODEL_DIR, 'quantum_fusion')
+
+for _p in [MODEL_DIR, QF_DIR]:
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
+
+from quantum_fusion.main_train import (
     load_with_model_features,
     FusionDataset,
     ModelHybridFC_Reservoir,
     evaluate_model,
 )
-from testing_random_unitaries import (
+from testing_unitaries.testing_random_unitaries import (
     generate_g3_random_circuits,
     preselect_circuits_by_expressibility,
 )
@@ -60,10 +70,10 @@ EARLY_STOP_PAT = 15                               # patience epochs before early
 # True = original behaviour; False = honest quantum evaluation.
 USE_SKIP   = False
 
-_qf_dir    = os.path.dirname(os.path.abspath(__file__))
+_qf_dir    = QF_DIR
 _dcnn_npz  = os.path.join(_qf_dir, 'refined_3dcnn_features.npz')
 _sgcnn_npz = os.path.join(_qf_dir, 'refined_sgcnn_features.npz')
-OUT_DIR    = _qf_dir   # write outputs next to this script
+OUT_DIR    = THIS_DIR  # write outputs next to this script
 
 
 def _train_one(model, loaders, epochs=EPOCHS, lr=LR, device=DEVICE, early_stop_patience=0):
@@ -524,11 +534,13 @@ def main():
     # Build circuit lookup by index
     circuit_by_idx = {circ_idx: circuit for circ_idx, circuit in indexed}
 
+    non_empty_quartiles = {k: v for k, v in quartiles.items() if len(v) > 0}
+
     # Print quartile statistics
     print(f"\n{'='*70}")
     print(f"QUARTILE ANALYSIS (based on {n_results} trained circuits)")
     print(f"{'='*70}")
-    for q_name, vals in quartiles.items():
+    for q_name, vals in non_empty_quartiles.items():
         if vals:
             print(f"\n{q_name:15} ({len(vals):2d} circuits):")
             print(f"  Adj-R² range:   {min(vals):.4f} – {max(vals):.4f}")
@@ -552,49 +564,59 @@ def main():
     print(f"{'='*70}\n")
 
     # ── 7a. Box plot + Violin plot comparison ────────────────────────────────
-    fig_q, axes_q = plt.subplots(1, 2, figsize=(14, 5))
+    ordered_labels = ['Top 25%', 'Q2 (25-50%)', 'Q3 (50-75%)', 'Bottom 25%']
+    labels_present = [q for q in ordered_labels if len(quartiles[q]) > 0]
+    if len(labels_present) >= 2:
+        fig_q, axes_q = plt.subplots(1, 2, figsize=(14, 5))
 
-    # Box plot
-    ax_box = axes_q[0]
-    bp = ax_box.boxplot(
-        [quartiles[q] for q in ['Top 25%', 'Q2 (25-50%)', 'Q3 (50-75%)', 'Bottom 25%']],
-        labels=['Top 25%', 'Q2\n(25-50%)', 'Q3\n(50-75%)', 'Bottom 25%'],
-        patch_artist=True,
-        widths=0.6,
-    )
-    colors_q = ['#2ecc71', '#f39c12', '#e74c3c', '#c0392b']
-    for patch, color in zip(bp['boxes'], colors_q):
-        patch.set_facecolor(color)
-        patch.set_alpha(0.7)
-    ax_box.set_ylabel('Adjusted R²', fontsize=11)
-    ax_box.set_title('Quartile Comparison: Adjusted R² Distribution', fontsize=12, fontweight='bold')
-    ax_box.grid(True, axis='y', alpha=0.3)
-    ax_box.set_ylim(min(min(v) for v in quartiles.values()) - 0.05,
-                    max(max(v) for v in quartiles.values()) + 0.05)
+        # Box plot
+        ax_box = axes_q[0]
+        bp = ax_box.boxplot(
+            [quartiles[q] for q in labels_present],
+            labels=[q.replace(' (25-50%)', '\n(25-50%)').replace(' (50-75%)', '\n(50-75%)') for q in labels_present],
+            patch_artist=True,
+            widths=0.6,
+        )
+        colors_q = ['#2ecc71', '#f39c12', '#e74c3c', '#c0392b']
+        for patch, color in zip(bp['boxes'], colors_q):
+            patch.set_facecolor(color)
+            patch.set_alpha(0.7)
+        ax_box.set_ylabel('Adjusted R²', fontsize=11)
+        ax_box.set_title('Quartile Comparison: Adjusted R² Distribution', fontsize=12, fontweight='bold')
+        ax_box.grid(True, axis='y', alpha=0.3)
+        ax_box.set_ylim(min(min(v) for v in non_empty_quartiles.values()) - 0.05,
+                        max(max(v) for v in non_empty_quartiles.values()) + 0.05)
 
-    # Violin plot
-    ax_vio = axes_q[1]
-    vio_data = [quartiles[q] for q in ['Top 25%', 'Q2 (25-50%)', 'Q3 (50-75%)', 'Bottom 25%']]
-    positions = [1, 2, 3, 4]
-    parts = ax_vio.violinplot(vio_data, positions=positions, showmeans=True, showmedians=True)
-    for pc, color in zip(parts['bodies'], colors_q):
-        pc.set_facecolor(color)
-        pc.set_alpha(0.7)
-    ax_vio.set_xticks(positions)
-    ax_vio.set_xticklabels(['Top 25%', 'Q2\n(25-50%)', 'Q3\n(50-75%)', 'Bottom 25%'])
-    ax_vio.set_ylabel('Adjusted R²', fontsize=11)
-    ax_vio.set_title('Violin Plot: Adjusted R² by Quartile', fontsize=12, fontweight='bold')
-    ax_vio.grid(True, axis='y', alpha=0.3)
-    ax_vio.set_ylim(min(min(v) for v in vio_data) - 0.05,
-                    max(max(v) for v in vio_data) + 0.05)
+        # Violin plot
+        ax_vio = axes_q[1]
+        vio_data = [quartiles[q] for q in labels_present]
+        positions = list(range(1, len(labels_present) + 1))
+        parts = ax_vio.violinplot(vio_data, positions=positions, showmeans=True, showmedians=True)
+        for pc, color in zip(parts['bodies'], colors_q):
+            pc.set_facecolor(color)
+            pc.set_alpha(0.7)
+        ax_vio.set_xticks(positions)
+        ax_vio.set_xticklabels([q.replace(' (25-50%)', '\n(25-50%)').replace(' (50-75%)', '\n(50-75%)') for q in labels_present])
+        ax_vio.set_ylabel('Adjusted R²', fontsize=11)
+        ax_vio.set_title('Violin Plot: Adjusted R² by Quartile', fontsize=12, fontweight='bold')
+        ax_vio.grid(True, axis='y', alpha=0.3)
+        ax_vio.set_ylim(min(min(v) for v in vio_data) - 0.05,
+                        max(max(v) for v in vio_data) + 0.05)
 
-    plt.tight_layout()
-    quartile_path = os.path.join(OUT_DIR, 'quartile_comparison.png')
-    plt.savefig(quartile_path, dpi=150, bbox_inches='tight')
-    plt.close()
-    print(f"Saved quartile comparison -> {quartile_path}")
+        plt.tight_layout()
+        quartile_path = os.path.join(OUT_DIR, 'quartile_comparison.png')
+        plt.savefig(quartile_path, dpi=150, bbox_inches='tight')
+        plt.close()
+        print(f"Saved quartile comparison -> {quartile_path}")
+    else:
+        print("Skipping quartile comparison plot (need at least 2 non-empty quartiles).")
 
     # ── 7b. Best vs Worst scatter (side-by-side) ────────────────────────────
+    if n_results < 2:
+        print("Skipping best-vs-worst scatter (need at least 2 circuits).")
+        print("\nDone!")
+        return
+
     # Rebuild models for best and worst circuits to get their predictions
     fig_bw, axes_bw = plt.subplots(1, 2, figsize=(14, 6))
     fig_bw.suptitle('Best Circuit vs Worst Circuit — Predictions', fontsize=14, fontweight='bold')
