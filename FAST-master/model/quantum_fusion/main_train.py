@@ -345,36 +345,42 @@ class ModelHybridFC_Reservoir(nn.Module):
     """
     Quantum Reservoir Computing model following Domingo et al. (2022).
 
-    - Measures X, Y, Z on every qubit --> 3*n_qubits features (vs just Z before)
-    - Skip connection: pre-quantum encoding concatenated with quantum output so
-      gradients flow even when the reservoir adds no information for a particular
-      circuit.
-    - MLP head with BatchNorm + Dropout replaces a single Linear layer
-    - Less aggressive compression: in_features -> 4*n_qubits -> n_qubits
+    The G3 circuit (CNOT, H, T) is fixed and non-trainable; only the
+    classical compressor and MLP head are trained.
 
-    The G3 circuit (CNOT, H, T) is fixed and non-trainable.
-    Only the classical layers are trained.
+    use_skip=True  (original):  head receives cat([quantum_out, x_enc])
+                                → the model can learn to IGNORE quantum and
+                                  rely solely on the classical skip path.
+                                  Run ablation to confirm quantum contribution.
+    use_skip=False (recommended for honest eval): head receives only
+                                  quantum_out, forcing all signal to flow
+                                  through the reservoir.
     """
     def __init__(self,
                  in_features: int,
                  out_features: int,
-                 qiskit_circuit,  # Qiskit QuantumCircuit from G3 family
+                 qiskit_circuit,
                  n_qubits: int = 4,
-                 backend: str = 'lightning.qubit'
+                 backend: str = 'lightning.qubit',
+                 use_skip: bool = True,
                 ):
         super().__init__()
         self.n_qubits = n_qubits
+        self.use_skip = use_skip
 
-        # 1) Classical compressor: less aggressive squeeze (4x to 1x instead of 2x to 1x)
+        # Classical compressor: in_features → 4*n_qubits → n_qubits
         self.fc1 = nn.Linear(in_features, 4 * n_qubits)
         self.bn1 = nn.BatchNorm1d(4 * n_qubits)
         self.fc2 = nn.Linear(4 * n_qubits, n_qubits)
 
-        # 2) Fixed quantum reservoir (no trainable params)
+        # Fixed quantum reservoir — no trainable quantum parameters
         self.dev = qml.device(backend, wires=n_qubits)
         self.qiskit_circuit = qiskit_circuit
 
-        @qml.qnode(self.dev, interface='torch')
+        # diff_method='adjoint' lets PennyLane differentiate the QNode w.r.t.
+        # the encoding angles (x_enc), so gradients still flow through the
+        # classical compressor even via the quantum path.
+        @qml.qnode(self.dev, interface='torch', diff_method='adjoint')
         def quantum_reservoir(inputs):
             for i in range(n_qubits):
                 qml.RY(inputs[i], wires=i)
@@ -387,7 +393,6 @@ class ModelHybridFC_Reservoir(nn.Module):
                     qml.T(wires=qubits[0])
                 elif gate.name == 'cx':
                     qml.CNOT(wires=qubits)
-            # X, Y, Z measurements --> 3*n_qubits features instead of just Z
             return (
                 [qml.expval(qml.PauliX(i)) for i in range(n_qubits)] +
                 [qml.expval(qml.PauliY(i)) for i in range(n_qubits)] +
@@ -396,9 +401,9 @@ class ModelHybridFC_Reservoir(nn.Module):
 
         self.quantum_reservoir = quantum_reservoir
 
-        # 3) MLP head: (3*n_qubits quantum features + n_qubits skip) --> out_features
-        q_features   = 3 * n_qubits
-        combined_dim = q_features + n_qubits   # quantum + skip connection
+        # Head input size depends on whether skip connection is used
+        q_features   = 3 * n_qubits                                      # 18 for 6 qubits
+        combined_dim = q_features + n_qubits if use_skip else q_features  # 24 or 18
         self.head = nn.Sequential(
             nn.Linear(combined_dim, 64),
             nn.BatchNorm1d(64),
@@ -412,20 +417,67 @@ class ModelHybridFC_Reservoir(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         batch_size = x.shape[0]
 
-        # Classical preprocessing
         x     = torch.relu(self.bn1(self.fc1(x)))
         x_enc = torch.tanh(self.fc2(x)) * math.pi   # [batch, n_qubits]
 
-        # Quantum reservoir (fixed, no grads through it)
         q_outputs = []
         for i in range(batch_size):
             q_out = self.quantum_reservoir(x_enc[i])
             q_outputs.append(torch.stack(q_out))
-        q_out = torch.stack(q_outputs).float()   # [batch, 3*n_qubits]
+        q_out = torch.stack(q_outputs).float()       # [batch, 3*n_qubits]
 
-        # Skip connection: append pre-quantum encoding
-        combined = torch.cat([q_out, x_enc], dim=1)  # [batch, 3*n+n = 4*n]
+        combined = torch.cat([q_out, x_enc], dim=1) if self.use_skip else q_out
+        return self.head(combined)
 
+
+# ============================================================================
+# Classical-only baseline: same compressor + head, NO quantum layer.
+# Use this for ablation — if it matches the reservoir R², the quantum layer
+# contributes nothing meaningful.
+# ============================================================================
+class ClassicalMLPBaseline(nn.Module):
+    """
+    Ablation baseline: identical architecture to ModelHybridFC_Reservoir
+    but the quantum reservoir is replaced by a learned linear projection of
+    the same output dimension (3*n_qubits).  Trainable end-to-end.
+    """
+    def __init__(self,
+                 in_features: int,
+                 out_features: int,
+                 n_qubits: int = 6,
+                 use_skip: bool = False,
+                ):
+        super().__init__()
+        self.n_qubits = n_qubits
+        self.use_skip = use_skip
+
+        self.fc1 = nn.Linear(in_features, 4 * n_qubits)
+        self.bn1 = nn.BatchNorm1d(4 * n_qubits)
+        self.fc2 = nn.Linear(4 * n_qubits, n_qubits)
+
+        # Learned projection replacing the fixed quantum kernel
+        q_features = 3 * n_qubits
+        self.classical_proj = nn.Sequential(
+            nn.Linear(n_qubits, q_features),
+            nn.Tanh(),
+        )
+
+        combined_dim = q_features + n_qubits if use_skip else q_features
+        self.head = nn.Sequential(
+            nn.Linear(combined_dim, 64),
+            nn.BatchNorm1d(64),
+            nn.ReLU(),
+            nn.Dropout(0.2),
+            nn.Linear(64, 32),
+            nn.ReLU(),
+            nn.Linear(32, out_features),
+        )
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        x     = torch.relu(self.bn1(self.fc1(x)))
+        x_enc = torch.tanh(self.fc2(x)) * math.pi
+        proj  = self.classical_proj(x_enc)
+        combined = torch.cat([proj, x_enc], dim=1) if self.use_skip else proj
         return self.head(combined)
 
 

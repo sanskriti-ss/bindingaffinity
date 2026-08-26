@@ -65,7 +65,7 @@ from testing_random_unitaries import (
 )
 
 # ── Default config (all overridable via CLI) ─────────────────────────────────
-_GATE_COUNTS = [30, 100, 300, 1000]
+_GATE_COUNTS = [3, 10, 30, 100]
 _SHOT_SEEDS  = [0, 1, 2]       # 3 independent trials per gate count
 _N_CIRCUITS  = 100              # random circuit pool per trial
 _TOP_K       = 25               # kept after RFD filter
@@ -360,6 +360,89 @@ def plot_results(df, output_dir, gate_counts, shot_seeds, n_circuits, top_k):
     ax.axhline(0, color='red', lw=1, linestyle=':')
     plt.tight_layout()
     out = os.path.join(output_dir, 'r2_by_seed_grouped.png')
+    plt.savefig(out, dpi=200, bbox_inches='tight')
+    plt.close()
+    print(f"  Saved -> {out}")
+
+    # ── 5. Average quantum gain (R² delta) vs gate count ─────────────────
+    gain_by_gate = [df[df['gate_count'] == g]['r2_gain'].values for g in gate_counts]
+    gain_means   = np.array([v.mean() for v in gain_by_gate])
+    gain_stds    = np.array([v.std()  for v in gain_by_gate])
+
+    fig, ax = plt.subplots(figsize=(8, 5))
+    bar_colors = ['seagreen' if m > 0 else 'tomato' for m in gain_means]
+    ax.bar(x_pos, gain_means, color=bar_colors, alpha=0.78,
+           edgecolor='k', linewidth=0.6)
+    ax.errorbar(x_pos, gain_means, yerr=gain_stds, fmt='none',
+                color='black', capsize=5, capthick=1.5, elinewidth=1.5)
+    ax.axhline(0, color='black', lw=1.2)
+    for xi, m, s in zip(x_pos, gain_means, gain_stds):
+        ax.text(xi, m + s * 1.15 + max(abs(gain_means)) * 0.02,
+                f'{m:+.4f}', ha='center', va='bottom', fontsize=9)
+    ax.set_xticks(x_pos)
+    ax.set_xticklabels([f'{g}\ngates' for g in gate_counts], fontsize=11)
+    ax.set_ylabel('Mean R² gain  (quantum+classical − classical)', fontsize=11)
+    ax.set_title(
+        'Average Quantum Effect on R² vs Gate Count\n'
+        f'(pool={n_circuits} circuits/seed, top-{top_k} by RFD, '
+        f'{len(shot_seeds)} seeds)',
+        fontsize=12, fontweight='bold'
+    )
+    ax.grid(True, axis='y', alpha=0.3)
+    plt.tight_layout()
+    out = os.path.join(output_dir, 'gain_avg.png')
+    plt.savefig(out, dpi=200, bbox_inches='tight')
+    plt.close()
+    print(f"  Saved -> {out}")
+
+    # ── 6. IQR (Q1–Q3) of R² gain vs gate count ──────────────────────────
+    gain_q25  = np.array([np.percentile(v, 25) for v in gain_by_gate])
+    gain_med  = np.array([np.median(v)          for v in gain_by_gate])
+    gain_q75  = np.array([np.percentile(v, 75)  for v in gain_by_gate])
+    gain_min  = np.array([v.min()               for v in gain_by_gate])
+    gain_max  = np.array([v.max()               for v in gain_by_gate])
+
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+    # Left: filled IQR band over gate count
+    ax = axes[0]
+    ax.fill_between(x_pos, gain_q25, gain_q75,
+                    alpha=0.35, color='steelblue', label='IQR (Q1–Q3)')
+    ax.fill_between(x_pos, gain_min, gain_max,
+                    alpha=0.12, color='steelblue', label='Full range')
+    ax.plot(x_pos, gain_med,   'o-',  color='steelblue',  lw=2.2, ms=8, label='Median')
+    ax.plot(x_pos, gain_means, 's--', color='darkorange', lw=1.8, ms=8, label='Mean')
+    ax.axhline(0, color='black', lw=1.2, linestyle=':')
+    ax.set_xticks(x_pos)
+    ax.set_xticklabels([f'{g}\ngates' for g in gate_counts], fontsize=11)
+    ax.set_ylabel('R² gain  (quantum − classical)', fontsize=11)
+    ax.set_title('IQR of Quantum Gain vs Gate Count\n(shaded = middle 50% of circuits)',
+                 fontsize=12, fontweight='bold')
+    ax.legend(fontsize=10)
+    ax.grid(True, alpha=0.3)
+
+    # Right: IQR width (Q3−Q1) — pure spread measure
+    iqr_width = gain_q75 - gain_q25
+    ax = axes[1]
+    ax.bar(x_pos, iqr_width, color=colors, alpha=0.78,
+           edgecolor='k', linewidth=0.6)
+    for xi, w in zip(x_pos, iqr_width):
+        ax.text(xi, w + max(iqr_width) * 0.02, f'{w:.4f}',
+                ha='center', va='bottom', fontsize=9)
+    ax.set_xticks(x_pos)
+    ax.set_xticklabels([f'{g}\ngates' for g in gate_counts], fontsize=11)
+    ax.set_ylabel('IQR width  (Q3 − Q1)', fontsize=11)
+    ax.set_title('Gain Spread (IQR) vs Gate Count\n(smaller = more consistent circuits)',
+                 fontsize=12, fontweight='bold')
+    ax.grid(True, axis='y', alpha=0.3)
+
+    fig.suptitle(
+        f'How the middle 50% of circuits behave — gain IQR by gate count\n'
+        f'(pool={n_circuits}/seed, top-{top_k} by RFD, {len(shot_seeds)} seeds)',
+        fontsize=11, fontweight='bold', y=1.02,
+    )
+    plt.tight_layout()
+    out = os.path.join(output_dir, 'gain_quartiles.png')
     plt.savefig(out, dpi=200, bbox_inches='tight')
     plt.close()
     print(f"  Saved -> {out}")
