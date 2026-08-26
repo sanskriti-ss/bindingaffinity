@@ -562,20 +562,30 @@ def _load_preprocessed_data_old(n_pca_components=64):
 # ===========================================================================
 # 2a. Expressibility pre-selection  (Sim et al., PRL 2019)
 # ===========================================================================
-def reservoir_feature_diversity(qc, n_qubits, n_samples=120):
+def reservoir_feature_diversity(qc, n_qubits, n_samples=120,
+                                real_inputs: np.ndarray = None):
     """
     Reservoir Feature Diversity (RFD): effective rank of the feature matrix
-    F[sample, observable] computed over random angle-encoded inputs.
+    F[sample, observable] computed over angle-encoded inputs.
 
     Deep G3 circuits (depth>=6) are approximate unitary 3-designs, so they
     ALL converge to near-Haar fidelity variance ≈ 1/(d*(d+1)).  That metric
     cannot distinguish them.  RFD instead asks: do the 3*n_qubits Pauli
     expectation values (X,Y,Z on each qubit) span enough distinct directions
-    to support accurate linear regression?  Higher effective rank --> the
-    circuit's outputs are more linearly independent --> better reservoir.
+    to support accurate linear regression?  Higher effective rank → the
+    circuit's outputs are more linearly independent → better reservoir.
 
     Metric: participation ratio  PR = (Σ sᵢ)² / Σ sᵢ²  where sᵢ are the
     singular values of the standardised feature matrix.  Range [1, 3*n_qubits].
+
+    Args:
+        real_inputs: Optional (M, n_qubits) array of actual encoder outputs
+            (tanh(fc2(x)) * π) sampled from the training data.  When provided,
+            RFD is evaluated on the TRUE input distribution the compressor
+            produces rather than uniform [0, π], which removes a distribution
+            mismatch that can cause incorrect circuit rankings.
+            Pass None to fall back to the original uniform sampling (used when
+            no data is available at circuit-selection time).
     """
     dev = qml.device('lightning.qubit', wires=n_qubits)
 
@@ -598,10 +608,19 @@ def reservoir_feature_diversity(qc, n_qubits, n_samples=120):
             [qml.expval(qml.PauliZ(i)) for i in range(n_qubits)]
         )
 
-    rng = np.random.default_rng(0)
+    if real_inputs is not None and len(real_inputs) >= n_samples:
+        # Sample from the real encoder output distribution
+        rng = np.random.default_rng(0)
+        idxs = rng.choice(len(real_inputs), size=n_samples, replace=False)
+        input_batch = real_inputs[idxs].astype(np.float64)
+    else:
+        # Fallback: uniform [0, π] — same as original, but note this does NOT
+        # match the tanh-compressed encoder outputs which cluster near ±π.
+        rng = np.random.default_rng(0)
+        input_batch = rng.uniform(0, np.pi, (n_samples, n_qubits))
+
     rows = []
-    for _ in range(n_samples):
-        x   = rng.uniform(0, np.pi, n_qubits)
+    for x in input_batch:
         out = feature_circuit(x)
         rows.append(np.array([float(v) for v in out]))
 
@@ -613,15 +632,26 @@ def reservoir_feature_diversity(qc, n_qubits, n_samples=120):
     return float(pr)                           # higher = more diverse outputs
 
 
-def preselect_circuits_by_expressibility(circuits, n_qubits, top_k, return_all_scores=False):
+def preselect_circuits_by_expressibility(circuits, n_qubits, top_k,
+                                          real_inputs: np.ndarray = None,
+                                          return_all_scores=False):
     """
     Pre-select circuits by Reservoir Feature Diversity (replaces fidelity
     variance which is degenerate for deep G3 circuits).
+
+    Args:
+        real_inputs: Optional (M, n_qubits) array of actual compressor outputs
+            (tanh(fc2(features)) * π) from a representative data sample.
+            Pass this to make RFD circuit rankings valid for the actual input
+            distribution.  Falls back to uniform sampling when None.
     """
-    print(f"\nComputing Reservoir Feature Diversity for {len(circuits)} circuits ...")
+    dist_note = "real encoder distribution" if real_inputs is not None \
+                else "uniform [0,π] (fallback — consider passing real_inputs)"
+    print(f"\nComputing Reservoir Feature Diversity for {len(circuits)} circuits "
+          f"[input dist: {dist_note}] ...")
     scores = []
     for i, qc in enumerate(tqdm(circuits, desc='RFD', ascii=True)):
-        score = reservoir_feature_diversity(qc, n_qubits)
+        score = reservoir_feature_diversity(qc, n_qubits, real_inputs=real_inputs)
         scores.append((score, i, qc))
         print(f"  Circuit {i:3d}: RFD = {score:.4f}")
     scores.sort(key=lambda t: t[0], reverse=True)

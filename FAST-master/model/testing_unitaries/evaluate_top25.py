@@ -62,10 +62,13 @@ EPOCHS     = 50
 BATCH_SIZE = 64
 LR         = 3e-4
 TOP_K      = 25           # Train on top-25 by RFD
-NUM_CIRCS  = 100          # Generate 100 circuits for quartile analysis (each circuit is ~1-2 min to train on 2000 samples for 50 epochs, so 25 circuits is ~30-60 min total)
+NUM_CIRCS  = 100          # Generate 100 circuits for quartile analysis
 DEVICE         = torch.device('cpu')   # PennyLane simulators are CPU-only
 N_WORKERS      = min(4, (os.cpu_count() or 1))   # parallel workers (set to 1 to disable)
 EARLY_STOP_PAT = 15                               # patience epochs before early stop
+# Set False to force head to use ONLY quantum features (no classical shortcut).
+# True = original behaviour; False = honest quantum evaluation.
+USE_SKIP   = False
 
 _qf_dir    = QF_DIR
 _dcnn_npz  = os.path.join(_qf_dir, 'refined_3dcnn_features.npz')
@@ -126,11 +129,11 @@ def _get_predictions(model, loader, device=DEVICE):
 def _train_circuit_worker(args):
     """Module-level worker for ProcessPoolExecutor: trains one circuit end-to-end.
 
-    args = (rank, circ_idx, circ_bytes, datasets_payload, dims)
+    args = (rank, circ_idx, circ_bytes, datasets_payload, dims, use_skip)
     datasets_payload = {'train': {'sg':..., 'c3':..., 'y':...}, 'val':..., 'test':...}
     Returns dict with all metrics + raw preds/labs arrays.
     """
-    rank, circ_idx, circ_bytes, datasets, dims = args
+    rank, circ_idx, circ_bytes, datasets, dims, use_skip = args
     circuit = _pickle.loads(circ_bytes)
 
     from torch.utils.data import DataLoader as _DL
@@ -144,6 +147,7 @@ def _train_circuit_worker(args):
         in_features=dims, out_features=1,
         qiskit_circuit=circuit, n_qubits=N_QUBITS,
         backend='lightning.qubit',
+        use_skip=use_skip,
     ).to(DEVICE)
 
     _, best_state = _train_one(model, lok, early_stop_patience=EARLY_STOP_PAT)
@@ -158,7 +162,11 @@ def _train_circuit_worker(args):
     r2    = r2_score(labs, preds)
     pear  = pearsonr(labs, preds)[0]
     spear = spearmanr(labs, preds)[0]
-    adj_r2 = 1 - (1 - r2) * (len(labs) - 1) / (len(labs) - dims - 1)
+    # Adjusted R²: use the number of QUANTUM output features (not raw input dim)
+    # as the "number of predictors" — the head sees q_features (+n_qubits if skip).
+    n_predictors = (3 * N_QUBITS) + (N_QUBITS if use_skip else 0)
+    n_test = len(labs)
+    adj_r2 = 1 - (1 - r2) * (n_test - 1) / max(n_test - n_predictors - 1, 1)
 
     return {
         'rank': rank, 'circ_idx': circ_idx,
@@ -179,24 +187,44 @@ def main():
     )
 
     n_samples = len(labels)
-    n_train   = int(0.70 * n_samples)
-    n_val     = int(0.15 * n_samples)
 
-    train_idx = np.arange(0, n_train)
-    val_idx   = np.arange(n_train, n_train + n_val)
-    test_idx  = np.arange(n_train + n_val, n_samples)
+    # Stratified shuffle split — prevents alphabetical-PDB-ID ordering bias.
+    # The sequential np.arange split always puts '1xxx' IDs in train and '4xxx'
+    # IDs in test, creating a systematic confound unrelated to binding affinity.
+    from sklearn.model_selection import train_test_split as _tts
+    from sklearn.preprocessing import StandardScaler as _SS
 
+    all_idx  = np.arange(n_samples)
+    n_bins   = min(10, max(2, int(np.sqrt(n_samples))))
+    bins     = pd.qcut(labels, q=n_bins, labels=False, duplicates='drop')
+
+    train_idx, tmp_idx = _tts(all_idx, test_size=0.30, random_state=42,
+                               shuffle=True, stratify=bins)
+    bins_tmp = bins[tmp_idx]
+    val_idx, test_idx  = _tts(tmp_idx, test_size=0.50, random_state=42,
+                               shuffle=True, stratify=bins_tmp)
+
+    # Normalise labels using train-set statistics only (no val/test leakage)
     label_mean = float(labels[train_idx].mean())
     label_std  = float(labels[train_idx].std()) + 1e-8
-    print(f"Label stats — mean={label_mean:.3f}  std={label_std:.3f}")
+    print(f"Label stats (train) — mean={label_mean:.3f}  std={label_std:.3f}")
 
     def _norm(y): return (y - label_mean) / label_std
+
+    # Re-scale the combined features using train indices only.
+    # load_with_model_features() currently fits its internal scalers on the
+    # first ~80% of sorted PDB IDs, which does not match this split.
+    # We post-hoc re-scale the whole feature matrix here to be safe.
+    combined_all = np.hstack([sgcnn_features, cnn3d_features])  # (N, D)
+    feat_scaler  = _SS().fit(combined_all[train_idx])
+    combined_all = feat_scaler.transform(combined_all).astype(np.float32)
+    empty        = np.zeros((n_samples, 0), dtype=np.float32)
 
     datasets = {}
     for split, idx in [('train', train_idx), ('val', val_idx), ('test', test_idx)]:
         datasets[split] = {
-            'sg': sgcnn_features[idx],
-            'c3': cnn3d_features[idx],
+            'sg': combined_all[idx],
+            'c3': empty[idx],
             'y':  _norm(labels[idx]),
         }
 
@@ -206,13 +234,36 @@ def main():
                            datasets[split]['y'])
         loaders[split] = DataLoader(ds, batch_size=BATCH_SIZE, shuffle=(split == 'train'))
 
-    dims = datasets['train']['sg'].shape[1] + datasets['train']['c3'].shape[1]
+    dims = datasets['train']['sg'].shape[1]
     print(f"Input dim: {dims}   Train/Val/Test: {len(train_idx)}/{len(val_idx)}/{len(test_idx)}")
 
     # ── 2. Generate & rank circuits ──────────────────────────────────────────
+    # Compute real encoder inputs from a train-data sample so that RFD is
+    # evaluated on the actual distribution the compressor will produce,
+    # not on uniform [0, π] which is a different distribution entirely.
+    print("Computing real encoder input distribution for RFD …")
+    _rfd_sample = datasets['train']['sg'][:min(300, len(train_idx))]
+    _rfd_t      = torch.tensor(_rfd_sample, dtype=torch.float32)
+    with torch.no_grad():
+        # Mirror the compressor: fc1 → bn1 → relu → fc2 → tanh * π
+        # We don't have a trained model yet, so use a randomly-initialised
+        # compressor to get a representative shape. The distribution of
+        # tanh(random_linear(data)) * π captures the data-dependent
+        # spread far better than uniform [0, π].
+        import torch.nn as _nn
+        _tmp_fc1 = _nn.Linear(dims, 4 * N_QUBITS)
+        _tmp_bn1 = _nn.BatchNorm1d(4 * N_QUBITS)
+        _tmp_fc2 = _nn.Linear(4 * N_QUBITS, N_QUBITS)
+        _tmp_bn1.eval()
+        _enc = torch.tanh(_tmp_fc2(torch.relu(
+            _tmp_bn1(_tmp_fc1(_rfd_t))))) * math.pi
+    real_rfd_inputs = _enc.numpy()  # (n_sample, N_QUBITS)
+    del _tmp_fc1, _tmp_bn1, _tmp_fc2, _enc, _rfd_t
+
     print(f"\nGenerating {NUM_CIRCS} G3 circuits ({NUM_GATES} gates each) and selecting top {TOP_K} by RFD …")
     circuits = generate_g3_random_circuits(N_QUBITS, num_gates=NUM_GATES, num_circuits=NUM_CIRCS)
-    indexed  = preselect_circuits_by_expressibility(circuits, N_QUBITS, top_k=TOP_K)
+    indexed  = preselect_circuits_by_expressibility(
+        circuits, N_QUBITS, top_k=TOP_K, real_inputs=real_rfd_inputs)
     print(f"Top-{TOP_K} circuit indices (by RFD): {[i for i,_ in indexed]}")
 
     # ── 3. Train each circuit (parallel) ────────────────────────────────────
@@ -227,7 +278,7 @@ def main():
         for split in ['train', 'val', 'test']
     }
     worker_args = [
-        (rank, circ_idx, _pickle.dumps(circuit), datasets_payload, dims)
+        (rank, circ_idx, _pickle.dumps(circuit), datasets_payload, dims, USE_SKIP)
         for rank, (circ_idx, circuit) in enumerate(indexed, 1)
     ]
 
