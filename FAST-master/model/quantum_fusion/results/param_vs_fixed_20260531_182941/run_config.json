@@ -1,0 +1,21 @@
+{
+  "timestamp": "20260531_182941",
+  "gate_counts": [
+    3,
+    10,
+    30
+  ],
+  "modes": [
+    "fixed_e2e",
+    "param_vqc"
+  ],
+  "replicas": 30,
+  "n_qubits": 6,
+  "epochs": 15,
+  "batch_size": 64,
+  "lr": 0.0003,
+  "data_source": "hdf_embed_split",
+  "n_train": 3615,
+  "n_val": 904,
+  "n_holdout": 797
+}
