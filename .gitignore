@@ -23,6 +23,5 @@ data
 ChimeraX-1.9.exe
 *.hdf
 
-
 h5py
 .venv/
