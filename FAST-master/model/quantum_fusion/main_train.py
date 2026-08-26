@@ -510,8 +510,8 @@ class ModelHybridFC_VQC(nn.Module):
         q_outputs = []
         for i in range(batch_size):
             q_out = self.variational_circuit(
-                x[i], 
-                self.quantum_params, 
+                x[i].double(),  # PennyLane expects double
+                self.quantum_params.double(), 
                 self.gate_structure, 
                 self.n_qubits
             )
