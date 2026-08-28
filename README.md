@@ -31,6 +31,9 @@ A research framework for protein-ligand binding affinity prediction (PDBbind ref
 
 ### Ablation Study (MLP readout, 50 epochs, stratified 70/15/15 split)
 
+## The ablation study uses a stratified 70/15/15 training/validation/test split with random seed 42. The quantum-kernel study uses a stratified 80/20 training/test split with random seed 42. Experiment-specific preprocessing and model-selection procedures are implemented in the corresponding scripts.
+
+
 | Condition | R² | Pearson r | RMSE (pKi) | Notes |
 |-----------|------|-----------|------------|-------|
 | **A — Classical MLP (no quantum)** | 0.7775 | 0.8893 | 0.881 | Baseline |
