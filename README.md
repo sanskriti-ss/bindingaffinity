@@ -218,6 +218,14 @@ Uses PDBbind 2020 refined set (5316 complexes; 836 have complete featurization):
 2. Download "Protein-ligand complexes: The refined set" (~658 MB)
 3. Place at `data/refined-set/`
 
+**License / terms of use:** PDBbind is made available for **academic research purposes**
+under the PDBbind-Plus terms of use. Access requires free registration at
+[pdbbind-plus.org.cn](https://www.pdbbind-plus.org.cn/); the raw dataset is not
+redistributable and is therefore not included in this repository — only the download
+instructions above and the precomputed feature embeddings we derived from it
+(`refined_3dcnn_features.npz`, `refined_sgcnn_features.npz`) are provided. Users must
+agree to PDBbind's own license terms when downloading the data directly from the source.
+
 ---
 
 ## References
@@ -235,6 +243,24 @@ Uses PDBbind 2020 refined set (5316 complexes; 836 have complete featurization):
 - RDKit, PennyLane, PyTorch, Qiskit communities
 - PDBbind team for structural biology data
 - ChimeraX development team
+
+## Licenses & Attribution
+
+This repository (code authored by us) is released under the **MIT License** (see `LICENSE`).
+
+Key third-party assets used in this work:
+
+| Asset | License | Source |
+|-------|---------|--------|
+| 3D-CNN / SG-CNN fusion architecture (Jones et al., 2021) | MIT | `FAST-master/LICENSE` |
+| Ingenii Quantum Hybrid Networks (quantum layer) | MPL 2.0 | [github.com/ingenii-solutions/ingenii-quantum-hybrid-networks](https://github.com/ingenii-solutions/ingenii-quantum-hybrid-networks) |
+| Qiskit, PennyLane | Apache 2.0 | respective PyPI packages |
+| PyTorch, torchvision, torchaudio, torch-geometric, scikit-learn, RDKit | BSD-3-Clause | respective PyPI packages |
+| PDBbind 2020 refined set (dataset) | Academic-use only, not redistributable | [pdbbind-plus.org.cn](https://www.pdbbind-plus.org.cn/) |
+
+No modified copies of third-party library source code are redistributed in this repository;
+libraries are used only as installed dependencies. The original `FAST-master/LICENSE` and
+`FAST-master/LICENSE-CC-BY` files are preserved unmodified alongside the code they cover.
 
 ## Contributing & Contact
 
