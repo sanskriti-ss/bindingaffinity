@@ -18,7 +18,16 @@ dependencies:
   - qiskit>=0.39.0,<1.0.0
   - qiskit-machine-learning>=0.5.0,<1.0.0
   - tensorflow>=2.8.0,<2.16.0
+  - tqdm>=4.65.0
   - pip
   - pip:
     - tensorflow>=2.8.0,<2.16.0
     - deepchem>=2.7.0
+    # Quantum ML (quantum_fusion experiments)
+    - pennylane>=0.35.0
+    - ingenii-quantum>=0.1.1
+    # Deep learning (3D-CNN / SG-CNN / quantum_fusion models)
+    - torch>=2.0.0
+    - torchvision>=0.15.0
+    - torchaudio>=2.0.0
+    - torch-geometric>=2.3.0

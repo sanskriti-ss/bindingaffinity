@@ -186,11 +186,29 @@ train-only StandardScaler to prevent data leakage.
 
 ### Installation
 
+**Option A — conda (recommended, matches the environment used to produce the paper's results):**
+
+```bash
+git clone https://github.com/sanskriti-ss/bindingaffinity.git
+cd bindingaffinity
+conda env create -f environment.yml
+conda activate acnn_env
+```
+
+**Option B — pip only:**
+
 ```bash
 git clone https://github.com/sanskriti-ss/bindingaffinity.git
 cd bindingaffinity
 pip install -r requirements.txt
 ```
+
+`requirements.txt` is fully pinned to the versions used to generate the results in this
+repository (PyTorch 2.10, PennyLane 0.44, Qiskit 2.3, Ingenii Quantum 0.1.1, etc.).
+`torch-geometric` wheels are platform/CUDA-specific — if the plain `pip install` fails for
+your platform, install PyTorch first, then follow the
+[PyTorch Geometric installation guide](https://pytorch-geometric.readthedocs.io/en/latest/install/installation.html)
+for a matching `torch-geometric` build before re-running `pip install -r requirements.txt`.
 
 ### Dataset
 

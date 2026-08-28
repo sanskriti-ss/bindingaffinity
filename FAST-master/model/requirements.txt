@@ -1,38 +1,27 @@
 # Core scientific computing
-numpy
-pandas
-matplotlib
+numpy==2.3.1
+pandas==2.3.1
+matplotlib==3.10.3
+scipy==1.16.0
+h5py==3.14.0
+tqdm==4.67.3
 
 # Deep learning framework
-torch
-torchvision
-torchaudio
-tqdm
+torch==2.10.0
+torchvision==0.25.0
+torchaudio==2.10.0
+torch-geometric==2.7.0
+
 # Chemistry and molecular data processing
-rdkit
+rdkit==2025.3.3
 
-# Utilities
-pathlib
+# Machine learning
+scikit-learn==1.7.0
 
-# Type hints (usually built-in but good to include)
-typing
-
-# Standard library modules (included for completeness, but not needed in requirements.txt)
-# These are built-in Python modules:
-# os
-# glob
-# math
-# time
-# itertools
+# Quantum computing / quantum machine learning
+qiskit==2.3.0
+pennylane==0.44.0
+ingenii-quantum==0.1.1
 
 # Note: google.colab is only available in Google Colab environment
 # If running locally, you would need to comment out or remove any google.colab imports
-
-#quantum
-qiskit
-pennylane
-scikit-learn
-ingenii-quantum
-
-#h5py
-h5py
